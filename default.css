@@ -1,0 +1,522 @@
+﻿* {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  color: #fafafa;
+  text-align: center;
+  vertical-align: middle;
+  font-family: 'Press Start';
+  z-index: 96;
+	image-rendering: optimizeSpeed;
+ 	image-rendering: -moz-crisp-edges;
+ 	image-rendering: -o-crisp-edges;
+ 	image-rendering: -webkit-optimize-contrast;
+ 	image-rendering: optimize-contrast;
+}
+/* body, body * {
+  /* Get that GPU in here! (actually hurts on my T420.. never mind)
+  transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+} */
+
+body {
+  /*visibility: hidden;*/
+	background: #8179ff;
+  overflow: hidden;
+  background-repeat: repeat-x;
+}
+body.Underworld, body.Castle, body.Night { background: black; }
+body.Underwater { background: #2038ec; }
+
+.hidden {
+  visibility: hidden;
+}
+
+
+
+/*
+ * Game objects
+ */ 
+.display {
+  position: absolute;
+  width: 100%;
+  font-size: 21px;
+}
+.indisplay {
+  margin: 7px 14px 0 14px;
+}
+.indisplay:first-of-type {
+  float: left;
+  left: 7%;
+}
+.indisplay:nth-of-type(2) {
+  position: absolute;
+  left: 24.5%;
+  text-align: center;
+}
+.indisplay:nth-of-type(3) {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}
+.indisplay:nth-last-of-type(2) {
+  position: absolute;
+  right: 24.5%;
+  text-align: center;
+}
+.indisplay:last-of-type {
+  float: right;
+  right: 7%;
+}
+
+.score {
+  position: absolute;
+  width: 35px;
+  height: 14px;
+  font-size: 21px;
+  z-index: 14;
+ }
+.quad {
+  position: absolute;
+  background: rgba(35,210,35,.49);
+}
+.quad:nth-of-type(4n) {
+  background: rgba(35,35,210,.49);
+}
+.quad:nth-of-type(4n+1) {
+  background: rgba(210,35,35,.49);
+}
+.quad:nth-of-type(4n+2) {
+  background: rgba(210,210,35,.49);
+}
+
+.character { z-index: 3; }
+.character.enemy { z-index: 7; }
+.solid { z-index: 4; }
+.character, .solid {
+  position: absolute;
+}
+.character, .scenery {
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.flipped {
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+  filter: FlipH;
+  -ms-filter: "FlipH";
+}
+.flipped-vert {
+  -moz-transform: scaleY(-1);
+  -o-transform: scaleY(-1);
+  -webkit-transform: scaleY(-1);
+  transform: scaleY(-1);
+  filter: FlipV;
+  -ms-filter: "FlipV";
+  z-index: 13;
+}
+
+/*
+ * Characters
+ */
+
+.mario {
+  background-image: url('Sprites/Mario.gif');
+  background-position: bottom;
+  z-index: 14;
+}
+.mario.running { background-image: url('Sprites/Mario-Running.gif'); }
+.mario.jumping { background-image: url('Sprites/Mario-Jump.gif'); }
+.mario.skidding { background-image: url('Sprites/Mario-Skidding.gif'); }
+* .mario.climbing { background-image: url('Sprites/Mario-Climbing.gif'); }
+.mario.large { background-image: url('Sprites/Mario-Large.gif'); }
+.mario.large.running { background-image: url('Sprites/Mario-Large-Running.gif'); }
+.mario.large.jumping { background-image: url('Sprites/Mario-Large-Jumping.gif'); }
+.mario.large.skidding { background-image: url('Sprites/Mario-Large-Skidding.gif'); }
+* .mario.large.crouching { background-image: url('Sprites/Mario-Large-Crouching.gif'); }
+* .mario.large.climbing { background-image: url('Sprites/Mario-Large-Climbing.gif'); }
+* .mario.intofiery { background-image: url('Sprites/Mario-IntoFiery.gif'); }
+.mario.fiery { background-image: url('Sprites/Mario-Fiery.gif'); }
+.mario.fiery.running { background-image: url('Sprites/Mario-Fiery-Running.gif'); }
+.mario.fiery.jumping { background-image: url('Sprites/Mario-Fiery-Jumping.gif'); }
+.mario.fiery.skidding { background-image: url('Sprites/Mario-Fiery-Skidding.gif'); }
+.mario.large.fiery.crouching { background-image: url('Sprites/Mario-Fiery-Crouching.gif'); }
+
+.Underwater .mario.jumping { background-image: url('Sprites/Mario-Jump-Water.gif'); }
+
+.mario.shrooming1 { background-image: url('Sprites/Mario-Shrooming1.gif'); }
+.mario.shrooming2 { background-image: url('Sprites/Mario-Shrooming2.gif'); }
+.mario.shrooming3 { background-image: url('Sprites/Mario-Shrooming3.gif'); }
+
+.mario.star { background-image: url('Sprites/MarioStarStill.gif'); }
+.mario.star.jumping { background-image: url('Sprites/Mario-Star-Jump.gif'); }
+.mario.large.star { background-image: url('Sprites/Mario-Large-Star.gif'); } /* fire :( */
+
+.mario.dead { background-Image: url('Sprites/Mario-Dead.gif'); }
+
+.mushroom { background-image: url('Sprites/Mushroom.gif'); }
+.mushroom.gainlife { background-image: url('Sprites/Mushroom-1Up.gif'); }
+
+.fireflower { background-image: url('Sprites/FireFlower.gif'); }
+
+.fireball, .castle.fireball {
+  background-image: url('Sprites/FireBall.gif');
+  background-size: contain;
+}
+.fireball.exploding { background-image: url('Sprites/FireBall-Exploding.gif'); }
+
+.star { background-image: url('Sprites/Star.gif'); }
+
+.shell { background-image: url('Sprites/Shell.gif'); }
+.shell.peeking { background-image: url('Sprites/Koopa-Peeking.gif'); }
+.shell.smart { background-image: url('Sprites/Shell-Red.gif'); }
+.shell.smart.peeking { background-image: url('Sprites/Koopa-Peeking.gif'); }
+.Underworld .shell { background-image: url('Sprites/Shell-Under.gif'); }
+.Underworld .shell.smart { background-image: url('Sprites/Shell-Under.gif'); }
+.Underworld .shell.peeking { background-image: url('Sprites/Koopa-Peeking.gif'); }
+.Underworld .shell.smart.peeking { background-image: url('Sprites/Koopa-Peeking.gif'); }
+
+.coin {
+  background-image: url('Sprites/Coin.gif');
+  background-size: contain;
+  z-index: 3;
+}
+.Underworld .coin{ background-image: url('Sprites/Coin-Under.gif'); }
+.coin.anim1 { background-image: url('Sprites/Coin-Animate-1.gif'); }
+.coin.anim2 { background-image: url('Sprites/Coin-Animate-2.gif'); }
+.coin.anim3 { background-image: url('Sprites/Coin-Animate-3.gif'); }
+.coin.anim4 { background-image: url('Sprites/Coin-Animate-4.gif'); }
+
+.goomba { background-image: url('Sprites/Goomba.gif'); }
+.Underworld .goomba { background-image: url('Sprites/Goomba-Under.gif'); }
+.deadGoomba { 
+  background-image: url('Sprites/Goomba-Dead.gif');
+  background-size: contain;
+}
+.Underworld .deadGoomba { background-image: url('Sprites/Goomba-Dead-Under.gif'); }
+
+.koopa { background-image: url('Sprites/Koopa.gif'); }
+.koopa.flying { background-image: url('Sprites/Koopa-Flying.gif'); }
+.koopa.smart { background-image: url('Sprites/Koopa-Red.gif'); }
+.koopa.smart.flying { background-image: url('Sprites/Koopa-Red-Flying.gif'); }
+.Underworld .koopa { background-image: url('Sprites/Koopa-Under.gif'); }
+
+.pirhana {
+  background-image: url('Sprites/Pirhana.gif');
+  background-size: cover;
+}
+.Underworld .pirhana { background-image: url('Sprites/Pirhana-Under.gif'); }
+
+.podoboo {
+  background-image: url('Sprites/Podoboo.gif');
+  z-index: 0;
+}
+
+.hammerbro {
+  background-image: url('Sprites/HammerBro.gif');
+  z-index: 7;
+}
+
+.hammer {
+  background-image: url('Sprites/Hammer.gif');
+  background-size: contain;
+  z-index: 7;
+}
+.Night .hammer { background-image: url('Sprites/Hammer-Night.gif'); }
+
+.cannon {
+  background-image: url('Sprites/Cannon.gif');
+  background-size: 100%;
+}
+.bulletbill { 
+  background-image: url('Sprites/BulletBill.gif');
+  background-size: contain;
+}
+
+.bowser { background-image: url('Sprites/Bowser.gif'); }
+.bowser.owned { background-image: url('Sprites/Bowser-Owned.gif'); }
+.bowserfire {
+  background-image: url('Sprites/BowserFire.gif');
+  z-index: 9;
+}
+
+.blooper {
+  background-image: url('Sprites/Blooper.gif');
+  z-index: 12;
+}
+.blooper.squeeze { background-image: url('Sprites/Blooper-Squeezing.gif'); }
+
+.cheepcheep {
+  background-image: url('Sprites/CheepCheep.gif');
+  z-index: 12;
+}
+.cheepcheep.red { background-image: url('Sprites/CheepCheep-Red.gif'); }
+
+.lakitu { background-image: url('Sprites/Lakitu.gif'); }
+
+.spiny { background-image: url('Sprites/Spiny.gif'); }
+.spinyegg { background-image: url('Sprites/SpinyEgg.gif'); }
+
+.beetle { background-image: url('Sprites/Beetle.gif'); }
+.shell.beetle { background-image: url('Sprites/ShellBeetle.gif'); }
+
+/*
+ * Solids
+ */
+ 
+.GenericStone {
+  background-size: 32px;
+}
+
+.floor {
+  background-image: url('Sprites/Floor.gif');
+  z-index: 11;
+}
+.Underworld .floor{ background-image: url('Sprites/Floor-Under.gif'); }
+.Underwater .floor { background-image: url('Sprites/Floor-Water.gif'); }
+.clouds {
+  background-image: url('Sprites/Cloud.gif');
+  background-size: contain;
+}
+.brick {
+  background-image: url('Sprites/Brick.gif');
+  background-size: contain;
+}
+.Underworld .brick { background-image: url('Sprites/Brick-Under.gif'); }
+.Castle .brick { background-image: url('Sprites/Brick-Castle.gif'); }
+.brickshard {
+  background-image: url('Sprites/Brick-Shard.gif');
+  background-size: contain;
+}
+.block {
+  background-image: url('Sprites/Block.gif');
+  background-size: contain;
+}
+.Underworld .block{ background-image: url('Sprites/Block-Under.gif'); }
+.block.used, .brick.used { background-image: url('Sprites/Block-Used.gif'); }
+.Underworld.block.used, .Underworld.brick.used {
+  background-image: url('Sprites/Block-Used-Under.gif');
+}
+.stone, .GenericStone {
+  background-image: url('Sprites/Stone.gif'); 
+  background-size: 32px;
+}
+.Underworld .stone{ background-image: url('Sprites/Stone-Under.gif'); }
+
+.Castle .GenericStone {
+  background-image: url('Sprites/CastleStone.gif');
+  background-size: 32px;
+}
+.castleblock {
+  background-image: url('Sprites/CastleBlock.gif');
+  background-size: 32px;
+}
+.castle.fireball {
+  z-index: 7;
+}
+
+.pipe {
+  background-image: url('Sprites/Pipe-Full.gif');
+  background-repeat: no-repeat;
+  background-size: 100%;
+  z-index: 3;
+}
+.pipe.side {
+  background-image: url('Sprites/Pipe-Side.gif');
+  background-position: left bottom;
+}
+.pipe.vertical {
+  background-image: url('Sprites/Pipe-Vertical.gif');
+  background-repeat: repeat-y;
+  z-index: 4;
+}
+.Night .pipe { background-image: url('Sprites/Pipe-Full-Night.gif'); }
+.Night .pipe.side { background-image: url('Sprites/Pipe-Side-Night.gif'); }
+.Night .pipe.vertical { background-image: url('Sprites/Pipe-Vertical-Night.gif'); }
+
+.Castle .platformgenerator {
+  background-image: url('Sprites/PlatformGenerator.gif');
+  background-repeat: repeat-y;
+  background-position: center top;
+  background-size: 4px;
+}
+.platform {
+  background-image: url('Sprites/Platform.gif');
+  background-repeat: repeat-x;
+  background-size: contain;
+}
+.platform.cloud {
+  background-image: url('Sprites/PlatformCloud.gif');
+}
+.scale {
+  background-image: url('Sprites/ScaleLeft.gif'), url('Sprites/ScaleRight.gif'), url('Sprites/Scale.gif');
+  background-repeat: no-repeat, no-repeat, repeat-x;
+  background-position: 0px 0px, right, 0px 0px;
+  background-size: contain;
+}
+.Night .scale {
+  background-image: url('Sprites/ScaleLeft-Night.gif'), url('Sprites/ScaleRight-Night.gif'), url('Sprites/Scale.gif');
+}
+.string {
+  background-image: url('Sprites/String.gif');
+}
+
+.treetop {
+  background-image: url('Sprites/TreeTop-Left.gif'), url('Sprites/TreeTop-Right.gif'), url('Sprites/TreeTop.gif');
+  background-repeat: no-repeat, no-repeat, repeat-x;
+  background-position: 0px 0px, right, 0px 0px;
+  background-size: contain;
+}
+.Night .treetop { background-image: url('Sprites/TreeTop-Left-Night.gif'), url('Sprites/TreeTop-Right-Night.gif'), url('Sprites/TreeTop.gif'); }
+
+.vine {
+  background-image: url('Sprites/VineTop.gif'), url('Sprites/Vine.gif');
+  background-repeat: no-repeat, repeat-y;
+  background-position: 0px 0px, 0px 32px;
+  background-size: 100%;
+  z-index: 3;
+}
+
+.springboard {
+  background-image: url('Sprites/Springboard-Bottom.gif');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: bottom;
+}
+.springboard.top { background-image: url('Sprites/Springboard-Top.gif'); }
+.springboard.mid {
+  background-image: url('Sprites/Springboard-Mid.gif');
+  background-size: cover;
+}
+
+.flag {
+  background-image: url('Sprites/Flag.gif'); 
+  background-size: 100%;
+}
+.flagpole {
+  background-image: url('Sprites/FlagPole.gif'); 
+  background-size: 100%;
+  z-index: 3;
+}
+.flagtop {
+  background-image: url('Sprites/FlagTop.gif');
+  background-size: contain;
+}
+.firework { background-size: contain; }
+.firework.n1 { background-image: url('Sprites/Firework-1.gif'); }
+.firework.n2 { background-image: url('Sprites/Firework-2.gif'); }
+.firework.n3 { background-image: url('Sprites/Firework-3.gif'); }
+.scenery.CastleWall {
+  background-image: url('Sprites/CastleWall.gif');
+  background-size: contain;
+  z-index: 2;
+}
+.CastleBridge {
+  background-image: url('Sprites/CastleBridge.gif');
+  background-size: contain;
+}
+.castlechain {
+  background-image: url('Sprites/CastleChain.gif');
+  background-size: contain;
+}
+.castleaxe {
+  background-image: url('Sprites/Axe.gif');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom left;
+}
+
+.water-block {
+  background: #5c94fc;
+}
+
+.Underwater .GenericStone {
+  background-image: url('Sprites/Floor-Water.gif');
+}
+.coral {
+  background-image: url('Sprites/Coral.gif');
+  background-size: contain;
+}
+
+.bridge-base {
+  background-image: url('Sprites/Bridge-Base.gif');
+  background-size: contain;
+}
+.Railing {
+  background-image: url('Sprites/Railing.gif');
+  background-size: contain;
+}
+.Night .Railing { background-image: url('Sprites/Railing-Night.gif'); }
+
+.npc {
+  background-repeat: no-repeat;
+  background-position: bottom right;
+}
+.toad {
+  background-image: url('Sprites/Toad.gif');
+  background-size: contain;
+}
+.peach {
+  background-image: url('Sprites/Peach.gif');
+  background-size: contain;
+}
+
+/*
+ * Scenery & etc
+ */
+
+.scenery {
+  background-size: contain;
+  background-repeat: repeat-x;
+  z-index: 1;
+ }
+.Bush1 { background-image: url('Sprites/Bush1.gif'); }
+.Bush2 { background-image: url('Sprites/Bush2.gif'); }
+.Bush3 { background-image: url('Sprites/Bush3.gif'); }
+.Cloud1 { background-image: url('Sprites/Cloud1.gif'); }
+.Cloud2 { background-image: url('Sprites/Cloud2.gif'); }
+.Cloud3 { background-image: url('Sprites/Cloud3.gif'); }
+.Fence { background-image: url('Sprites/Fence.gif'); }
+.HillSmall { background-image: url('Sprites/HillSmall.gif'); }
+.HillLarge { background-image: url('Sprites/HillLarge.gif'); }
+.PlantSmall { background-image: url('Sprites/PlantSmall.gif'); }
+.PlantLarge { background-image: url('Sprites/PlantLarge.gif'); }
+.TreeTrunk {
+  background-image: url('Sprites/TreeTrunk.gif');
+  background-repeat: repeat;
+  background-size: 32px;
+  z-index: 2;
+}
+.Castle {
+  background-image: url('Sprites/Castle.gif');
+  z-index: 2;
+}
+.Water {
+  background-image: url('Sprites/water.gif'), url('Sprites/water-back.gif');
+  background-size: 16px;
+  background-repeat: repeat-x, repeat;
+}
+.Night .Water { background-image: url('Sprites/water-night.gif'), url('Sprites/water-night-back.gif'); }
+.Castle .Water{ background-image: url('Sprites/water-red.gif'), url('Sprites/water-red-back.gif'); }
+
+.text {
+  text-align: left;
+  line-height: 210%;
+}
+
+@font-face {
+    font-family: 'Press Start';
+    src: url('/Fonts/Pressstart2p/PressStart2P.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.blue {
+  background-color: blue;
+}
