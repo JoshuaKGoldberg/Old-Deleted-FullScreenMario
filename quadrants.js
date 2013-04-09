@@ -26,7 +26,7 @@ function Quadrant(row, left) {
   this.right = this.left + quads.width;
   this.bottom = this.top + quads.height;
   
-  this.things = new JSList();
+  this.things = []
   this.numobjects = this.tolx = this.toly = 0;
 }
 
@@ -61,27 +61,41 @@ function addQuadCol(left) {
 
 function shiftQuadCol() {
   var old = [];
-  for(var i=0; i<quads.rows; ++i)
-    old.push(deleteQuad(quads.shift()));
+  if(!map.nodeletequads) {
+    for(var i=quads.rows-1; i>0; --i) {
+      old.push(deleteQuad(quads.shift()));
+    }
+  }
   quads.leftmost = quads[0];
   quads.rightdiff = quads.width;
 }
 
 function deleteQuad(quad) {
-  // if(quad.element) document.body.removeChild(quad.element);
+  if(quad.element) document.body.removeChild(quad.element);
+  return quad;
 }
 function updateQuads(xdiff) {
-  if(quads.leftmost.left > quads.delx) return false;
-  addQuadCol(quads.rightmost.right);
-  shiftQuadCol();
-  spawnMap();
+  if(quads.visible) shiftAll(quads, 0, 0, true);
   quads.rightdiff += xdiff;
-  return true;
+  if(quads.leftmost.left <= quads.delx) {
+    addQuadCol(quads.rightmost.right);
+    shiftQuadCol();
+    spawnMap();
+    if(quads.visible) {
+      hideQuads();
+      showQuads();
+    }
+  }
 }
 
 function showQuads() {
+  quads.visible = true;
+  var quad, style;
   for(var i=0; i<quads.length; ++i) {
-    var k = quads[i].element = document.createElement('div');
+    quad = quads[i];
+    if(quad.element) continue;
+    var k = quad.element = document.createElement('div');
+    quad.style = style = quad.element.style;
     k.className = "quad";
     k.style.marginLeft = quads[i].left + "px";
     k.style.marginTop = quads[i].top + "px";
@@ -90,10 +104,18 @@ function showQuads() {
     document.body.appendChild(k);
   }
 }
+function hideQuads() {
+  quads.visible = false;
+  for(var i=0; i<quads.length; ++i)
+    if(quads[i].element) {
+      body.removeChild(quads[i].element);
+      quads[i].element = quads[i].style = false;
+    }
+}
 
 function determineAllQuadrants() {
   for(var i=0; i<quads.length; ++i)
-    refreshQuadList(quads[i]);
+    quads[i].numthings = 0;
   
   for(var j=0; j<solids.length; ++j)
     if(solids[j].moved != false)
@@ -104,16 +126,9 @@ function determineAllQuadrants() {
 }
 
 function determineThingQuadrants(me) {
-  while(me.mynodes.next) {
-    me.mynodes = me.mynodes.next;
-    me.mynodes.nope = true;
-  }
-  me.mynodes = new JSList();
-  me.quads = new JSList();
-  
   me.numquads = 0;
-  for(var i=0; i<quads.length; ++i) {
-    if(objectsTouch(me, quads[i])) {
+  for(var i = 0, len = quads.length; i < len; ++i) {
+    if(objectInQuadrant(me, quads[i])) {
       setThingInQuadrant(me, quads[i]);
       if(me.numquads > me.maxquads) break;
     }
@@ -121,21 +136,8 @@ function determineThingQuadrants(me) {
 }
 
 function setThingInQuadrant(me, quad) {
-  me.quads.addNode(quad);
-  me.mynodes.addNode(quad.things.addNode(me));
+  me.quads[me.numquads] = quad;
+  quad.things[quad.numthings] = me;
   ++me.numquads;
-}
-
-function refreshQuadList(quad) {
-  var curnode = quad.things;
-  var i=0;
-  
-  while(curnode.next) {
-    if(curnode.next.nope) {
-      if(curnode.next.next) curnode.next = curnode.next.next;
-      else curnode.next = false;
-    } else curnode.next = false;
-  }
-  
-  quad.things.last = curnode;
+  ++quad.numthings;
 }

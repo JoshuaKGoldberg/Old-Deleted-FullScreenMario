@@ -1,3 +1,84 @@
+/* 
+ * General stuff
+ */
+max = Math.max;
+min = Math.min
+abs = Math.abs
+floor = Math.floor;
+ceil = Math.ceil;
+round = Math.round;
+
+function sign(a) { return a ? a < 0 ? -1 : 1 : 0; }
+
+function roundDigit(num, digit) { return round(num / digit) * digit; }
+
+function stringIncludes(haystack, needle) { return haystack.indexOf(needle) != -1; }
+
+function step() {
+  unpause();
+  upkeep();
+  pause();
+}
+
+function fastforward(num) {
+  pause();
+  function resume() {
+    for(i = speed = (num || 1) - 1; i > 0; --i)
+      step();
+    unpause();
+  }
+  
+  requestAnimationFrame(resume);
+}
+
+function specifyTimer(timerin) {
+  // Only use if you're not worried about losing the benefits of requestAnimationFrame
+  // Also, performance is a big concern with this. Works best with smaller windows
+  timer = timerin;
+  requestAnimationFrame = function(func) {
+    window.setTimeout(func, timer);
+  };
+}
+
+function changeUnitsize(num) {
+  if(!num) return;
+  resetUnitsize(num);
+  
+  function setter(arr) {
+    for(i in arr) {
+      updateSize(arr[i]);
+      updateLocation(arr[i]);
+    }
+  }
+  
+  setter(solids);
+  setter(characters);
+}
+
+// num = 1 by default
+// 1 = floor(0->2) = 50% chance
+// 2 = floor(0->3) = 67% chance
+// 3 = floor(0->4) = 75% chance
+function randTrue(num) {
+  return Math.floor(getSeed() * ((num || 1) + 1));
+  // return Math.floor(Math.random() * ((num || 1) + 1));
+}
+function randSign(num) {
+  return randTrue(num) * 2 - 1;
+}
+
+function prethingsorter(a,b) {
+  if(a.xloc == b.xloc) return b.yloc - a.yloc;
+  else return a.xloc - b.xloc;
+};
+
+function arrayof(contents, num) {
+  var arr = [];
+  for(var i=num; i>0; --i)
+    arr.push(contents);
+  return arr;
+}
+
 /*
  * Basic object positioning helper functions
  */
@@ -9,10 +90,13 @@ function updatePosition(me) {
   if(!me.nomove) shiftHoriz(me, me.xvel);
   if(!me.nofall) shiftVert(me, me.yvel);
 }
+// To do: measure whether rounding improves or hurts performance
 function updateDisplay(me) {
   if(!me.element) return;
-  me.style.marginTop = me.top + "px";
-  me.style.marginLeft = me.left + "px";
+  // me.style.marginTop = me.top + "px";
+  // me.style.marginLeft = me.left + "px";
+  me.style.marginTop = round(me.top) + "px";
+  me.style.marginLeft = round(me.left) + "px";
 }
 function updateAllDisplays() {
   for(i in solids) updateDisplay(solids[i]);
@@ -32,8 +116,8 @@ function reduceHeight(me, dy, see) {
   }
 }
 function shiftBoth(me, dx, dy, see) {
-  me.left += dx; me.right += dx;
-  me.top += dy; me.bottom += dy;
+  if(!me.noshiftx) shiftHoriz(me, dx);
+  if(!me.noshifty) shiftVert(me, dy);
   if(see) updateDisplay(me);
 }
 function shiftHoriz(me, dx, see) {
@@ -78,6 +162,17 @@ function setMidY(me, top, see) {
 function setMidXObj(me, object, see) {
   setLeft(me, (object.left + object.width * unitsized2) - (me.width * unitsized2), see);
 }
+function slideToXLoc(me, xloc, maxspeed, see) {
+  maxspeed = maxspeed || Infinity;
+  var midx = getMidX(me);
+  if(midx < xloc) {
+    // Me is the left
+    shiftHoriz(me, min(maxspeed, (xloc - midx)), see);
+  } else {
+    // Me is the right
+    shiftHoriz(me, max(maxspeed * -1, (xloc - midx)), see);
+  }
+}
 function updateLeft(me, dx, see) {
   me.left += dx;
   me.right = me.left + me.width * unitsize;
@@ -107,30 +202,30 @@ function determineThingCollisions(me) {
   else if(!me.resting || me.resting.yvel == 0) me.resting = false;
   
   // Cur is each quadrant this object is in, and other is each other object in them.
-  var cur = me.quads, other, contents;
+  var cur, other, contents;
   
   checkOverlap(me);
   
-  while(cur.next) {
-    cur = cur.next;
-    // cur.contents is now pointing to a quadrant
-    other = cur.contents.things;
-    while(other.next) {
-      other = other.next;
-      // other.contents is now pointing to a thing
+  // For each quadrant the thing is in:
+  for(var i = 0, len = me.numquads; i < len; ++i) {
+    cur = me.quads[i];
+    others = cur.things;
+    // For each other thin in that quadrant:
+    for(var j = 0, lenj = cur.numthings; j < lenj; ++j) {
+      other = others[j];
       // to do: get nocollide working on scenery for performance's sake
-      if(me == (contents = other.contents)) break; // breaking should prevent double collisions
-      if(!contents.alive || contents.scenery || contents.nocollide) continue; // not removed in upkeep
+      if(me == other) break; // breaking should prevent double collisions
+      if(!other.alive || other.scenery || other.nocollide) continue; // not removed in upkeep
       // The .hidden check is required. Try the beginning of 2-1 without it.
-      if(objectsTouch(me, contents) && (!contents.hidden || solidOnCharacter(contents, me))) {
-        // Collisions for non-solids are simple
-        if(contents.type != "solid")
-          objectsCollided(me, contents);
+      if(objectsTouch(me, other) && (!other.hidden || solidOnCharacter(other, me))) {
+        // Collisions for characters are simple
+        if(other.character)
+            objectsCollided(me, other);
         // Collisions for solids, slightly less so (overlaps)
         else if(!me.nocollidesolid) {
-          objectsCollided(me, contents);
-          if(characterOverlapsSolid(me, contents))
-            me.overlaps.push(contents);
+          objectsCollided(me, other);
+          if(characterOverlapsSolid(me, other))
+            me.overlaps.push(other);
         }
       }
     }
@@ -188,19 +283,26 @@ function objectsTouch(one, two) {
       return true;
   return false;
 }
+// No tolerance!
+function objectInQuadrant(one, quad) {
+  if(one.right + unitsize >= quad.left && one.left - unitsize <= quad.right)
+    if(one.bottom + unitsize >= quad.top && one.top - unitsize <= quad.bottom)
+      return true;
+  return false;
+}
 
 function objectsCollided(one, two) {
   // Assume that if there's a solid, it's two. (solids don't collide with each other)
-  if(one.type == "solid") return objectsCollided(two, one);
+  if(one.solid) return objectsCollided(two, one);
   
   if(two.up && one != two.up) return characterTouchesUp(one, two);
   
-  
-  if(two.type != "solid") {
-    if(one.type == "mario") two.collide(one, two);
+  if(!two.solid) {
+    if(one.mario) two.collide(one, two);
     else {
-      // if(two.group == "coin" && one.type == "koopa smart") alert("two/one\n" + one.collide);
-      one.collide(two, one);
+      // To do: this is inefficient, redo it.
+      if(!(one.nocollidechar || two.nocollidechar && !(one.firechar || two.firechar)) || one.mario || two.mario)
+        one.collide(two, one);
     }
   } else two.collide(one, two);
 }
@@ -210,14 +312,31 @@ function objectToLeft(one, two) {
   return (one.left + one.right) / 2 < (two.left + two.right) / 2;
 }
 /*
-  TO DO: Revamp these!!
+  TO DO: Revamp these
 */
 function objectOnTop(one, two) {
   if(one.type == "solid" && two.yvel > 0) return false;
   if(one.yvel < two.yvel && two.type != "solid") return false;
-  if(one.type == "mario" && one.bottom < two.bottom && two.group == "enemy") return true;
+  if(one.mario && one.bottom < two.bottom && two.group == "enemy") return true;
   return(  (one.left + unitsize < two.right && one.right - unitsize > two.left) && 
   (one.bottom - two.yvel <= two.top + two.toly || one.bottom <= two.top + two.toly + Math.abs(one.yvel - two.yvel)));
+}
+// Like objectOnTop, but more specifically used for characterOnSolid and characterOnRestig
+function objectOnSolid(one, two) {
+  return(
+    (
+      one.left + unitsize < two.right
+        &&
+      one.right - unitsize > two.left
+    )
+    && 
+    (
+      one.bottom - one.yvel <= two.top + two.toly
+      // one.bottom - two.yvel <= two.top + two.toly
+      || 
+      one.bottom <= two.top + two.toly + Math.abs(one.yvel - two.yvel)
+    )
+  );
 }
 function solidOnCharacter(solid, me) {
   me.midx = me.left + unitsized2 * me.width;
@@ -227,16 +346,15 @@ function solidOnCharacter(solid, me) {
 // This would make the smart koopas stay on the edges more intelligently
 // Can't use objectOnTop for this, else Mario will walk on walls.
 function characterOnSolid(me, solid) {
-  return (me.resting == solid || (objectOnTop(me, solid) && me.yvel >= 0 &&
-    me.left - me.xvel + unitsize != solid.right && me.right - me.xvel - unitsize != solid.left));
+  return (me.resting == solid || (objectOnSolid(me, solid) && me.yvel >= 0 &&
+    me.left + me.xvel + unitsize != solid.right && me.right - me.xvel - unitsize != solid.left));
+    // me.left - me.xvel + unitsize != solid.right && me.right + me.xvel - unitsize != solid.left));
+    // me.left - me.xvel + unitsize != solid.right && me.right - me.xvel - unitsize != solid.left));
 }
 function characterOnResting(me, solid) {
-  return objectOnTop(me, solid) &&
-    me.left - me.xvel + unitsize != solid.right && me.right - me.xvel - unitsize != solid.left;
-}
-function characterOnCharacter(one, two) {
-  return(  (one.left - unitsizet2 < two.right && one.right + unitsizet2 > two.left) && 
-  (one.bottom - two.yvel <= two.top + two.toly || one.bottom <= two.top + two.toly + Math.abs(one.yvel - two.yvel)));
+  return objectOnSolid(me, solid) &&
+    // me.left - me.xvel + unitsize != solid.right && me.right - me.xvel - unitsize != solid.left;
+    me.left + me.xvel + unitsize != solid.right && me.right - me.xvel - unitsize != solid.left;
 }
 
 // This whole thing is just horrible and terrible... but it works. Meh.
@@ -256,10 +374,9 @@ function characterTouchedSolid(me, solid) {
     else if(solid.hidden) return;
     if(!me.under) me.under = [solid];
     else me.under.push(solid);
-    setTop(me, solid.bottom - me.toly, true);
-    me.yvel = 0;
-    if(me.type == "mario") me.keys.jump = 0;
-    updateDisplay(me);
+    setTop(me, solid.bottom - me.toly + solid.yvel, true);
+    me.yvel = solid.yvel;
+    if(me.mario) me.keys.jump = 0;
   }
   
   if(solid.hidden) return;
@@ -269,28 +386,28 @@ function characterTouchedSolid(me, solid) {
   if(!objectOnTop(me, solid) && !objectOnTop(solid, me) && !me.under
    && !(solid.up && me == solid.up)) {
     if(me.right <= solid.right) { // To left of solid
-      me.xvel = Math.min(me.xvel, 0);
-      shiftHoriz(me, Math.max(solid.left + unitsize - me.right, unitsized2 * -1), true);
+      me.xvel = min(me.xvel, 0);
+      shiftHoriz(me, max(solid.left + unitsize - me.right, unitsized2 * -1), true);
     } else if(me.left >= solid.left) { // To right of solid
-      me.xvel = Math.max(me.xvel, 0);
-      shiftHoriz(me, Math.min(solid.right - unitsize - me.left, unitsized2), true);
+      me.xvel = max(me.xvel, 0);
+      shiftHoriz(me, min(solid.right - unitsize - me.left, unitsized2), true);
     }
     
     if(me.type != "mario") {
       me.moveleft = !me.moveleft;
       if(me.group == "item") me.collide(solid, me);
-    } else if(solid.actionLeft)
+    }
+    // PipeSide
+    else if(solid.actionLeft)
       solid.actionLeft(me, solid, solid.transport);
-    
-    updateDisplay(me);
   }
 }
 
 function characterTouchesUp(me, solid) {
   switch(me.group) {
     case "item": 
+      me.moveleft = getMidX(me) <= getMidX(solid) + unitsized2;
       characterHops(me);
-      if(!objectOnTop(me, solid)) me.moveleft = objectToLeft(me, solid);
     break;
     case "coin":
       me.animate(me);
@@ -343,6 +460,7 @@ function scoreEnemyStar(enemy) {
     default: amount = 200; break;
   }
   scoreEnemyFin(enemy, amount);
+  play("Kick.wav");
 }
 function scoreEnemyBelow(enemy) {
   var amount = 100;
@@ -364,9 +482,9 @@ function moveSimple(me) {
   if(me.direction != me.moveleft) {
     if(me.moveleft) {
       me.xvel = me.speed * -1;
-      removeClass(me,"flipped");
+      if(!me.noflip) removeClass(me, "flipped");
     } else {
-      me.element.className += " flipped";
+      if(!me.noflip) addElementClass(me.element, "flipped");
       me.xvel = me.speed; 
     }
     me.direction = me.moveleft;
@@ -376,15 +494,15 @@ function moveSimple(me) {
 function moveSmart(me) {
   moveSimple(me);
   
-  if(this.yvel == 0 && (!this.resting || offResting(this))) {
-    this.resting = true;
-    this.moveleft = !this.moveleft;
+  if(me.yvel == 0 && (!me.resting || (offResting(me)))) {
+    if(me.moveleft) shiftHoriz(me, unitsize, true);
+    else shiftHoriz(me, unitsize * -1, true);
+    me.moveleft = !me.moveleft;
   }
 }
 function offResting(me) {
-  var mid = me.left + me.width * unitsized2;
-  if(me.moveleft) return mid < me.resting.left;
-  else return mid > me.resting.right;
+  if(me.moveleft) return me.right - unitsize < me.resting.left;
+  else return me.left + unitsize > me.resting.right;
 }
 
 function moveJumping(me) {
@@ -440,7 +558,8 @@ function moveFloating(me) {
 }
 // Sliding: the horizontal version
 // Changing: 0 for normal, |1| for forward/back, |2| for waiting
-// To do: use switch(me.changing)
+// Example usage on World 3-3
+// [moveSliding, 228, 260, 2] slides back and forth between 228 and 260
 function moveSliding(me) {
   switch(me.changing) {
     case 0:
@@ -483,34 +602,64 @@ function collideTransport(me, solid) {
 }
 
 // To do: make me.collide and stages w/functions
-function moveFalling() {
-  if(this != mario.resting) return;
+function moveFalling(me) {
+  if(me != mario.resting) {
+    if(me.partner) me.yvel = 0;
+    return;
+  }
   
-  shiftVert(this, this.yvel += unitsized32);
-  
-  if(this.partner) {
-    shiftVert(this.partner, this.yvel * -1);
-    this.tension += this.yvel;
-    if((this.partner.tension -= this.yvel) <= 0) {
-      this.collide = this.partner.collide = characterTouchedSolid;
-      this.partner.yvel = unitsize;
-      this.movement = this.partner.movement = function() {
-        shiftVert(this, this.yvel += unitsized32);
+  // Used by platforms on scales
+  if(me.partner) {
+    shiftScaleStringVert(me, me.string, me.yvel += unitsized16);
+    shiftScaleStringVert(me.partner, me.partner.string, me.yvel * -1);
+    me.tension += me.yvel;
+    // If the platform falls off,
+    if((me.partner.tension -= me.yvel) <= 0) {
+      me.collide = me.partner.collide = characterTouchedSolid;
+      me.partner.yvel = unitsize;
+      // Keep falling at an increasing pace
+      me.movement = me.partner.movement = function(me) {
+        shiftVert(me, me.yvel += unitsized16);
       }
     }
   }
-  if(this == mario.resting) setBottom(mario, this.top);
+  else {
+    shiftVert(me, me.yvel += unitsized16);
+    if(me.yvel >= unitsize * 1.75)
+      me.yvel += unitsized8;
+      me.movement = function(me) {
+        shiftVert(me, me.yvel += unitsized16);
+      };
+  }
+  
+  if(me == mario.resting) setBottom(mario, me.top);
+}
+function shiftScaleStringVert(me, string, yvel) {
+  shiftVert(me, yvel);
+  string.bottom = me.top;
+  string.height = (string.bottom - string.top) / unitsize;
+  updateSize(string);
+  updateDisplay(string); 
 }
 
 function moveFlying() {
-  
+  // To do: what goes here? It's called by BowserFire in things.js
 }
 
 
-function removeClass(me, strin) {
-  // me.element.className = me.element.className.split(strin).join(strout);
-  me.element.className = me.element.className.replace(new RegExp(" " + strin,"gm"),'');;
-  // result = mystring.replace(new RegExp(".","gm")," ");
+function addClass(me, strin) { me.element.className += " " + strin; }
+function removeClass(me, strin) { me.element.className = me.element.className.replace(new RegExp(" " + strin,"gm"),''); }
+function addElementClass(element, strin) { element.className += " " + strin; }
+function removeElementClass(element, strin) { element.className = element.className.replace(new RegExp(" " + strin,"gm"),''); }
+function removeClasses(me, strings) {
+  var arr = strings instanceof Array ? strings : strings.split(" ");
+  for(var i = arr.length - 1; i >= 0; --i)
+    removeClass(me, arr[i]);
+}
+function addClasses(me, strings) {
+  var arr = strings instanceof Array ? strings : strings.split(" ");
+  for(var i = arr.length - 1; i >= 0; --i)
+    addClass(me, arr[i]);
 }
 
 /*
@@ -519,13 +668,14 @@ function removeClass(me, strin) {
 
 // Javascript memory management, you are bad and should feel bad.
 function deleteThing(me, array, arrayloc) {
-  array.splice(arrayloc,1);
-  removeElement(me);
+  deleted.push(array.splice(arrayloc,1));
+  if(me) removeElement(me);
 }
 function removeElement(me) {
   if(!me.element) return;
-  document.body.removeChild(me.element);
-  me.element = false;
+  elems.push(me.element);
+  body.removeChild(me.element);
+  delete me.element;
   if(me.type == "fireball") --mario.numballs; // would like to make this part of fireball
 }
 function killNormal(me) {
@@ -534,10 +684,10 @@ function killNormal(me) {
   removeElement(me);
 }
 function killFlip(me, extra) {
-  me.element.className += " flipped-vert";
+  addElementClass(me.element, "flip-vert");
   me.bottomBump = function() {};
-  me.nocollide = true;
-  me.resting = me.movement = me.speed = me.xvel = false;
+  me.nocollide = me.dead = true;
+  me.resting = me.movement = me.speed = me.xvel = me.nofall = false;
   me.yvel = -1 * unitsize;
   addEvent(function(me) { killNormal(me); }, 70 + (extra || 0));
 }
@@ -552,8 +702,9 @@ function generalMovement(me, dx, dy, cleartime) {
 }
 function blockBumpMovement(me) {
   var dir = -3, dd = .5;
+  // To do: addEventInterval?
   var move = setInterval(function() {
-    shiftVert(me, dir, true);
+    shiftVert(me, dir);
     dir += dd;
     if(dir == 3.5) {
       clearInterval(move);
@@ -565,7 +716,7 @@ function blockBumpMovement(me) {
 
 function emergeUp(me, solid) {
   play("Powerup Appears.wav");
-  me.element.className += " flipped";
+  addClass(me, "flipped");
   me.nomove = me.nocollide = me.alive = me.nofall = me.emerging = true;
   determineThingQuadrants(me);
   var move = setInterval(function() {
@@ -579,7 +730,7 @@ function emergeUp(me, solid) {
         me.moving = setInterval(function() {
           if(me.resting != solid) {
             clearTimeout(me.moving);
-            me.movement = me.movementsave;
+            addEvent(function(me) { me.movement = me.movementsave; }, 1, me);
           }
         }, timer);
       }
@@ -587,6 +738,7 @@ function emergeUp(me, solid) {
   }, timer);
 }
 
+// To do: make this use events
 function flicker(me, cleartime) {
   me.flickering = true;
   var on = me.element.style.visibility == "visible", timing = timer * 8,
@@ -595,9 +747,29 @@ function flicker(me, cleartime) {
     else me.element.style.visibility = "visible";
     on = !on;
   }, timing);
-  setTimeout(function() {
+  addEvent(function() {
     clearInterval(flick);
     me.element.style.visibility = "visible";
     me.flickering = false;
   }, cleartime);
+}
+
+// Kills all characters other than mario
+// Used in endCastleOutside/Inside
+function killOtherCharacters() {
+  for(var i = characters.length - 1; i>0; --i)
+    if(!characters[i].nokillend)
+      deleteThing(characters[i], characters, i);
+}
+
+function lookTowardMario(me, big) {
+  if(objectToLeft(mario, me)) {
+    if(!me.lookleft || big) {
+      me.lookleft = true;
+      removeClass(me, "flipped");
+    }
+  } else if(me.lookleft || big) {
+    me.lookleft = false;
+    addClass(me, "flipped");
+  }
 }

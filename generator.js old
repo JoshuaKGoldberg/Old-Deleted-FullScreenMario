@@ -1,0 +1,110 @@
+// Creates a mini-area of a certain width
+// First, it determines which jumplevs have horizontal rows
+// Then, it might place a few characters or solids on the floor
+function generateSection(xloc, num) {
+  var bwidth = 7;
+  
+  data.time.amount = "Inf";
+  notime = true;
+  updateDataElement(data.time);
+  map.canscroll = true;
+  
+  xloc *= unitsize; 
+  pushPreThing(Floor, xloc, 0, bwidth);
+  
+  // jumplev1
+  var lev1 = false, lev2 = false, height;
+  if(randTrue()) {
+    lev1 = generateSolidRow(xloc, bwidth, jumplev1)
+    // jumplev2
+    if(randTrue())
+    lev2 = generateSolidRow(xloc, bwidth, jumplev2)
+  }
+  
+  generateFloorObstacles(xloc, bwidth, lev1);
+
+  // pushPreThing(GenerationStarter, xloc + bwidth * 8, 0)
+  lol = pushPreThing(GenerationStarter, xloc + bwidth * 8, 0)
+  gens.push(lol.object);
+  ++mario.star;
+  
+  map.area.presolids.sort(prethingsorter);
+  map.area.prechars.sort(prethingsorter);
+  spawnMap();
+}
+
+function generateSolidRow(xloc, bwidth, level) {
+  var bool = false, character, arr = [];
+  for(var i=0; i<bwidth; ++i) {
+    if(randTrue()) {
+      arr.push(true);
+      if(bool = randTrue(1.5))
+        pushPreThing(Brick, xloc + i * 8, level, generateBrickItem());
+      else if(bool = !randTrue(2))
+        pushPreThing(Block, xloc + i * 8, level, generateBlockItem());
+        
+      if(bool && !randTrue(7)) {
+        character = generateRandomCharacter(14);
+        pushPreThing(character[0], xloc + i * 8, level + character[1], character[2], character[3])
+      }
+    }
+    else arr.push(false);
+    
+  }
+  return arr;
+}
+
+function generateFloorObstacles(xloc, width, levarr) {
+  var thing, height, hadpipe = 1, count = 0;
+  for(var i=0; i<width; i += 2) {
+    if(!randTrue(3)) {
+      if(hadpipe < 0 && !levarr[count] && !levarr[count-1] && !levarr[count+1] && !randTrue(3)) {
+        height = (randTrue(2) + 2) * 8;
+        thing = [Pipe, height, height];
+        hadpipe = 4;
+        i += 2;
+      }
+      else {
+        thing = generateRandomCharacter();
+        if(hadpipe >= 0) --hadpipe;
+      }
+      pushPreThing(thing[0], xloc + i * 8, thing[1], thing[2], thing[3]);
+      if(!randTrue(3.5) && thing[0] != Pipe)
+        pushPreThing(thing[0], xloc + i * 8 + 12, thing[1], thing[2], thing[3]);
+      
+      ++count;
+    }
+  }
+}
+
+function generateRandomCharacter(num) {
+  switch(randTrue(num || 7)) {
+    case 1:
+      return [Koopa, 12, randTrue(1), randTrue(1)];
+    break;
+    case 2:
+      return [Koopa, 12, randTrue(1)]
+    break;
+    case 3:
+      return [Beetle, 8.5];
+    break;
+    default:
+      return [Goomba, 8];
+    break;
+  }
+}
+
+function generateBrickItem(yes) {
+  return (yes || !randTrue(14)) ? Coin : false;
+}
+function generateBlockItem(yes) {
+  if(!yes && randTrue(3)) return false;
+  switch(randTrue(3)) {
+    case 1:
+      return Star;
+    break;
+    default:
+      return Mushroom;
+    break;
+  }
+}

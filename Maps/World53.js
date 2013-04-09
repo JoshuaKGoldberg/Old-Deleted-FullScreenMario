@@ -22,7 +22,7 @@ map.areas = [
     fillPreThing(Goomba, 352, 80, 2, 1, 16);
     pushPreTree(400, 0, 4);
     fillPreThing(Coin, 402, 55, 2, 1, 8, 8);
-    pushPreThing(Platform, 440, 56, 6, [moveFloating, 8, 104, 1.5]);
+    pushPreThing(Platform, 440, 56, 4, [moveFloating, 8, 104, 1.5]);
     pushPreTree(472, 0, 5);
     pushPreThing(Block, 472, 24, Mushroom);
     pushPreTree(480, 64, 4);
@@ -33,9 +33,9 @@ map.areas = [
     pushPreTree(608, 56, 6);
     pushPreThing(Goomba, 640, 64);
     fillPreThing(Coin, 681, 63, 2, 1, 8, 8);
-    pushPreThing(Platform, 688, 40, 6, [moveSliding, 660, 740, 1.5]);
+    pushPreThing(Platform, 688, 40, 4, [moveSliding, 660, 740, 1.5]);
     fillPreThing(Coin, 745, 71, 2, 1, 8, 8);
-    pushPreThing(Platform, 752, 32, 6, [moveSliding, 730, 800, 1.5]);
+    pushPreThing(Platform, 752, 32, 4, [moveSliding, 730, 800, 1.5]);
     fillPreThing(Coin, 777, 71, 2, 1, 8, 8);
     pushPreTree(784, 16, 4);
     pushPreTree(832, 48, 8);
@@ -48,7 +48,7 @@ map.areas = [
     pushPreTree(976, 32, 4);
     
     pushPreFloor(1032, 0, 47);
-    pushPreThing(Platform, 1048, 56, 6, [moveFloating, 56, map.floor - 8, 1.5]);
+    pushPreThing(Platform, 1048, 56, 4, [moveFloating, 56, map.floor - 8, 1.5]);
     pushPreThing(Koopa, 1064, 12, true); 
     pushPreThing(Stone, 1104, 32, 4);
     pushPreThing(Stone, 1112, 32, 4);
@@ -56,7 +56,7 @@ map.areas = [
     pushPreThing(Stone, 1128, 48, 6);
     pushPreThing(Stone, 1136, 64, 8);
     pushPreThing(Stone, 1144, 64, 8);
-    
-    endCastleOutside(1212, 0, 0, 12);
+    endCastleOutside(1212, 0, 0);
+    pushPreScenery("CastleWall", 1312, 0, 12);
   })
 ];
