@@ -52,7 +52,7 @@ map.areas = [
     pushPreThing(Cannon, 1168, 24, 2);
     fillPreThing(Brick, 1192, 40, 2, 1, 8);
     pushPreThing(Springboard, 1208, 15.5);
-    pushPreThing(Brick, 1208, 88);
+    pushPreThing(Brick, 1208, 88, Mushroom);
     
     pushPreFloor(1224, 0, 50);
     pushPreThing(GenericStone, 1224, 8);

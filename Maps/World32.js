@@ -1,12 +1,13 @@
+map.time = 300;
 map.locs = [
   new Location(0, true)
 ];
 map.areas = [
-  new Area("Overworld Night", function() {
+  new Area("Overworld Night Alt", function() {
     setLocationGeneration(0);
 
     pushPreScenery("Castle", -1 * unitsizet4, castlev);
-    pushPrePattern("backfence", 28, 0, [1800]);
+    pushPrePattern("backfence", -384, 0, 6);
     pushPreFloor(0, 0, 80);
     pushPreThing(Koopa, 136, 12);
     fillPreThing(Goomba, 192, 8, 3, 1, 12);

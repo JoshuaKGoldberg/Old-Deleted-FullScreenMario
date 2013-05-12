@@ -1,3 +1,4 @@
+map.time = 300;
 map.locs = [
   new Location(0, startCastle)
 ];
@@ -49,5 +50,6 @@ map.areas = [
     pushPreThing(GenericStone, 984, 80, 5, 2);
     
     endCastleInside(1024);
+    pushPreThing(Platform, 1108, 56, 4, [moveSliding, 1080, 1112]).object.nocollidechar = true;
   })
 ];

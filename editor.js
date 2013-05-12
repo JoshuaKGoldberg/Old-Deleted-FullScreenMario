@@ -10,12 +10,20 @@ function loadEditor() {
   startReset();
   body.className = "Overworld Editor";
   body.id = "editor";
+  body.style.height = "";
   
+  // Set the library and controls
   setEditorLibrary();
   setEditorHTML();
   setEditorSection("solids");
   setEditorControls();
   setEditorEvents();
+  
+  // If progress has been recorded in localStorage, use it
+  // To do: character check this
+  if(localStorage.editor) {
+    setTimeout(function() { editorLoadParsed(JSON.parse(localStorage.editor)); }, 1);
+  }
 }
 
 function setEditorLibrary() {
@@ -136,7 +144,7 @@ function setEditorLibrary() {
       },
       Stone: {
         arguments: { width: 1, height: 1 },
-        multiplier: {width: 8, height: 8},
+        multiplier: { width: 8, height: 8},
         postargs: [
           function(me, properties) { return properties.width; },
           function(me, properties) { return properties.height; }
@@ -144,6 +152,17 @@ function setEditorLibrary() {
         loadfunc: function(current, reference, input) {
           updateSidebarOption("width", input.args[0]);
           updateSidebarOption("height", input.args[1]);
+        }
+      },
+      Coral: {
+        width: 8,
+        arguments: { height: 1 },
+        multiplier: { height: 8 },
+        postargs: [
+          function(me, properties) { return properties.height; }
+        ],
+        loadfunc: function(current, reference, input) {
+          updateSidebarOption("height", input.args[0]);
         }
       },
       CastleBlock: {
@@ -171,7 +190,6 @@ function setEditorLibrary() {
           function(preline, properties) { return properties.hidden.toLowerCase(); }
         ],
         loadfunc: function(current, reference, input) {
-          console.log(input);
           updateSidebarOption("fireballs", JSON.parse(input.args[0])[0]);
           updateSidebarOption("hidden", BoolToString(input.args[1]));
         },
@@ -180,7 +198,7 @@ function setEditorLibrary() {
         height: 4,
         arguments: {
           width: 2,
-          movement: ["false", "moveFalling", "moveFloating"]
+          movement: ["False", "Falling", "Floating", "Sliding", "Transport"]
         },
         previewstyle: {
           background_size: "50%",
@@ -190,10 +208,32 @@ function setEditorLibrary() {
         multiplier: { width: 8, height: 1 },
         postargs: [
           function(preline, properties) { return properties.width * 2; },
-          function(preline, properties) { return properties.movement; }
+          function(preline, properties) {
+            var begin, end;
+            switch(properties.movement) {
+              case "False": properties.movement = false; break;
+              case "Falling": properties.movement = "moveFalling"; break;
+              case "Floating":
+                properties.movement = "moveFloating"; 
+                begin = 8;
+                end = 72;
+              break;
+              case "Sliding":
+                properties.movement = "moveSliding"; 
+                begin = preline.xloc - 24;
+                end = preline.xloc + 24;
+              break;
+              case "Transport":
+                properties.movement = "collideTransport";
+              break;
+              default: return properties.movement;
+            }
+            return "[" + properties.movement + ", " + begin + ", " + end + "]";
+          }
+          
         ],
         loadfunc: function(current, reference, input) {
-          updateSidebarOption("width", input.args[0]);
+          updateSidebarOption("width", input.args[0] / 2);
           updateSidebarOption("movement", input.args[1]);
         }
       },
@@ -229,12 +269,20 @@ function setEditorLibrary() {
               case "moveJumping": return "true";
               case "moveFloating":
                 var height = preline.yloc,
-                    one = height - 32,
-                    two = height + 48;
+                    one = 8,
+                    two = 72;
               return "[" + one + ", " + two + "]";
             }
           }
-        ]
+        ],
+        loadfunc: function(current, reference, input) {
+          var moveraw = input.args[1], movement = "moveSimple";
+          if(StringToBool(moveraw) == true) movement = "moveJumping";
+          else if(moveraw[0] == "[") movement = "moveFloating";
+          
+          updateSidebarOption("smart", BoolToString(input.args[0]));
+          updateSidebarOption("movement", movement);
+        }
       },
       Beetle: {
         width: 8.5, height: 8.5,
@@ -250,7 +298,10 @@ function setEditorLibrary() {
             else removeCurrentPreviewClass("red");
           }
         },
-        postargs: [ function(preline, properties) { return properties.red.toLowerCase(); } ]
+        postargs: [ function(preline, properties) { return properties.red.toLowerCase(); } ],
+        loadfunc: function(current, reference, input) {
+          updateSidebarOption("red", BoolToString(input.args[0]));
+        }
       },
       Lakitu: { width: 8, height: 12, alt: "hiding" },
       Podoboo: { width: 7, height: 8, alt: "flip-vert" },
@@ -276,7 +327,32 @@ function setEditorLibrary() {
           background_repeat: "repeat-x",
           background_position: "center bottom"
         },
-        postargs: [ function(preline, properties) { return properties.width; } ]
+        postargs: [ function(preline, properties) { return properties.width; } ],
+        loadfunc: loadFuncScenery
+      },
+      Water: {
+        height: Infinity,
+        arguments: { width: 4 },
+        multiplier: { width: 3 },
+        customfunc: function(current, properties) {
+          current.y -= screen.height * unitsize; // unitsize will be removed by the placer
+          return "fillPreWater";
+        },
+        postargs: [
+          function(preline, properties) { return properties.width; }
+        ],
+        loadfunc: function(current, reference, input) {
+          updateSidebarOption("width", input.args[0]);
+          // *= .75;
+          // input.args[0] *= .75;
+        },
+        previewstyle: { 
+          background_size: "50%",
+          background_position: "bottom",
+          background_repeat: "repeat-x",
+          background_color: "#5c94fc"
+        },
+        regular_yreal: true
       },
       CastleWall: {
         width: 8, height: 48,
@@ -288,17 +364,25 @@ function setEditorLibrary() {
           background_position: "center top"
         }
       },
-      Castle: { width: 72, height: 88 }
+      Castle: {
+        width: 72, height: 88,
+        widthoff: -35,
+        previewstyle: { 
+          background_size: "250%",
+          background_position: "center top"
+        }
+      }
     },
     // specials: {
       
     // },
     settings: {
-      area: {
+      Area: {
         arguments: {
           time: 350,
           night: Boolean,
-          setting: ["Overworld", "Underworld", "Underwater", "Castle"]
+          alt: Boolean,
+          setting: ["Overworld", "Underworld", "Underwater", "Castle", "Sky"]
         }
       },
       fill: {
@@ -361,7 +445,8 @@ function setEditorLibrary() {
   editor.locsettings = {
     setting: "Overworld",
     time: 350,
-    night: false
+    night: false,
+    alt: false
   }
 }
 
@@ -422,6 +507,19 @@ function setBottomBar() {
   bottombar.id = "bottombar";
   bottombar.style.maxWidth = (innerWidth - sidebar.clientWidth) + "px";
   body.appendChild(bottombar);
+  bottomBarRetract();
+  bottombar.onmouseover = bottomBarExpand;
+  bottombar.onmouseout = bottomBarRetract;
+}
+function bottomBarRetract() {
+  var widthraw = bottombar.clientWidth,
+      widthmargin = round(widthraw - 96);
+  // bottombar.style.marginRight = -1 * widthmargin + "px";
+  bottombar.style.opacity = .49;
+}
+function bottomBarExpand() {
+  bottombar.style.marginRight = "";
+  bottombar.style.opacity = 1;
 }
 
 function setFollower() {
@@ -443,19 +541,14 @@ function setEditorBackground() {
   var background_style = (window.background = document.createElement("div")).style;
   
   background.id = "background";
-  background.className = "mario"; // for the background image
-  background_style.zIndex = "-70";
+  background.className = "mario body"; // for the background image and color, respectively
+  background_style.zIndex = "-98";
   background_style.cursor = "crosshair";
   background_style.backgroundRepeat = "no-repeat";
   background_style.backgroundPosition = editor.startx + "px " + editor.starty + "px";
   background_style.backgroundSize = (7 * unitsize) + "px, " + unitsizet8 + "px";
   
   body.appendChild(background);
-  
-  /*
-  me.width = 7;
-  me.height = 8;
-  */
 }
 
 function setGuideLines() {
@@ -487,24 +580,60 @@ function setGuideLines() {
 /* Preview & panel settings
 */
 function displayEditorSettings() {
+  var settings = editor.locsettings;
+  
+  // Update the sidebar to reflect what's on record
+  updateSidebarOption("time", settings.time);
+  updateSidebarOption("night", BoolToString(settings.night));
+  updateSidebarOption("alt", BoolToString(settings.alt));
+  updateSidebarOption("setting", BoolToString(settings.setting));
+  
+  // Make sidebar options & inputs call updateEditorSettings
+  setAllInputsChange(updateEditorSettings);
+  
+  // Don't want to see the bottombar transition
+  // bottombar.style.width = "0px";
   bottombar.style.visibility = "hidden";
+}
+function updateEditorSettings() {
+  var properties = getEditorCurrentProperties(),
+      settings = editor.locsettings,
+      time = settings.time = Number(properties.time),
+      name = settings.setting = properties.setting,
+      night = settings.night = StringToBool(properties.night),
+      alt = settings.alt = StringToBool(properties.alt);
   
+  if(night) name += " Night";
+  if(alt) name += " Alt";
   
-  sidebar.appendChild(group);
+  body.className = name;
 }
 
 function setEditorSection(name) {
   var section = editor.section = editor[name], first, i;
   editor.section_name = name;
   
-  // Make the current preview the first one in section. I wonder if there's a better way to do this...
+  // Make the current preview the first one in section.
   for(i in section) { setEditorCurrent(i); break; }
   
   // Clear and reset the bottom bar
-  bottombar.innerHTML = bottombar.style.visibility = "";
+  bottombar.innerHTML = bottombar.style.opacity = bottombar.style.width = "";
   for(i in section) addEditorBottomPreview(i, section[i]);
   
+  // If it has an activation function (namely settings), call it
   if(section.activation) section.activation();
+  
+  // Get that nice scrolling effect on the bottombar
+  bottombar.style.marginRight = "";
+  // It's set 700ms after the bar goes all the way out - double the 350ms CSS3 transition time
+  setTimeout(bottomBarRetract, 700);
+  
+  // Settings have to be updated to reflect changes
+  if(name == "settings") game.updateEditorSettings();
+  else bottombar.style.visibility = "visible";
+  
+  // Manually set the name if needed
+  setSelectedName(sectionselect, name);
 }
 
 function setEditorCurrent(name) {
@@ -523,21 +652,27 @@ function setEditorCurrent(name) {
   updateFollowerPreview(current);
   
   // Make changes to the inputs and dropdowns have effects
-  // To do: there's probably a better way to do this.
-  setInputsChange(options.getElementsByTagName("input"));
-  setInputsChange(options.getElementsByTagName("select"));
-  setInputsChange(options.getElementsByTagName("option"));
+  setAllInputsChange();
   
   // Finally, set the current follower visual settings
   updateCurrentArguments(current);
 }
 
+function setAllInputsChange(rawfunc) {
+  setInputsChange(options.getElementsByTagName("input"), rawfunc);
+  setInputsChange(options.getElementsByTagName("select"), rawfunc);
+  setInputsChange(options.getElementsByTagName("option"), rawfunc);
+}
+
 // setTimeout is used to make sure it's applied after the onchange is recorded
-function setInputsChange(elements) {
+// To do: get rid of redundant events... yeah.
+function setInputsChange(elements, rawfunc) {
   var i, j, events = ["onchange", "onclick", "onkeypress", "onkeyup", "onfocus", "onselect", "onmouseup", "onmousedown"], // just in case
-      func = function() { setTimeout(updateCurrentArguments); };
+      callfunc = rawfunc || updateCurrentArguments,
+      func = function() { setTimeout(this.callfunc); };
   for(i in elements) {
     elem = elements[i];
+    elem.callfunc = callfunc;
     for(j in events) elem[events[j]] = func;
   }
 }
@@ -736,17 +871,11 @@ function updateSidebarOption(nameraw, value) {
       item = document.getElementById(name).cells[1].firstChild,
       valuereal = removeLastS(String(value).toLowerCase());
   switch(item.tagName) {
-    case "SELECT": 
-      for(var i, j = 0; i = item.options[j]; j++) {
-        if(removeLastS(i.value.toLowerCase()) == valuereal) {
-          item.selectedIndex = j;
-          break;
-        }
-      }
-    break;
+    case "SELECT": setSelectedName(item, value); break;
     default: item.value = value; break;
   }
   updateCurrentArguments(editor.current);
+  item.callfunc();
 }
 
 function addEditorBottomPreview(name, thing) {
@@ -795,6 +924,13 @@ function setEditorEvents() {
 
 function editorMouseDown(event) {
   if(editor.section.nofollow) return;
+  
+  // Right clicks just open the bottombar
+  if(event.which == 3) {
+    event.preventDefault();
+    return bottomBarExpand();
+  }
+  
   var x = follower.x,
       y = follower.y,
       fill = editor.fill;
@@ -890,12 +1026,19 @@ function editorUndo() {
   return true;
 }
 
-function editorReset() { if(editorUndo()) setTimeout(editorReset, 35); }
+function editorReset() {
+  if(editor.resetting) return editorResetImmediate();
+  editor.resetting = true;
+  editorResetContinue();
+}
+function editorResetContinue() {
+  if(editorUndo()) setTimeout(editorResetContinue, 35);
+}
 function editorResetImmediate() { while(editorUndo()) {}; }
 
 function editorPlay() {
-  var rawfunc = getEditorSave(),
-      mapfunc = Function(rawfunc);
+  var rawfunc = getEditorSave(), // rawfunc is a string representing the function
+      mapfunc = Function(rawfunc); // typecast that string into an actual function
   body.style.marginLeft = "";
   mapfuncs.Custom = {Map: mapfunc};
   currentmap = ["Custom", "Map"];
@@ -906,13 +1049,15 @@ function editorPlay() {
 */
 function editorSave() {
   if(editor.placed.length == 0) return;
-  var text = getEditorSave();
-  createEditorInputWindow("Hit Submit below to start playing!<br><p style='font-size:.7em;text-decoration:line-through'>You may copy this text to work on again later using Load (the button next to Save)</p>", text, submitGameFunc);
+  var text = getEditorSave(),
+      title = "<span style='font-size:1.4em;'>Hit Submit below to start playing!</span>",
+      p = "<p style='font-size:.7em;line-height:140%'>This map will be resumed automatically the next time you use the editor on this computer.<br>Alternately, you may copy this text to work on again later using Load (the button next to Save). </p>";
+  createEditorInputWindow(title + "<br>" + p, text, submitGameFunc);
   return text;
 }
 
 function getEditorSave() {
-  var prelines, json, lines, mapfunc;
+  var prelines, lines, mapfunc;
   
   // Get the prelines based on everything in placed
   prelines = createEditorMapFuncPreLines(editor.placed),
@@ -922,6 +1067,9 @@ function getEditorSave() {
   
   // Create a string that can eval/parse to an object storing the lines
   lines = createJSONMapLines(prelines);
+  
+  // Save the string in localStorage to be resumed later
+  localStorage.editor = "[" + lines + "]";
   
   // Wrap the lines with the rest of the map function
   mapfunc = createEditorMapFunc(lines);
@@ -958,6 +1106,9 @@ function sortEditorMapFuncPreLines(prelines) { prelines.sort(prethingsorter); }
 
 function createJSONMapLines(prelines) {
   var lines = [], j, line, len, preline, line, args;
+  
+  lines[0] = JSON.stringify(editor.locsettings);
+  
   for(var i = 0, len = prelines.length; i < len; ++i) {
     preline = prelines[i];
     line = {
@@ -1019,12 +1170,12 @@ function createEditorInputWindow(blurb, value, submitfunc) {
   div.appendChild(cancel);
   
   body.appendChild(div);
-  follower.style.visibility = "hidden";
+  follower.style.visibility = controls.style.visibility = "hidden";
   game.scrollEditorWindow(game.editor.offset.x * -1);
 }
 
 function cancelEditorInputWindow() {
-  follower.style.visibility = "";
+  follower.style.visibility = controls.style.visibility = "";
   body.removeChild(input_window);
 }
 
@@ -1034,7 +1185,7 @@ function getEditorInputWindowText() {
 
 function submitGameFunc() {
   var rawtext = getEditorInputWindowText(),
-      uncool = "!@#$%^&\/;", errors, errortext = "",
+      uncool = "<>|?!@#$%^&\/;", errors, errortext = "",
       gamefunc, ok = true, i;
   
   // Make sure bad characters aren't involved
@@ -1056,23 +1207,33 @@ function submitGameFunc() {
 
 function parseJSONMapFunc(rawtext) {
   var text = rawtext.replace(new RegExp("\n","gm")," "),
-      lines = JSON.parse(text), line, output = "";
+      lines = JSON.parse(text), line, output = "",
+      locsettings = lines[0],
+      settingname = locsettings.setting;
+  
+  // The first line contains the loc settings, such as night or time.
+  // To do: Why is time not working?
+  if(locsettings.night) settingname += " Night";
+  if(locsettings.alt) settingname += " Alt";
   
   output += "custom = function(map) {";
   output += "  map.locs = [ new Location(0, true) ];";
   output += "  map.areas = [";
-  output += "    new Area(\"Overworld Editor\", function() {";
-  output += "      setLocationGeneration(0);  "
+  output += "    new Area(\"" + settingname + "\", function() {";
+  output += "      setLocationGeneration(0);"
+  output += "      data.time.amount = " + locsettings.time + ";";
+  if(locsettings.setting == "Underwater")
+    output += "      goUnderWater(); ";
   
   window.lines = lines;
   
-  // lines is an object, which contains:
+  // The rest of the lines contain line objects, which contain:
     // xloc: xloc,
     // yloc: yloc,
     // prefunc: prefunc (if there is one)
     // prething: prething (used if there isn't prefunc)
     // args: [arg1, arg2, arg3]
-  for(var i = 0, leni = lines.length; i < leni; ++i) {
+  for(var i = 1, leni = lines.length; i < leni; ++i) {
     line = lines[i];
     // Start the line with...
     switch(line.prefunc) {
@@ -1106,7 +1267,6 @@ function editorWindowError(text) {
 [  {"xloc":0,"yloc":0,"prefunc":"pushPreFloor","prething":"Floor","args":["24"]},  {"xloc":144,"yloc":8,"prefunc":"pushPrePipe","prething":"Pipe","args":[16,"false"]},  {"xloc":248,"yloc":48,"prefunc":"pushPreThing","prething":"Cannon","args":["2"]}]
 */
 function editorLoad() {
-  // To do: use localStorage to keep the most recently submitted one?
   createEditorInputWindow("Paste your work in progress here, and click Submit to continue it.", "", submitEditorLoad);
 }
 
@@ -1141,8 +1301,11 @@ function submitEditorLoad() {
 function editorLoadParsed(parsed) {
   follower.style.visibility = "visible";
   
+  loadEditorSettings(parsed[0])
+  
   var i, len, current, reference;
-  for(i = 0, len = parsed.length; i < len; ++i) {
+  for(i = 1, len = parsed.length; i < len; ++i) {
+    // ylocs aren't being registered here for scenery/water?
     current = parsed[i];
     reference = editor.load_paths[parsed[i].prething];
     setEditorSection(reference.section_name);
@@ -1152,16 +1315,42 @@ function editorLoadParsed(parsed) {
   }
 }
 
-function defaultLoadParse(current, reference) {
-  var xreal = current.xloc * unitsize,
-      yreal = (map.floor - current.yloc) * unitsize;
+function loadEditorSettings(settings) {
+  setEditorSection("settings");
   
-  if(reference.section_name == "scenery") yreal -= (reference.height/* + reference.heightdiff*/) * unitsize;
+  updateSidebarOption("time", settings.time);
+  updateSidebarOption("night", BoolToString(settings.night));
+  updateSidebarOption("alt", BoolToString(settings.alt));
+  updateSidebarOption("setting", settings.setting);
+  
+  // var rows = options.children[1].rows, cell;
+  // for(var i = 0, len = rows.length; i < len; ++i) {
+    // cell = rows[i].cells[1].firstChild;
+    // cell.onclick();
+    // // alert(cell.outerHTML);
+  // }
+}
+
+/*
+
+  var x = roundFollowerDigit(event.x) + (editor.current.widthoff - editor.offset.x) * unitsize,
+      y = roundFollowerDigit(event.y) + editor.current.heightoff * unitsize;
+
+*/
+function defaultLoadParse(current, reference) {
+  var xreal = (current.xloc - reference.widthoff) * unitsize,
+      yreal = (map.floor - current.yloc + reference.heightoff) * unitsize;
+  
+  // alert(JSON.stringify(reference));
+  
+  if(reference.section_name == "scenery" && !reference.regular_yreal) yreal -= (reference.height/* + reference.heightdiff*/) * unitsize;
   
   followerFollowsCursor({x: xreal, y: yreal});
   
   editorMouseDown({x: xreal, y: yreal});
 }
+// The few sceneries with width measurements really just all use this.
+function loadFuncScenery(current, reference, input) { updateSidebarOption("width", input.args[0]); }
 
 /* Small helpers
 */
@@ -1209,7 +1398,7 @@ function StringToBool(text) {
   }
 }
 function BoolToString(bool) {
-  if(typeof(text) == "boolean") return bool ? "true" : "false";
+  if(typeof(bool) == "boolean") return bool ? "true" : "false";
   switch(bool.toLowerCase()) {
     case "true": case "on": case "1": case "one": return "true";
     default: return "false";
@@ -1240,4 +1429,12 @@ function SplitByLines(text) { return text.split(/\r?\n/); }
 function clearSelection() {
   // Chrome
   getSelection().empty()
+}
+
+function setSelectedName(elem, valueraw) {
+  var valuereal = removeLastS(valueraw.toLowerCase()), options = elem.options;
+  for(var i = 0, len = options.length; i < len; ++i) {
+    if(removeLastS(options[i].value.toLowerCase()) == valuereal)
+      return elem.selectedIndex = i;
+  }
 }

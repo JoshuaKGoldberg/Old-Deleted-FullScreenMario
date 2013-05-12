@@ -1,4 +1,3 @@
-
 map.locs = [
   new Location(0, true),
   new Location(0, exitPipeVert),
@@ -35,6 +34,7 @@ map.areas = [
     pushPreThing(Koopa, 456, 26, false, true);
     pushPreFloor(512, 0, 14);
     fillPreThing(Brick, 616, 32, 2, 1, 8);
+    pushPreScenery("PlantLarge", 552, 0);
     pushPreFloor(640, 0, 4);
     
     pushPreFloor(680, 0, 53);
@@ -47,9 +47,11 @@ map.areas = [
     pushPreThing(Brick, 800, jumplev1, Mushroom);
     pushPreThing(Cannon, 840, 16, 2);
     fillPreThing(Brick, 880, jumplev1, 2, 1, 8);
+    pushPreScenery("Fence", 888, 0);
     pushPreThing(Beetle, 888, 8.5);
     pushPreThing(Cannon, 920, 8, 1);
     pushPreThing(Brick, 944, jumplev1);
+    pushPreScenery("PlantLarge", 936, 0);
     pushPreThing(GenericStone, 952, jumplev1);
     pushPreThing(Cannon, 952, 40);
     pushPreThing(Brick, 960, jumplev1, Mushroom);
@@ -65,8 +67,10 @@ map.areas = [
     pushPreFloor(1176, 0, 1);
     
     pushPreFloor(1232, 0, 20);
+    pushPreScenery("Fence", 1272, 0);
     pushPrePipe(1248, 0, 32, true, 2);
     pushPrePipe(1304, 0, 16, true, false, 1);
+    pushPreScenery("PlantLarge", 1320, 0);
     pushPreThing(Koopa, 1360, 32, false, true);
     pushPreThing(Koopa, 1376, 24, false, true);
     pushPreFloor(1400, 0, 1);
@@ -91,9 +95,12 @@ map.areas = [
     pushPreThing(GenericStone, 1624, 40, 1, 5);
     pushPreThing(Koopa, 1624, 72, false, true);
     
+    pushPreThing(SceneryBlocker, 1640, 24, 8, 24);
     pushPreFloor(1648, 0, 40);
+    pushPreFuncCollider(1648, zoneDisableLakitu);
     pushPreThing(GenericStone, 1648, 64, 2, 8);
     endCastleOutside(1724, 0, castlev);
+    pushPreScenery("PlantLarge", 1704, 0);
   }),
   new Area("Underworld", function() {
       setLocationGeneration(2);

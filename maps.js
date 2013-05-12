@@ -1,4 +1,4 @@
-﻿// possible addition: map.base, which is the level things like floor and tree trunk go until
+// possible addition: map.base, which is the level things like floor and tree trunk go until
 /* To do: add checkpoints :
 
 map.checkpoints = [
@@ -31,7 +31,8 @@ function createMaps() {
     Underworld: WorldRandomUnderworld,
     Underwater: WorldRandomUnderwater,
     Bridge: WorldRandomBridge,
-    Sky: WorldRandomSky
+    Sky: WorldRandomSky,
+    Castle: WorldRandomCastle
   };
   
   document.cookie = "";
@@ -41,7 +42,7 @@ function Map() {
   this.element = this.underwater = this.current = this.current_solid = this.current_char = this.xloc = 0;
   this.canscroll = true;
   this.floor = 104;
-  this.time = 400;
+  this.time = 400; // optionally specified later
   this.curloc = -1;
   this.gravity = gravity;
   this.maxyvel = unitsize * 1.75;
@@ -106,17 +107,18 @@ function setMap(one, two) {
 // Down means Mario is moving down; Up means Mario is moving up.
 function setMapRandom(transport) {
   checkReset();
-  if(!transport) transport = ["Random", "Overworld"];
+  if(typeof(transport) == "string") transport = ["Random", transport];
+  else if(!transport) transport = ["Random", "Overworld"];
   data.traveledold = data.traveled;
-  clearMarioStats();
   resetVariables();
   map = new Map();
   currentmap.func = mapfuncs[transport[0]][transport[1]];
   currentmap.func(map);
-  map.areanum = map.curloc = map.sincechange = 0;
+  map.areanum = map.curloc = map.sincechange = map.num_random_sections = 0;
   map.area = map.areas[0];
   map.entrancetype = transport[2];
   shiftToLocation(0);
+  if(map.randname == "Sky") map.exitloc = ["Random", "Overworld", "Down"];
 }
 // Because using mapfuncs on custom maps is just silly
 function setMapCustom(func) {
@@ -147,17 +149,16 @@ function shiftToLocation(loc) {
   resetVariables();
 
   area.creation();
-
-
+  
   spawnMap();
   setAreaSettings();
   mario = placeMario(); // To do: this may not be needed, depending on the startfuncs
   map.shifting = false;
   
   bodystyle.visibility = "visible";
-  body.className = map.area.setting;
+  body.className = "body " + map.area.setting;
   if(map.areas[map.areanum].setting != "")
-    addEvent(function() { window.theme = play(map.areas[map.areanum].setting.split(" ")[0] + ".mp3", true, true); }, 0);
+    addEvent(playCurrentTheme, 0);
   data.time.amount = map.time;
   data.world.amount = currentmap[0] + "-" + currentmap[1];
   setDataDisplay();
@@ -179,6 +180,7 @@ function shiftToLocation(loc) {
 // (screen.right - screen.left) / unitsize is width
 function processAreaPostFunc(area) {
   map.current = map.current_solid = map.current_char = 0;
+  area.width = max(area.width, screen.width);
   
   // If the area has loops (really just castles), do this.
   if(area.sections && area.sections[0]) {
@@ -186,8 +188,8 @@ function processAreaPostFunc(area) {
     area.sections.current = 0;
     area.sections[0](area.sections.start);
   }
-  // Otherwise, give it a ScrollBlocker at the area.width
-  else {
+  // Otherwise, give it a ScrollBlocker at the area.width if it's not a random Sky
+  else if(!map.randname && area.setting != "Sky") {
     var blocker = new PreThing(area.width, 0, ScrollBlocker);
     area.presolids.push(blocker);
   }
@@ -236,7 +238,7 @@ function removeElementCautious(element) {
 // To do: add in other stuff
 function setAreaSettings() {
   map.underwater = map.area.underwater;
-  map.jumpmod = 1.05 + 3.5 * map.underwater;
+  map.jumpmod = 1.056 + 3.5 * map.underwater;
   map.has_lakitu = false;
   addEvent(function() {
     if(map.underwater) mario.gravity = gravity / 2.8;
@@ -273,7 +275,8 @@ function spawnMap() {
 function endLevel() {
   if(map.ending) return;
   map.ending = true;
-  setNextLevelArr(currentmap);
+  if(map.random) setMapRandom(["Random", "Castle"]);
+  else setNextLevelArr(currentmap);
   storeMarioStats();
   pause();
   setMap();
@@ -315,24 +318,24 @@ function intoPipeVert(me, pipe, transport) {
                         me.right + unitsizet2 > pipe.right ||
                         me.left - unitsizet2 < pipe.left) return;
   pipePreparations(me);
+  unpause();
   var move = setInterval(function() {
     shiftVert(me, unitsized4, true);
     if(me.top >= pipe.top) {
       clearInterval(move);
-      goToTransport(transport);
+      setTimeout(function() { goToTransport(transport); }, 700);
     }
   }, timer);
 }
 function intoPipeHoriz(me, pipe, transport) {
-  if(!me.keys.run || !me.resting ||
-                      me.top + unitsizet2 < pipe.top ||
-                      me.bottom - unitsizet2 > pipe.bottom) return;
+  console.log("trying " + me.keys.run + ", " + String(me.resting));
+  if(!me.keys.run || !(me.resting || map.underwater)) return;
   pipePreparations(me);
   var move = setInterval(function() {
     shiftHoriz(me, unitsized4, true);
     if(me.left >= pipe.left) {
       clearInterval(move);
-      goToTransport(transport);
+      setTimeout(function() { goToTransport(transport); }, 700);
     }
   }, timer);
 }
@@ -341,7 +344,8 @@ function pipePreparations(me) {
   pauseTheme();
   play("Pipe.wav");
   locMovePreparations(me);
-  nokeys = true;
+  me.nofall = me.nocollide = nokeys = notime = true;
+  me.movement = me.xvel = me.yvel = 0;
 }
 
 function locMovePreparations(me) {
@@ -355,7 +359,7 @@ function locMovePreparations(me) {
   removeClass(me, "flipped");
 }
 function exitPipeVert(me, pipe) {
-  me.nofall = true;
+  me.nofall = nokeys = notime = true;
   play("Pipe.wav");
   setTop(me, pipe.top);
   setMidXObj(me, pipe, true);
@@ -364,7 +368,7 @@ function exitPipeVert(me, pipe) {
     shiftVert(me, dy, true);
     if(me.bottom <= pipe.top) {
       clearInterval(move);
-      me.nocollide = me.piping = me.nofall = nokeys = false;
+      me.nocollide = me.piping = me.nofall = nokeys = notime = false;
       me.placed = true;
       me.element.style.zIndex = 14;
       unpause();
@@ -383,10 +387,11 @@ function enterCloudWorld(me, nopause) {
   var screenbottom = 140 * unitsize,
       screentop = 72 * unitsize;
   setTop(me, screenbottom);
-  setLeft(me, unitsizet32);
+  setLeft(me, unitsize * 30);
   me.element.style.zIndex = 14;
   removeClass(me, "jumping");
-  me.element.className += " climbing";
+  addClasses(me, ["climbing", "animated"]);
+  me.climbing = addSpriteCycleManual(me, ["one", "two"], "climbing");
   me.nofall = true;
   
   me.attached = new Thing(Vine, -1);
@@ -404,19 +409,20 @@ function enterCloudWorld(me, nopause) {
         // Mario moving up
         shiftVert(me, unitsized4 * -1, true);
         if(me.top <= stopheight) {
+          // Mario stops moving up
+          removeClass(me, "animated");
           clearInterval(movement);
           setTop(me, stopheight, true);
           clearInterval(movement);
           setTimeout(function() {
-          // Mario switches sides
-          setLeft(me, unitsize * 36, true);
-          me.element.className += " flipped";
+            // Mario switches sides
+            setLeft(me, unitsize * 36, true);
+            addClass(me, "flipped");
             setTimeout(function() {
               // Mario hops off
+              // unattachMario(me);
               marioHopsOff(me, me.attached);
-              me.death = function(me) {
-                // alert("yeah");
-              }
+              mario.cycles.climbing.push("three"); // emulates running
             }, timer * 28);
           }, timer * 14);
         }
@@ -443,8 +449,9 @@ function entryNormal(me) {
   unpause();
 }
 function entryRandom(me) {
-  data.time.amount = Infinity;
-  notime = map.random = true;
+  data.time.amount = 0;
+  data.time.dir = 1;
+  map.random = true;
   updateDataElement(data.time);
   if(map.startwidth) {
     if(!map.nofloor) pushPreFloor(0, 0, map.startwidth);
@@ -531,9 +538,9 @@ function pushPreThingsVert(type, xloc, yloc, height, num, extras, more) {
 
 function fillPreThing(type, xloc, yloc, numx, numy, width, height, extras, more) {
   var x = xloc, y;
-  for(var i=0; i<numx; ++i) {
+  for(var i = 0, j; i < numx; ++i) {
     y = yloc;
-    for(var j=0; j<numy; ++j) {
+    for(j = 0; j < numy; ++j) {
       pushPreThing(type, x, y, extras, more);
       y += height;
     }
@@ -542,7 +549,7 @@ function fillPreThing(type, xloc, yloc, numx, numy, width, height, extras, more)
 }
 
 function pushPreFloor(xloc, yloc, length) {
-  pushPreThing(Floor, xloc, yloc, length || 1, DtB(yloc, 8));
+  pushPreThing(Floor, xloc, yloc || 0, length || 1, DtB(yloc, 8));
 }
 
 function makeCeiling(xloc, num) {
@@ -551,7 +558,7 @@ function makeCeiling(xloc, num) {
     pushPreThing(Brick, xloc + i * 8, ceillev);
 }
 function makeCeilingCastle(xloc, bwidth, bheight) {
-  pushPreThing(GenericStone, xloc, ceillev, bwidth || 1, bheight || 1);
+  pushPreThing(Stone, xloc, ceillev, bwidth || 1, bheight || 1);
 }
 
 function pushPreBridge(xloc, yloc, length, sides) {
@@ -582,11 +589,12 @@ function pushPreScale(xloc, yloc, width, settings) {
       me = pushPreThing(Scale, xloc, yloc, width).object;
   
   // Set the platforms
-  platleft = pushPreThing(Platform, xloc - offx, yloc - offy1 * 4, platwidth, moveFalling).object;
-  platright = pushPreThing(Platform, xloc + width * 4 - platwidth - 6, yloc - offy2 * 4, platwidth, moveFalling).object;
+  platleft = pushPreThing(Platform, xloc - offx, yloc - offy1 * 4, platwidth, moveFallingScale).object;
+  platright = pushPreThing(Platform, xloc + width * 4 - platwidth - 6, yloc - offy2 * 4, platwidth, moveFallingScale).object;
   platleft.parent = me; platright.parent = me;
-  platleft.partner = platright; platleft.tension = offy1 * unitsize * 4 - unitsizet8;
-  platright.partner = platleft; platright.tension = offy2 * unitsize * 4 - unitsizet8;
+  platleft.partner = platright; platright.partner = platleft;
+  platleft.tension = offy1 * unitsize * 4 - unitsizet8; 
+  platright.tension = offy2 * unitsize * 4 - unitsizet8;
   
   // Set the tension
   me.tensionleft = offy1 * unitsize;
@@ -594,7 +602,7 @@ function pushPreScale(xloc, yloc, width, settings) {
   
   // Add the strings
   platleft.string = pushPreScenery("String", xloc, yloc - offy1 * 4, 1, offy1 * 4).object;
-  platright.string = pushPreScenery("String", xloc + width * 4 - platwidth + 5, yloc - offy2 * 4, 1, offy2 * 4).object;
+  platright.string = pushPreScenery("String", xloc + width * 4 - 1, yloc - offy2 * 4, 1, offy2 * 4).object;
 }
 
 // worlds gives the pipe [X,Y]
@@ -640,7 +648,7 @@ function endCastleOutside(xloc, yloc, castlevel, wall, dist) {
   dist = dist || 20;
   var detect = pushPreThing(FlagDetector, xloc + 7, yloc + 108).object;
   detect.flag = pushPreThing(Flag, xloc + .5, yloc + 79.5).object;
-  detect.stone = pushPreThing(GenericStone, xloc + 4, yloc + 8).object;
+  detect.stone = pushPreThing(Stone, xloc + 4, yloc + 8).object;
   detect.top = pushPreThing(FlagTop, xloc + 6.5, 84).object;
   detect.pole = pushPreThing(FlagPole, xloc + 8, 80).object;
   var detect2 = pushPreThing(CastleDoorDetector, xloc + 60 + (castlev == 0) * 8, 8).object;
@@ -650,34 +658,40 @@ function endCastleOutside(xloc, yloc, castlevel, wall, dist) {
 }
 
 function startCastleInside() {
-  pushPreThing(GenericStone, 0, 88, 5, 3);
-  pushPreThing(GenericStone, 0, 48, 3, DtB(48, 8));
-  pushPreThing(GenericStone, 24, 40, 1, DtB(40, 8));
-  pushPreThing(GenericStone, 32, 32, 1, DtB(32, 8));
+  pushPreThing(Stone, 0, 88, 5, 3);
+  pushPreThing(Stone, 0, 48, 3, DtB(48, 8));
+  pushPreThing(Stone, 24, 40, 1, DtB(40, 8));
+  pushPreThing(Stone, 32, 32, 1, DtB(32, 8));
 }
 
 function endCastleInside(xloc, last) {
-  var axe = pushPreThing(CastleAxe, xloc + 104, 40).object;
-  pushPreThing(ScrollBlocker, xloc + 116, ceilmax); // 104 + 16
+  var axe = pushPreThing(CastleAxe, xloc + 104, 56).object;
+  pushPreThing(ScrollBlocker, xloc + 112, ceilmax); // 104 + 16
   axe.bridge = pushPreThing(CastleBridge, xloc, 24, 13).object;
   axe.chain = pushPreThing(CastleChain, xloc + 96.5, 32).object;
   axe.bowser = pushPreThing(Bowser, xloc + 69, 42).object;
   
-  pushPreThing(GenericStone, xloc, 88, 32);
+  pushPreThing(Stone, xloc, 88, 32);
   fillPreWater(xloc, 0, 26);
-  pushPreThing(GenericStone, xloc + 104, 32, 3, DtB(24, 8));
-  pushPreThing(GenericStone, xloc + 104, 0, 19, DtB(0, 8));
-  pushPreThing(GenericStone, xloc + 112, 80, 2, 3);
-  var npc;
-  if(last) npc = pushPreThing(Peach, xloc + 194, 13).object;
-  else npc = pushPreThing(Toad, xloc + 194, 12).object;
-  npc.text = [
-    pushPreThing(text, xloc + 160, 66, ["THANK YOU MARIO!", 88, 24, true]).object,
-    pushPreThing(text, xloc + 148, 50, ["Come back soon for the full game!", 88, 24, true]).object
-  ];
+  pushPreFloor(xloc + 104, 32, 3);
+  pushPreFloor(xloc + 104, 0, 19);
+  pushPreThing(Stone, xloc + 112, 80, 2, 3);
   
-  if(map.area.noscrollblock)
-    pushPreThing(ScrollBlocker, xloc + 256, ceilmax);
+  // If last == 2, query the NPC from the server
+  if(last == 2) placeRandomCastleNPC(xloc);
+  
+  // Otherwise, either put Peach or that jerk Toad
+  else {var npc;
+    if(last) npc = pushPreThing(Peach, xloc + 194, 13).object;
+    else npc = pushPreThing(Toad, xloc + 194, 12).object;
+    npc.text = [
+      pushPreThing(text, xloc + 160, 66, ["THANK YOU MARIO!", 88, 24, true]).object,
+      pushPreThing(text, xloc + 148, 50, ["Come back soon for the full game!", 88, 24, true]).object
+    ];
+  }
+  
+  // Stop that scrolling.
+  pushPreThing(ScrollBlocker, xloc + 256, ceilmax);
 }
 
 function pushPreSectionPass(xloc, yloc, width, height, secnum) {
@@ -768,8 +782,8 @@ function zoneEnableLakitu() {
   map.zone_lakitu = true;
   enterLakitu();
 }
-function zoneDisableLakitu(me) {
-  if(!map.zone_lakitu || !map.has_lakitu) return killNormal(me);
+function zoneDisableLakitu() {
+  if(!map.has_lakitu) return;// killNormal(me);
   
   var lakitu = map.has_lakitu;
   map.zone_lakitu = map.has_lakitu = false;
@@ -782,24 +796,15 @@ function zoneDisableLakitu(me) {
     me.xvel = max(me.xvel - unitsized32, unitsize * -1);
   };
 }
-function zoneEnableCheeps() {
-  if(map.zone_cheeps) return;
+function zoneStartCheeps(xloc) { pushPreFuncCollider(xloc, zoneEnableCheeps); }
+function zoneStopCheeps(xloc) { pushPreFuncCollider(xloc, zoneDisableCheeps); }
+function zoneEnableCheeps(me) {
+  if(map.zone_cheeps || !me.mario) return;
   startCheepSpawn();
 }
-function zoneDisableCheeps() {
+function zoneDisableCheeps(me) {
+  if(!me.mario) return;
   map.zone_cheeps = false;
-}
-
-function zoneStopLakitu(xloc) {
-  pushPreThing(zoneToggler, xloc, ceilmax + 40, zoneDisableLakitu);
-}
-
-// CheepCheep zones
-function zoneStartCheeps(xloc) {
-  pushPreThing(zoneToggler, xloc, ceilmax + 40, zoneEnableCheeps);
-}
-function zoneStopCheeps(xloc) {
-  pushPreThing(zoneToggler, xloc, ceilmax + 40, zoneDisableCheeps);
 }
 
 /*
@@ -855,8 +860,40 @@ function World11(map) {
   map.areas = [
     new Area("Overworld", function() {
       setLocationGeneration(0);
-
-      pushPreThing(text, 20, 96, ["<div style='width:350px;height:305px;background-color:#d64d00;border-radius:7px;box-shadow:3px 3px #efb28b inset, -3px -3px black inset;'><p style='text-align:left;padding:7px 14px;font-family: Super Mario Bros Alphabet;font-size:106px;line-height:96px;text-shadow:6px 8px black'>Super<br>Mario Bros<br></p><p style='text-align:center;text-shadow:2px 2px 1px #61341b'>Arrow/WASD keys move<br>Shift to fire/sprint<br>P/M to pause/mute</p></div>"]);
+      
+      var greeter = "";
+      greeter += "<div style='width:350px;background-color:#d64d00;border-radius:7px;box-shadow:3px 3px #efb28b inset, -3px -3px black inset;";
+      greeter += "background-image: url(\"Theme/Greeting.gif\"), url(\"Theme/Greeting.gif\"), url(\"Theme/Greeting.gif\"), url(\"Theme/Greeting.gif\");";
+      greeter += "background-repeat: no-repeat;";
+      greeter += "background-position: 7px 7px, 336px 7px, 7px 168px, 336px 168px";
+      greeter += "'>";
+      greeter += "  <p style='text-align:left;padding:7px 0 11px 11px;color:#ffcccc;font-family: Super Plumber Bros;font-size:77px;text-shadow:3px 8px black'>";
+      greeter += "    <span style='font-size:84px'>super</span>";
+      greeter += "    <br><br>"; // To do: make this not so font dependant
+      greeter += "    <span style='font-size:81px;line-height:96px'>MARIO BROS.</span>";
+      greeter += "  </p>";
+      greeter += "</div>";
+      greeter += "<div style='text-align:right;color:#ffcccc;margin-top:-7px'>&copy;1985 NINTENDO</div>";
+      // if(data.lives.amount == 3) {
+        greeter += "<p id='explanation' style='text-align:center;<!--/*text-shadow:2px 2px 1px black;*/-->margin-left:7px;'>";
+        greeter += "  Arrow/WASD keys move";
+        greeter += "  <br>";
+        greeter += "  Shift to fire/sprint";
+        greeter += "  <br>";
+        greeter += "  P/M to pause/mute";
+        // greeter += "  <br>";
+        // greeter += "  TOP- " + (localStorage.highscore || "000000");
+        greeter += "</p>";
+      // }
+      pushPreThing(text, 20, 91, [greeter]);
+      // addEventInterval(function(threshold) {
+        // if(mario.left > threshold) {
+          // explanation.style.transition = "all 1400ms";
+          // explanation.style.opacity = "0";
+          // return true;
+        // }
+      // }, 1, Infinity, unitsize * 96);
+      
       
       pushPrePattern("backreg", 0, 0, 5);
       pushPreFloor(0, 0, 69);
@@ -1063,14 +1100,12 @@ function WorldRandomSky(map) {
   map.randname = "Sky";
   map.areatype = "Sky" + randDayNight();
   map.firstRandomThings = function(map) {
-    pushPreThing(Clouds, 0, 0, 4);
-    // enterCloudWorld(mario);
+    pushPreThing(GenericStone, 0, 0, 4);
   }
   map.startwidth = 4;
   map.nofloor = true;
   randMapType(map);
 }
-// To do: make this, with transitions?
 function WorldRandomCastle(map) {
   map.randtype = startRandomSectionCastle;
   map.randname = map.areatype = "Castle";
@@ -1078,67 +1113,791 @@ function WorldRandomCastle(map) {
     startCastleInside();
     startCastle();
   };
+  map.respawndist = 35;
   randMapType(map);
 }
 
-
-function World32(map) {
+function World21(map) {
   map.locs = [
-    new Location(0, true)
+    new Location(0, true),
+    new Location(0, false, 1260),
+    new Location(0, exitPipeVert),
+    new Location(1, enterCloudWorld),
+    new Location(2)
   ];
   map.areas = [
-    new Area("Overworld Night Alt", function() {
+    new Area("Overworld", function() {
       setLocationGeneration(0);
-
-      pushPrePattern("backfence", -384, 0, 5);
-      pushPreScenery("Castle", -1 * unitsizet4, castlev);
-      pushPreFloor(0, 0, 80);
-      pushPreThing(Koopa, 136, 12);
-      fillPreThing(Goomba, 192, 8, 3, 1, 12);
-      fillPreThing(Koopa, 264, 12, 3, 1, 12);
-      fillPreThing(Koopa, 344, 12, 2, 1, 12);
-      pushPreThing(Stone, 392, 8);
-      fillPreThing(Coin, 441, jumplev1-1, 3, 1, 8);
-      pushPreThing(Stone, 480, 24, 1, 3);
-      pushPreThing(Block, 480, 56, Mushroom);
+      
+      pushPreScenery("Castle", -16, 0);
+      pushPrePattern("backfence", 0, 0, 2);
+      pushPrePattern("backfencemin", 768, 0, 1);
+      pushPrePattern("backfence", 1152, 0, 2);
+      
+      pushPreFloor(0, 0, 92);
+      pushPreThing(Brick, 120, jumplev1);
+      pushPreThing(Brick, 128, jumplev1, Mushroom);
+      pushPreThing(Brick, 136, jumplev1);
+      pushPreThing(Stone, 160, 8);
+      pushPreThing(Stone, 168, 16, 1, 2);
+      pushPreThing(Stone, 176, 24, 1, 3);
+      pushPreThing(Stone, 184, 32, 1, 4);
+      pushPreThing(Stone, 192, 40, 1, 5);
+      pushPreThing(Goomba, 192, 48);
+      pushPreThing(Block, 224, jumplev1, false, true);
+      pushPreThing(Block, 224, jumplev2, [Mushroom, 1], true);
+      fillPreThing(Brick, 232, jumplev2, 3, 1, 8, 8);
+      pushPreThing(Koopa, 256, 12); 
+      pushPreThing(Koopa, 264, 12); 
+      pushPreThing(Stone, 272, 32, 1, 4);
+      pushPreThing(Stone, 280, 16, 1, 2);
+      pushPreThing(Goomba, 336, 8);
+      pushPreThing(Goomba, 348, 8);
+      pushPrePipe(368, 0, 32, true);
+      pushPreThing(Block, 424, jumplev1, Mushroom);
+      fillPreThing(Block, 424, jumplev2, 5, 1, 8, 8);
+      fillPreThing(Block, 432, jumplev1, 4, 1, 8, 8);
+      pushPreThing(Goomba, 472, 8);
+      pushPreThing(Goomba, 484, 8);
       pushPreThing(Koopa, 528, 12);
-      fillPreThing(Goomba, 568, 8, 3, 1, 12);
-      pushPreThing(Stone, 600, 16, 1, 2);
-      pushPreThing(Brick, 616, jumplev1, Coin);
-      pushPreThing(Brick, 616, jumplev2, Star);
-      pushPreThing(Koopa, 624, 12);
-      pushPreThing(Stone, 632, 16, 1, 2);
+      fillPreThing(Goomba, 544, 8, 3, 1, 12, 8);
+      pushPreThing(Brick, 544, jumplev1);
+      pushPreThing(Brick, 552, jumplev2, Star);
+      fillPreThing(Brick, 560, jumplev2, 3, 1, 8, 8);
       
-      pushPreFloor(656, 0, 41);
-      pushPreThing(Koopa, 736, 34, false, true);
-      pushPreThing(Koopa, 888, 12);
-      fillPreThing(Goomba, 952, 8, 3, 1, 12);
+      pushPrePipe(592, 0, 32, true);
+      fillPreThing(Block, 632, jumplev1, 4, 1, 8, 8);
+      fillPreThing(Brick, 648, jumplev2, 2, 1, 8, 8);
+      pushPreThing(Brick, 664, jumplev2, [Vine, 3]);
+      fillPreThing(Brick, 672, jumplev2, 2, 1, 8, 8);
+      fillPreThing(Block, 680, jumplev1, 3, 1, 8, 8);
+      fillPreThing(Goomba, 704, 8, 3, 1, 12, 8);
       
-      pushPreFloor(1000, 0, 3);
-      pushPreThing(Stone, 1008, 16, 1, 2);
-      pushPreThing(Brick, 1008, 56);
+      fillPreThing(Brick, 736, jumplev2, 4, 1, 8, 8);
+      pushPreFloor(768, 0, 10);
+      pushPreThing(Goomba, 820, 40, 8, 8);
+      pushPrePipe(824, 0, 32, true, 4);
+
+      pushPreFloor(872, 0, 30);
+      pushPreThing(Goomba, 916, 24, 8, 8);
+      pushPrePipe(920, 0, 16, true, false, 2);
+      pushPreThing(Goomba, 962, 8);
+      pushPrePipe(976, 0, 32, true);
+      pushPreThing(Brick, 1000, jumplev2, Mushroom);
+      fillPreThing(Brick, 1008, jumplev2, 3, 1, 8, 8);
+      pushPrePipe(1008, 0, 24);
+      pushPrePipe(1040, 0, 40, true);
+      pushPreThing(Koopa, 1096, 12);
       
-      pushPreFloor(1040, 0, 94);
-      pushPreThing(Koopa, 1072, 12);
-      fillPreThing(Koopa, 1120, 12, 3, 1, 12);
-      fillPreThing(Koopa, 1200, 12, 2, 1, 12);
-      fillPreThing(Koopa, 1296, 12, 3, 1, 12);
-      fillPreThing(Coin, 1345, 55, 4, 1, 8);
-      pushPrePipe(1352, 0, 24, true);
-      pushPreThing(Koopa, 1400, 12);
-      fillPreThing(Goomba, 1432, 8, 3, 1, 12);
-      fillPreThing(Goomba, 1504, 8, 3, 1, 12);
-      pushPreThing(Stone, 1536, 8);
-      pushPreThing(Stone, 1544, 16, 1, 2);
-      pushPreThing(Stone, 1552, 24, 1, 3);
-      pushPreThing(Stone, 1560, 32, 1, 4);
-      pushPreThing(Stone, 1568, 40, 1, 5);
-      pushPreThing(Stone, 1576, 48, 1, 6);
-      pushPreThing(Stone, 1584, 56, 1, 7);
-      pushPreThing(Stone, 1592, 64, 1, 8);
-      pushPreThing(Stone, 1600, 64, 1, 8);
+      pushPreFloor(1136, 0, 10);
+      pushPreThing(Koopa, 1200, 36, false, true);
       
-      endCastleOutside(1668, 0, castlev);
+      pushPreFloor(1232, 0, 72);
+      pushPreThing(Stone, 1232, 24, 1, 3);
+      pushPreThing(Brick, 1288, jumplev1, Coin);
+      fillPreThing(Goomba, 1296, 8, 2, 1, 12);
+      fillPreThing(Brick, 1312, jumplev2, 5, 1, 8);
+      fillPreThing(Koopa, 1352, 12, 2, 1, 16);
+      pushPreThing(Block, 1360, jumplev1);
+      pushPreThing(Block, 1374, jumplev2, Mushroom);
+      pushPrePipe(1408, 0, 24, true);
+      pushPreThing(Koopa, 1480, 12);
+      fillPreThing(Brick, 1480, jumplev1, 2, 1, 8);
+      pushPreThing(Block, 1488, jumplev2, Coin, true);
+      pushPreThing(Springboard, 1504, 15.5);
+      fillPreThing(Stone, 1520, 80, 2, 1, 8, 8, 1, 10);
+      endCastleOutside(1596, 0, castlev);
+    }),
+    new Area("Sky", function() {
+      setLocationGeneration(3);
+      
+      pushPreThing(Stone, 0, 0, 4);
+      pushPreThing(Stone, 40, 0, 72);
+      pushPreThing(Platform, 120, 32, 8, collideTransport);
+      fillPreThing(Coin, 120, 64, 16, 1, 8);
+      fillPreThing(Coin, 256, 80, 3, 1, 8);
+      fillPreThing(Coin, 288, 72, 16, 1, 8);
+      fillPreThing(Coin, 424, 80, 3, 1, 8);
+      
+      setExitLoc(1);
+      // pushPreThing(LocationShifter, 609, -32, 2, [window.innerWidth / unitsize, 16]);
+  }),
+    new Area("Underworld", function() {
+      setLocationGeneration(4);
+      
+      makeCeiling(32, 7);
+      pushPreFloor(0, 0, 17);
+      fillPreThing(Brick, 0, 8, 1, 11, 8, 8);
+      fillPreThing(Brick, 32, 8, 7, 3, 8, 8);
+      pushPreThingsVert(Coin , 34, 17, 14, 2);
+      pushPreThingsVert(Coin , 42, 17, 14, 3);
+      pushPreThingsVert(Coin , 50, 17, 14, 3);
+      pushPreThingsVert(Coin , 58, 17, 14, 3);
+      pushPreThingsVert(Coin , 66, 17, 14, 3);
+      pushPreThingsVert(Coin , 74, 17, 14, 3);
+      pushPreThingsVert(Coin , 82, 17, 14, 2);
+      pushPreThing(PipeSide, 104, 16, 2);
+      pushPreThing(PipeVertical, 120, 88, 88);
     })
   ];
+}
+
+function World14(map) {map.time = 300;
+  map.locs = [
+    new Location(0, startCastle)
+  ];
+  map.areas = [
+    new Area("Castle", function() {
+      setLocationGeneration(0);
+      
+      startCastleInside();
+
+      pushPreThing(GenericStone, 40, 88, 19, 3);
+      pushPreFloor(40, 24, 8);
+      fillPreWater(104, 8, 4);
+      
+      pushPreFloor(120, 24, 11);
+      pushPreThing(GenericStone, 184, 64, 1, 1);
+      pushPreThing(CastleBlock, 184, 56);
+      makeCeilingCastle(192, 136);
+      fillPreWater(208, 0, 6);
+      
+      pushPreFloor(232, 24, 3);
+      pushPreThing(CastleBlock, 240, 24, 6);
+      pushPreThing(Block, 240, 56, Mushroom);
+      fillPreWater(256, 0, 6);
+      
+      pushPreThing(GenericStone, 280, 32, 37, 1);
+      pushPreThing(GenericStone, 280, 24, 69, 3);
+      pushPreFloor(280, 0, 93);
+      pushPreThing(GenericStone, 296, 80, 35, 3);
+      pushPreThing(CastleBlock, 296, 56);
+      pushPreThing(CastleBlock, 392, 56, 6);
+      pushPreThing(CastleBlock, 480, 56, 6);
+      pushPreThing(CastleBlock, 536, 56, 6);
+      pushPreThing(CastleBlock, 608, 32, 6);
+      pushPreThing(GenericStone, 640, 80, 1, 1);
+      pushPreThing(CastleBlock, 640, 72);
+      pushPreThing(CastleBlock, 672, 32, 6);
+      pushPreThing(GenericStone, 704, 80, 1, 1);
+      pushPreThing(CastleBlock, 704, 72, 6, true);
+      pushPreThing(CastleBlock, 736, 32);
+      pushPreThing(GenericStone, 776, 80, 7, 2);
+      pushPreThing(Block, 848, 32, Coin, true);
+      pushPreThing(Block, 872, 32, Coin, true);
+      pushPreThing(Block, 896, 32, Coin, true);
+      pushPreThing(Block, 856, 64, Coin, true);
+      pushPreThing(Block, 880, 64, Coin, true);
+      pushPreThing(Block, 904, 64, Coin, true);
+      pushPreThing(GenericStone, 928, 24, 4, 3);
+      pushPreThing(GenericStone, 984, 24, 5, 3);
+      pushPreThing(GenericStone, 984, 80, 5, 2);
+      
+      endCastleInside(1024);
+      pushPreThing(Platform, 1108, 56, 4, [moveSliding, 1080, 1112]).object.nocollidechar = true;
+    })
+  ];
+}
+
+function World24(map) {
+map.time = 300;
+map.locs = [
+  new Location(0, startCastle)
+];
+map.areas = [
+  new Area("Castle", function() {
+    setLocationGeneration(0);
+    
+    startCastleInside();
+    
+    makeCeilingCastle(40, 11, 3);
+    pushPreFloor(40, 24, 11);
+    
+    fillPreWater(128, 0, 32);
+    pushPreThing(Podoboo, 128, -32);
+    pushPreThing(GenericStone, 144, 32, 2, 1);
+    pushPreThing(GenericStone, 176, 48, 3, 1);
+    pushPreThing(CastleBlock, 184, 48);
+    pushPreThing(Block, 184, 80, Mushroom);
+    pushPreThing(GenericStone, 216, 32, 2, 1);
+    pushPreThing(Podoboo, 240, -32);
+    
+    pushPreFloor(256, 0, 52);
+    pushPreThing(GenericStone, 256, 24, 2, 3);
+    makeCeilingCastle(272, 49, 4);
+    pushPreThing(GenericStone, 296, jumplev1, 36, 1);
+    pushPreThing(CastleBlock, 344, 0);
+    pushPreThing(CastleBlock, 392, jumplev1, 6);
+    pushPreThing(CastleBlock, 440, 0);
+    pushPreThing(CastleBlock, 440, jumplev2, 6);
+    pushPreThing(CastleBlock, 488, jumplev1, 6);
+    pushPreThing(CastleBlock, 536, 0);
+    pushPreThing(CastleBlock, 584, jumplev1, 6);
+    pushPreThing(GenericStone, 640, 24, 4, 3)
+    pushPreThing(CastleBlock, 656, 56, 6);
+    
+    pushPrePlatformGenerator(686, 3, -1);
+    pushPrePlatformGenerator(710, 3, 1);
+    
+    pushPreFloor(736, 16);
+    pushPreThing(CastleBlock, 736, 24, 6, true);
+    pushPreFloor(744, 24, 6);
+    makeCeilingCastle(744, 6, 3);
+    pushPreFloor(792, 0, 10);
+    fillPreThing(Coin, 817, 7, 3, 2, 8, 32);
+    pushPreThing(CastleBlock, 824, 16);
+    fillPreWater(872, 0, 4);
+    pushPreThing(GenericStone, 864, 24, 1, 3);
+    pushPreFloor(888, 24, 2);
+    fillPreWater(904, 0, 4);
+    
+    pushPreFloor(920, 0, 13);
+    pushPreThing(GenericStone, 920, 24, 5, 3);
+    makeCeilingCastle(920, 13, 3);
+    fillPreThing(GenericStone, 976, 24, 2, 1, 32, 0, 2, 3);
+    
+    fillPreThing(Brick, 1024, 64, 6, 1, 8);
+    endCastleInside(1024);
+  })
+];
+}
+
+function World34(map) {
+map.time = 300;
+map.locs = [
+  new Location(0, startCastle)
+];
+map.areas = [
+  new Area("Castle", function() {
+    setLocationGeneration(0);
+
+    startCastleInside();
+    
+    makeCeilingCastle(40, 11, 3);
+    pushPreFloor(40, 24, 11);
+    pushPreThing(Podoboo, 128, -32);
+    makeCeilingCastle(128, 112);
+    
+    pushPreFloor(144, 24, 3);
+    pushPreThing(CastleBlock, 152, 16, 6);
+    pushPreFloor(184, 24, 3);
+    pushPreThing(CastleBlock, 192, 16, 6);
+    pushPreThing(Podoboo, 208, -32);
+    pushPreFloor(224, 24, 3);
+    pushPreThing(CastleBlock, 232, 16, 6);
+    
+    pushPreFloor(264, 0, 13);
+    pushPreThing(GenericStone, 264, 24, 2, 3);
+    pushPreThing(GenericStone, 280, 80, 11, 2);
+    pushPreThing(Block, 336, jumplev1);
+    pushPreThing(Block, 344, jumplev1, Mushroom);
+    pushPreThing(Block, 352, jumplev1);
+    
+    pushPreFloor(384, 0, 40);
+    pushPreThing(GenericStone, 424, 8, 3, 1);
+    pushPreThing(GenericStone, 424, 80, 3, 2);
+    pushPreThing(CastleBlock, 432, 16, 6, true);
+    pushPreThing(CastleBlock, 432, 64, 6);
+    pushPreThing(GenericStone, 504, 8, 3, 1);
+    pushPreThing(GenericStone, 504, 80, 3, 2);
+    pushPreThing(CastleBlock, 512, 16, 6, true);
+    pushPreThing(CastleBlock, 512, 64, 6);
+    pushPreThing(GenericStone, 632, 8, 3, 1);
+    pushPreThing(GenericStone, 632, 80, 3, 2);
+    pushPreThing(CastleBlock, 640, 16, 6);
+    pushPreThing(CastleBlock, 640, 64, 6, true);
+    pushPreThing(Podoboo, 704, -32);
+    fillPreWater(704, 0, 4);
+    
+    pushPreFloor(720, 24, 6);
+    pushPreThing(GenericStone, 720, 80, 6, 2);
+    fillPreWater(768, 0, 6);
+    pushPreThing(Podoboo, 776, -32);
+    pushPreFloor(792, 24, 3);
+    fillPreWater(816, 0, 6);
+    pushPreThing(Podoboo, 824, -32);
+    pushPreFloor(840, 24, 3);
+    fillPreWater(864, 0, 6);
+    pushPreThing(Podoboo, 872, -32);
+    pushPreFloor(888, 0, 17);
+    pushPreThing(GenericStone, 888, 24, 5, 3);
+    pushPreThing(GenericStone, 888, 80, 17, 2);
+    pushPreThing(GenericStone, 944, 24, 10, 3);
+    
+    endCastleInside(1024, 0);
+    fillPreThing(Brick, 1056, 64, 2, 3, 8, 8);
+  })
+];
+}
+
+function World44(map) {
+map.locs = [
+  new Location(0, startCastle)
+];
+map.areas = [
+  new Area("Castle", function() {
+    setLocationGeneration(0);
+    
+    startCastleInside();
+    
+    pushPreFloor(40, 24, 2);
+    makeCeilingCastle(40, 11);
+    fillPreWater(56, 0, 4);
+    pushPreFloor(72, 24, 2);
+    fillPreWater(88, 0, 4);
+    pushPreFloor(104, 24, 3);
+    
+    this.sections = {
+      start: 128,
+      0: function(xloc) {
+        pushPreFloor(xloc, 0, bstretch + 50);
+        makeCeilingCastle(xloc, bstretch + 50);
+        pushPreThing(GenericStone, xloc + 16, 56, 6, 4);
+        fillPreThing(GenericStone, xloc + 72, 56, 5, 1, 16, 0, 1, 4);
+        pushPreThing(GenericStone, xloc + 152, 56, 3, 4);
+        pushPreThing(GenericStone, xloc + 176, 56, 6, 1);
+        pushPrePipe(xloc + 192, 0, 24, true);
+        pushPreThing(GenericStone, xloc + 224, 56, 17, 4);
+        pushPreThing(CastleBlock, xloc + 296, 56, [6, 1], true);
+        pushPreSectionFail(xloc + 384, 24, 40, 24);
+        pushPreSectionPass(xloc + 384, 80, 40, 24);
+        pushPreThing(CastleBlock, xloc + 352, 32, [6, 1], true);
+        pushPreThing(GenericStone, xloc + 360, 56, bstretch, 4);
+        pushPreThing(GenericStone, xloc + 376 + bstretch * 8, 24, 3, 3);
+        pushPreThing(GenericStone, xloc + 376 + bstretch * 8, 80, 3, 3);
+        pushCastleDecider(xloc + 400 + bstretch * 8, 0);
+      },
+      1: function(xloc) {
+        pushPreFloor(xloc, 0, 8);
+        makeCeilingCastle(xloc, bstretch + 42);
+        pushPreThing(GenericStone, xloc + 48, 24, 2);
+        fillPreWater(xloc + 64, 0, 4);
+        pushPreThing(GenericStone, xloc + 72, 40, 2);
+        fillPreWater(xloc + 80, 0, 10);
+        
+        pushPreFloor(xloc + 80, 16);
+        pushPreThing(GenericStone, xloc + 80, 24, 5);
+        pushPreThing(GenericStone, xloc + 104, 48);
+        pushPreThing(GenericStone, xloc + 112, 40, 1, 2);
+        pushPreFloor(xloc + 120, 0, 27);
+        pushPreThing(GenericStone, xloc + 120, 56, 1, 2);
+        pushPreThing(GenericStone, xloc + 128, 24, 26);
+        pushPreThing(GenericStone, xloc + 128, 56, 2);
+        pushPreThing(GenericStone, xloc + 160, 56, 4);
+        pushPreThing(GenericStone, xloc + 200, 48, 1, 3);
+        pushPreThing(GenericStone, xloc + 200, 56, 3);
+        pushPreThing(GenericStone, xloc + 240, 56, 12);
+        pushPreThing(CastleBlock, xloc + 280, 56, [6, 1], true);
+        pushPreThing(CastleBlock, xloc + 328, 24, [6, 1], true);
+        
+        pushPreFloor(xloc + 336, 0, bstretch);
+        pushPreThing(GenericStone, xloc + 336, 24, bstretch);
+        pushPreThing(GenericStone, xloc + 336, 56, bstretch);
+        pushPreSectionPass(xloc + 360, 16, 40, 16);
+        pushPreSectionFail(xloc + 360, 48, 40, 24);
+        pushPreSectionFail(xloc + 360, 80, 40, 24);
+        pushCastleDecider(xloc + 336 + bstretch * 8, 1);
+      },
+      2: function(xloc) {
+        pushPreThing(GenericStone, xloc, 64, 1, 5);
+        makeCeilingCastle(xloc, 33, 3);
+        pushPreThing(GenericStone, xloc + 8, 80, 2, 2);
+        pushPreFloor(xloc, 0, 10);
+        pushPreFloor(xloc + 72, 24, 4);
+        makeCeilingCastle(xloc + 72, 8);
+        pushPreFloor(xloc + 96, 0, 4);
+        pushPreFloor(xloc + 120, 24, 2);
+        endCastleInside(xloc + 136);
+      }
+    };
+  })
+];
+}
+
+function World54(map) {
+map.time = 300;
+map.locs = [
+  new Location(0, startCastle)
+];
+map.areas = [
+  new Area("Castle", function() {
+    setLocationGeneration(0);
+    
+    startCastleInside();
+    
+    makeCeilingCastle(40, 11, 3);
+    pushPreFloor(40, 24, 11);
+    
+    fillPreWater(128, 0, 32);
+    pushPreThing(Podoboo, 128, -32);
+    pushPreThing(GenericStone, 144, 32, 2, 1);
+    pushPreThing(Podoboo, 160, -24);
+    pushPreThing(GenericStone, 176, 48, 3, 1);
+    pushPreThing(CastleBlock, 184, 48, 12, true);
+    pushPreThing(Block, 184, 80, Mushroom);
+    pushPreThing(GenericStone, 216, 32, 2, 1);
+    pushPreThing(Podoboo, 240, -32);
+    
+    pushPreFloor(256, 0, 52);
+    pushPreThing(GenericStone, 256, 24, 2, 3);
+    makeCeilingCastle(272, 49, 4);
+    pushPreThing(GenericStone, 296, jumplev1, 36, 1);
+    pushPreThing(CastleBlock, 344, 0, 6, true);
+    pushPreThing(CastleBlock, 392, jumplev1, 6);
+    pushPreThing(CastleBlock, 440, 0, 6, true);
+    pushPreThing(CastleBlock, 440, jumplev2);
+    pushPreThing(CastleBlock, 488, jumplev1, 6);
+    pushPreThing(CastleBlock, 536, 0, 6);
+    pushPreThing(CastleBlock, 584, jumplev1, 6);
+    pushPreThing(GenericStone, 640, 24, 4, 3)
+    pushPreThing(CastleBlock, 656, 56, 6);
+    
+    pushPrePlatformGenerator(686, 3, -1);
+    pushPrePlatformGenerator(710, 3, 1);
+    
+    pushPreFloor(736, 16);
+    pushPreThing(CastleBlock, 736, 24, 6, true);
+    pushPreFloor(744, 24, 6);
+    makeCeilingCastle(744, 6, 3);
+    pushPreFloor(792, 0, 10);
+    fillPreThing(Coin, 817, 7, 3, 2, 8, 32);
+    pushPreThing(CastleBlock, 824, 16, 6, -1.17);
+    fillPreWater(872, 0, 4);
+    pushPreThing(GenericStone, 864, 24, 1, 3);
+    pushPreThing(Podoboo, 872, -32);
+    pushPreFloor(888, 24, 2);
+    fillPreWater(904, 0, 4);
+    
+    pushPreFloor(920, 0, 13);
+    pushPreThing(GenericStone, 920, 24, 5, 3);
+    makeCeilingCastle(920, 13, 3);
+    fillPreThing(GenericStone, 976, 24, 2, 1, 32, 0, 2, 3);
+    pushPreThing(Podoboo, 904, -32);
+    
+    fillPreThing(Brick, 1024, 64, 6, 1, 8);
+    endCastleInside(1024);
+    pushPreThing(Podoboo, 1048, -40);
+  })
+];
+}
+
+function World64(map) {
+map.time = 300;
+map.locs = [
+  new Location(0, startCastle)
+];
+map.areas = [
+  new Area("Castle", function() {
+    setLocationGeneration(0);
+    
+    startCastleInside();
+    
+    makeCeilingCastle(40, 19, 3);
+    pushPreFloor(40, 24, 8);
+    fillPreWater(104, 8, 4);
+    
+    pushPreFloor(120, 24, 11);
+    pushPreThing(GenericStone, 184, 64, 1, 1);
+    pushPreThing(CastleBlock, 184, 56, 6);
+    makeCeilingCastle(192, 136);
+    fillPreWater(208, 0, 6);
+    pushPreThing(Podoboo, 216, -32);
+    
+    pushPreFloor(232, 24, 3);
+    pushPreThing(CastleBlock, 240, 24, 6);
+    pushPreThing(Block, 240, 56, Mushroom);
+    fillPreWater(256, 0, 6);
+    pushPreThing(Podoboo, 264, -32);
+    
+    pushPreThing(GenericStone, 280, 32, 37, 1);
+    pushPreThing(GenericStone, 280, 24, 69, 3);
+    pushPreFloor(280, 0, 93);
+    pushPreThing(GenericStone, 296, 80, 35, 3);
+    pushPreThing(CastleBlock, 296, 56, 6);
+    pushPreThing(CastleBlock, 392, 56, 6);
+    pushPreThing(CastleBlock, 480, 56, 6);
+    pushPreThing(CastleBlock, 536, 56, 6);
+    pushPreThing(CastleBlock, 608, 32, 6);
+    pushPreThing(GenericStone, 640, 80, 1, 1);
+    pushPreThing(CastleBlock, 640, 72, 6);
+    pushPreThing(CastleBlock, 672, 32, 6);
+    pushPreThing(GenericStone, 704, 80, 1, 1);
+    pushPreThing(CastleBlock, 704, 72, 6, true);
+    pushPreThing(CastleBlock, 736, 32, 6);
+    pushPreThing(GenericStone, 776, 80, 7, 2);
+    pushPreThing(Block, 848, 32, Coin, true);
+    pushPreThing(Block, 872, 32, Coin, true);
+    pushPreThing(Block, 896, 32, Coin, true);
+    pushPreThing(Block, 856, 64, Coin, true);
+    pushPreThing(Block, 880, 64, Coin, true);
+    pushPreThing(Block, 904, 64, Coin, true);
+    pushPreThing(GenericStone, 928, 24, 4, 3);
+    pushPreThing(GenericStone, 984, 24, 5, 3);
+    pushPreThing(GenericStone, 984, 80, 5, 2);
+    
+    endCastleInside(1024);
+  })
+];
+}
+
+function World74(map) {
+map.locs = [
+  new Location(0, startCastle)
+];
+map.areas = [
+  new Area("Castle", function() {
+    setLocationGeneration(0);
+    startCastleInside();
+
+    makeCeilingCastle(40, 11, 3);
+    pushPreFloor(40, 24, 11);
+    fillPreWater(128, 0, 22);
+    makeCeilingCastle(128, 16);
+    pushPreThing(Platform, 144, 48, 4, moveFalling); // falling
+    pushPreThing(Podoboo, 160, -32);
+    pushPreThing(Platform, 176, 40, 4, moveFalling); // falling
+    
+    pushPreThing(GenericStone, 216, 24, 5, DtB(24, 8));
+    pushPreThing(GenericStone, 224, 80, 4, 2)
+    
+    this.sections = {
+      start: 256,
+      0: function(xloc) {
+        pushPreFloor(xloc, 0, bstretch * 3 + 31);
+        makeCeilingCastle(xloc, bstretch * 3 + 31);
+        
+        pushPreThing(GenericStone, xloc + 16, 32, 5);
+        pushPreThing(GenericStone, xloc + 32, 40, 3);
+        pushPreThing(GenericStone, xloc + 40, 48, 2);
+        pushPreThing(GenericStone, xloc + 48, 56, 1);
+        pushPreThing(GenericStone, xloc + 56, 56, bstretch, 4);
+        
+        pushPreSectionPass(xloc + (bstretch + 1) * 8, 24, 40, 24);
+        pushPreSectionFail(xloc + (bstretch + 1) * 8, 80, 40, 24);
+
+        pushPreThing(GenericStone, xloc + (bstretch + 11) * 8, 24, bstretch + 2);
+        pushPreThing(GenericStone, xloc + (bstretch + 12) * 8, 56, bstretch);
+        pushPreSectionFail(xloc + (bstretch * 2 + 6) * 8, 16, 40, 16);
+        pushPreSectionPass(xloc + (bstretch * 2 + 6) * 8, 48, 40, 24);
+        pushPreSectionFail(xloc + (bstretch * 2 + 6) * 8, 80, 40, 24);
+        
+        pushPreThing(GenericStone, xloc + (bstretch * 2 + 16) * 8, 56, bstretch + 7, 4);
+        pushPreSectionFail(xloc + (bstretch * 2 + 17) * 8, 24, 40, 24);
+        pushPreSectionPass(xloc + (bstretch * 2 + 17) * 8, 80, 40, 24);
+        pushPreThing(GenericStone, xloc + (bstretch * 3 + 23) * 8, 40, 1);
+        pushPreThing(GenericStone, xloc + (bstretch * 3 + 23) * 8, 48, 2);
+        pushPreThing(GenericStone, xloc + (bstretch * 3 + 23) * 8, 56, 4);
+        
+        pushPreThing(GenericStone, xloc + (bstretch * 3 + 28) * 8, 24, 3, 3);
+        pushCastleDecider(xloc + (bstretch * 3 + 31) * 8, 0);
+      },
+      1: function(xloc) {
+        pushPreFloor(xloc, 24, 3);
+        makeCeilingCastle(xloc, 17);
+        pushPreFloor(xloc + 24, 0, 4);
+        pushPreThing(GenericStone, xloc + 48, 56, 2);
+        fillPreWater(xloc + 56, 0, 6);
+        pushPreThing(GenericStone, xloc + 72, 56, 3);
+        pushPreFloor(xloc + 80, 0);
+        pushPreThing(CastleBlock, xloc + 80, 48, 6, true);
+        fillPreWater(xloc + 88, 0, 6);
+        pushPreThing(GenericStone, xloc + 104, 56, 4, 1);
+        pushPreFloor(xloc + 112, 0, 3);
+        
+        pushPreSectionFail(xloc + 96 + (bstretch - 6) * 8, 24, 40, 24);
+        pushPreSectionPass(xloc + 96 + (bstretch - 6) * 8, 80, 40, 24);
+        pushPreFloor(xloc + 136, 0, bstretch - 5);
+        pushPreThing(GenericStone, xloc + 136, 56, bstretch - 5, 4);
+        makeCeilingCastle(xloc + 136, bstretch - 5);
+        
+        pushPreSectionFail(xloc + (bstretch * 2 + 9) * 8, 80, 40, 24);
+        pushPreSectionPass(xloc + (bstretch * 2 + 10) * 8, 48, 32, 24);
+        pushPreSectionFail(xloc + (bstretch * 2 + 10) * 8, 16, 40, 16);
+        pushPreFloor(xloc + (bstretch + 12) * 8, 0, bstretch + 10);
+        makeCeilingCastle(xloc + (bstretch + 12) * 8, bstretch + 10);
+        pushPreThing(GenericStone, xloc + (bstretch + 14) * 8, 56, 3);
+        pushPreThing(GenericStone, xloc + (bstretch + 15) * 8, 24, 3);
+        pushPreThing(GenericStone, xloc + (bstretch + 19) * 8, 56, bstretch - 4);
+        pushPreThing(GenericStone, xloc + (bstretch + 20) * 8, 24, bstretch - 4);
+        pushPreThing(GenericStone, xloc + (bstretch * 2 + 17) * 8, 56, 3);
+        pushPreThing(GenericStone, xloc + (bstretch * 2 + 18) * 8, 24, 3);
+        
+        pushPreFloor(xloc + (bstretch * 2 + 22) * 8, 0, bstretch + 12);
+        makeCeilingCastle(xloc + (bstretch * 2 + 22) * 8, bstretch + 12);
+        pushPreThing(GenericStone, xloc + (bstretch * 2 + 22) * 8, 48, 1, 3);
+        pushPreThing(GenericStone, xloc + (bstretch * 2 + 22) * 8, 56, bstretch + 5);
+        pushPreThing(GenericStone, xloc + (bstretch * 2 + 24) * 8, 8, bstretch + 10);
+        pushPreThing(GenericStone, xloc + (bstretch * 2 + 25) * 8, 16, bstretch + 9);
+        pushPreThing(GenericStone, xloc + (bstretch * 2 + 26) * 8, 24, bstretch + 8);
+        pushPreSectionFail(xloc + (bstretch * 2 + 28) * 8, 48, 40, 24);
+        pushPreSectionPass(xloc + (bstretch * 2 + 28) * 8, 80, 40, 24);
+        pushCastleDecider(xloc + (bstretch * 3 + 34) * 8, 1);
+      },
+      2: function(xloc) {
+        pushPreFloor(xloc, 0, 3);
+        makeCeilingCastle(xloc, 32);
+        pushPreFloor(xloc + 24, 24, 3);
+        pushPreFloor(xloc + 48, 0, 2);
+        pushPreFloor(xloc + 64, 24, 8);
+        pushPreFloor(xloc + 128, 0, 2);
+        pushPreFloor(xloc + 144, 24, 2);
+        pushPreFloor(xloc + 160, 0, 2);
+        pushPreFloor(xloc + 176, 24, 2);
+        pushPreFloor(xloc + 192, 0, 2);
+        pushPreFloor(xloc + 208, 24, 6);
+        endCastleInside(xloc + 256);
+      }
+    }
+  })
+];
+}
+
+function World84(map) {
+map.locs = [
+  new Location(0, startCastle),
+  new Location(0, exitPipeVert), // Pipe 1
+  new Location(1, exitPipeVert), // Past B
+  new Location(2, exitPipeVert), // Past D
+  new Location(3, exitPipeVert, 24), // Underwater
+  new Location(4, exitPipeVert)  // Pipe 2
+];
+map.areas = [
+  new Area("Castle", function() { // Area 0
+    setLocationGeneration(0);
+    
+    startCastleInside();
+    pushPreThing(GenericStone, 40, 24, 1, DtB(24, 8));
+    makeCeilingCastle(40, 32);
+    fillPreWater(48, 0, 10);
+    pushPreThing(GenericStone, 88, 0, 8, DtB(0, 8));
+    pushPrePipe(152, 16, Infinity, true, false, 1); // Pipe 1
+    pushPreFloor(168, 0, 11);
+    
+    this.sections = {
+      start: 256,
+      0: function(xloc) {
+        pushPreFloor(xloc, 0, bstretch);
+        makeCeilingCastle(xloc, bstretch + 53);
+        pushPreSectionFail(xloc, 80, 40, 80);
+        pushPrePipe(xloc + bstretch * 8, 16, Infinity, true, 1); // Back to Pipe 1
+        pushPreFloor(xloc + bstretch * 8 + 16, 0, 9);
+        fillPreThing(Goomba, xloc + bstretch * 8 + 36, 8, 3, 1, 12);
+        pushPreFloor(xloc + bstretch * 8 + 88, 24, 4);
+        fillPreWater(xloc + bstretch * 8 + 120, 0, 34);
+        // To do: make sure this is correct
+        pushPreThing(Platform, xloc + bstretch * 8 + 152, 0, 4, [moveSliding, xloc + bstretch * 8 + 140, xloc + bstretch * 8 + 232, 2]);
+        pushPreFloor(xloc + bstretch * 8 + 256, 24, 6);
+        pushPreThing(GenericStone, xloc + bstretch * 8 + 264, 56, 4);
+        pushPrePipe(xloc + bstretch * 8 + 304, 40, Infinity, true, 2); // Goes to Past B
+        pushPreFloor(xloc + bstretch * 8 + 320, 24, 7);
+        pushPrePipe(xloc + bstretch * 8 + 376, 48, Infinity, true);
+        pushPreFloor(xloc + bstretch * 8 + 392, 24, 4);
+        pushCastleDecider(xloc + bstretch * 8 + 424, 0);
+      }
+    }
+  }),
+  new Area("Castle", function() { // Area 1
+    setLocationGeneration(2);
+    
+    setBStretch();
+    pushPreFloor(0, 0, bstretch);
+    makeCeilingCastle(0, bstretch);
+    this.sections = {
+      start: bstretch * 8,
+      0: function(xloc) {
+        pushPreSectionFail(xloc, 80, 40, 80);
+        pushPrePipe(xloc, 16, Infinity, true, false, 2); // Past B
+        makeCeilingCastle(xloc, bstretch + 45);
+        pushPreFloor(xloc + 16, 0, 5);
+        pushPrePipe(xloc + 56, 24, Infinity, true);
+        pushPreFloor(xloc + 72, 0, 8);
+        fillPreThing(Beetle, xloc + 104, 8.5, 2, 1, 16);
+        pushPrePipe(xloc + 136, 16, Infinity, true, 1); // Back to Pipe 1
+        pushPreFloor(xloc + 152, 0, 8);
+        pushPreThing(Koopa, xloc + 192, 32, false, true);
+        pushPreThing(Koopa, xloc + 208, 24, false, true);
+        pushPrePipe(xloc + 216, 24, Infinity, true);
+        fillPreWater(xloc + 232, 0, 6);
+        pushPreFloor(xloc + 256, 0, 13 + bstretch);
+        pushPreThing(Block, xloc + 280, jumplev1, Coin, true);
+        pushPreThing(GenericStone, xloc + 296, jumplev1, 2);
+        pushPrePipe(xloc + 296, jumplev1, 24, true, 3); // Goes Past C
+        pushPreThing(Koopa, xloc + 320, 20, false, true);
+        pushPreThing(Koopa, xloc + 336, 24, false, true);
+        pushCastleDecider(xloc + 360 + bstretch * 8, 0);
+      }
+    }
+  }),
+  new Area("Castle", function() {  // Area 2
+    setLocationGeneration(3);
+    
+    pushPreFloor(0, 0, 3);
+    makeCeilingCastle(0, 3);
+    this.sections = {
+      start: 24,
+      0: function(xloc) {
+        pushPreSectionFail(xloc, 80, 40, 80);
+        pushPrePipe(xloc, 16, Infinity, true, false, 3);
+        makeCeilingCastle(xloc, bstretch + 38);
+        pushPreFloor(xloc + 16, 0);
+        pushPreFloor(xloc + 24, 24, 6);
+        pushPrePipe(xloc + 72, 40, Infinity, true);
+        // start cheeps here
+        pushPreFloor(xloc + 88, 24, 6);
+        pushPrePipe(xloc + 136, 48, Infinity, true, 1); // Back to Pipe 1
+        pushPreFloor(xloc + 152, 24, 6);
+        // end cheeps here
+        fillPreWater(xloc + 200, 0, 8);
+        pushPreFloor(xloc + 232, 24, 4);
+        pushPrePipe(xloc + 264, 40, Infinity, true, 4); // To Underwater (Area 3)
+        pushPreFloor(xloc + 280, 24, bstretch);
+        pushPreFloor(xloc + 280 + bstretch * 8, 0, 3);
+        pushCastleDecider(xloc + 304 + bstretch * 8, 0);
+      }
+    }
+  }),
+  new Area("Underwater Castle", function() { // Area 3 (Underwater)
+    setLocationGeneration(4);
+    
+    goUnderWater();
+    pushPreThing(GenericStone, 0, 88, 2, DtB(88, 8));
+    pushPreFloor(16, 0, 1, 62);
+    pushPrePipe(24, -200, 216, false, false, 4);
+    pushPreFloor(40, 0, 67);
+    pushPreThing(GenericStone, 48, 24, 5, 3);
+    pushPreThing(GenericStone, 48, 80, 5, 2);
+    pushPreThing(GenericStone, 48, 88, 66, 1);
+    pushPreThing(GenericStone, 88, 32, 7, 4);
+    pushPreThing(GenericStone, 88, 80, 7, 3);
+    pushPreThing(CastleBlock, 160, 46, [6, 1], true);
+    pushPreThing(Blooper, 224, 16);
+    pushPreThing(CastleBlock, 248, 22, [6, 1], true);
+    pushPreThing(GenericStone, 312, 24, 3, 3);
+    pushPreThing(GenericStone, 312, 80, 3, 3);
+    pushPreThing(CastleBlock, 320, 54, [6, 1], true);
+    pushPreThing(Blooper, 408, 24);
+    pushPreThing(Blooper, 424, 56);
+    pushPreThing(CastleBlock, 446, 38, [6, 1], true);
+    pushPreThing(CastleBlock, 512, 44, [6, 1], true);
+    pushPreThing(GenericStone, 536, 32, 5, 4);
+    pushPreThing(GenericStone, 536, 80, 5, 3);
+    pushPreThing(PipeSide, 544, 48, 5);
+    pushPreThing(GenericStone, 552, 56, 3, 3);
+  }),
+  new Area("Castle", function() { // Area 4
+    setLocationGeneration(5);
+    
+    pushPrePipe(0, 16, Infinity, true, false, 5);
+    makeCeilingCastle(0, 29);
+    pushPreFloor(16, 0, 5);
+    pushPrePipe(56, 16, Infinity, true);
+    pushPreFloor(72, 0, 9);
+    pushPreThing(HammerBro, 112, 12);
+    fillPreWater(128, 0, 14);
+    pushPreThing(Podoboo, 160, -32);
+    pushPreFloor(184, 24, 6);
+    pushPreThing(GenericStone, 184, 80, 6, 2);
+    endCastleInside(232, 0)
+  }),
+];
 }

@@ -1,3 +1,4 @@
+map.time = 300;
 map.locs = [
   new Location(0, true)
 ];
@@ -9,6 +10,7 @@ map.areas = [
     pushPrePattern("backcloud", 0, 4, 5);
     
     pushPreFloor(0, 0, 7);
+    zoneStartCheeps(64);
     pushPreTree(64, 0, 8);
     pushPreThing(Stone, 80, 8);
     pushPreThing(Stone, 88, 16, 1, 2);
@@ -16,33 +18,33 @@ map.areas = [
     pushPreThing(Stone, 104, 24, 1, 3);
     pushPreThing(Stone, 112, 24, 1, 3);
     pushPreBridge(120, 24, 16);
-    pushPreThing(Stone, 248, 24, 1, 64);
+    pushPreThing(Stone, 248, 24, 1, DtB(24, 8));
     pushPreBridge(256, 24, 15);
     fillPreThing(Coin, 290, 63, 4, 1, 8, 8);
     pushPreThing(Koopa, 312, 36);
-    pushPreThing(Stone, 376, 24, 64);
+    pushPreThing(Stone, 376, 24, 1, DtB(24, 8));
     pushPreBridge(384, 24, 16);
     pushPreThing(Koopa, 416, 44, false, true);
     fillPreThing(Coin, 441, 63, 3, 1, 16);
     fillPreThing(Coin, 449, 55, 2, 1, 16);
-    pushPreThing(Stone, 504, 24, 1, 64);
+    pushPreThing(Stone, 504, 24, 1, DtB(24, 8));
 
     
-    pushPreThing(Stone, 544, 24, 64);
+    pushPreThing(Stone, 544, 24, 1, DtB(24, 8));
     pushPreBridge(552, 24, 10);
     fillPreThing(Coin, 578, 63, 2, 1, 24);
     fillPreThing(Coin, 586, 71, 2, 1, 8);
-    pushPreThing(Stone, 632, 24, 1, 64);
+    pushPreThing(Stone, 632, 24, 1, DtB(24, 8));
     pushPreThing(Koopa, 632, 36, true, false);
     
     
-    pushPreThing(Stone, 672, 24, 1, 64);
+    pushPreThing(Stone, 672, 24, 1, DtB(24, 8));
     pushPreBridge(680, 24, 10);
-    pushPreThing(Stone, 760, 24, 1, 64);
+    pushPreThing(Stone, 760, 24, 1, DtB(24, 8));
     pushPreThing(Koopa, 760, 36, true, false);
     
     fillPreThing(Coin, 777, 63, 3, 1, 8);
-    pushPreThing(Stone, 792, 32, 1, 64);
+    pushPreThing(Stone, 792, 32, 1, DtB(24, 8));
     pushPreBridge(800, 32, 5, [true, true]);
     pushPreThing(Block, 816, 64, Mushroom);
     
@@ -71,6 +73,7 @@ map.areas = [
     pushPreThing(Stone, 1552, 24, 1, 3);
     pushPreThing(Stone, 1560, 16, 1, 2);
     pushPreThing(Stone, 1568, 8);
+    zoneStopCheeps(1600);
     
     pushPreFloor(1656, 0, 35);
     pushPreThing(Stone, 1664, 8);
@@ -83,6 +86,6 @@ map.areas = [
     pushPreThing(Stone, 1720, 64, 1, 8);
     pushPreThing(Stone, 1728, 64, 1, 8);
     
-    endCastleOutside(1796, 0, 0, 5);
+    endCastleOutside(1796, 0, 0, 6);
   })
 ];

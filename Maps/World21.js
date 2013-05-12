@@ -93,7 +93,7 @@ map.areas = [
     
     pushPreThing(Stone, 0, 0, 4);
     pushPreThing(Stone, 40, 0, 72);
-    pushPreThing(PlatformTransport, 120, 32, 8, "cloud");
+    pushPreThing(Platform, 120, 32, 8, collideTransport);
     fillPreThing(Coin, 120, 64, 16, 1, 8);
     fillPreThing(Coin, 256, 80, 3, 1, 8);
     fillPreThing(Coin, 288, 72, 16, 1, 8);

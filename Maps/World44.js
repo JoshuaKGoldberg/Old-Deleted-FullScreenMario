@@ -7,9 +7,8 @@ map.areas = [
     
     startCastleInside();
     
-    makeCeiling(40, 1, 3);
     pushPreFloor(40, 24, 2);
-    makeCeilingCastle(48, 10);
+    makeCeilingCastle(40, 11);
     fillPreWater(56, 0, 4);
     pushPreFloor(72, 24, 2);
     fillPreWater(88, 0, 4);

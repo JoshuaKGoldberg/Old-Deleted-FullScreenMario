@@ -104,15 +104,14 @@ map.areas = [
     pushPrePattern("backreg", 104, 0, 1);
     pushPreFloor(0, 0, 42);
     pushPrePipe(0, 0, 16, false, false, 2);
-    pushPreThing(Stone, 16, 8, 1);
-    pushPreThing(Stone, 24, 16, 2);
-    pushPreThing(Stone, 32, 24, 3);
-    pushPreThing(Stone, 40, 32, 4);
-    pushPreThing(Stone, 48, 40, 5);
-    pushPreThing(Stone, 56, 48, 6);
-    pushPreThing(Stone, 64, 56, 7);
-    pushPreThing(Stone, 72, 64, 8);
-    pushPreThing(Stone, 80, 64, 8);
+    pushPreThing(Stone, 16, 8, 1, 1);
+    pushPreThing(Stone, 24, 16, 1, 2);
+    pushPreThing(Stone, 32, 24, 1, 3);
+    pushPreThing(Stone, 40, 32, 1, 4);
+    pushPreThing(Stone, 48, 40, 1, 5);
+    pushPreThing(Stone, 56, 48, 1, 6);
+    pushPreThing(Stone, 64, 56, 1, 7);
+    pushPreThing(Stone, 72, 64, 2, 8);
     endCastleOutside(148, 0, castlev);
   })
 ];

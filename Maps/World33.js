@@ -1,3 +1,4 @@
+map.time = 300;
 map.locs = [
   new Location(0, true)
 ];
@@ -12,10 +13,10 @@ map.areas = [
     pushPreTree(144, 24, 5);
     pushPreTree(176, 48, 6);
     pushPreThing(Goomba, 208, 56);
-    pushPreThing(Platform, 240, 72, 6, [moveSliding, 228, 260, 2]);
+    pushPreThing(Platform, 240, 72, 6, [moveSliding, 228, 260]);
     pushPreTree(240, 0, 3);
     fillPreThing(Coin, 249, 7, 2, 1, 8);
-    pushPreThing(Platform, 264, 40, 6, [moveSliding, 244, 276, 2]);
+    pushPreThing(Platform, 264, 40, 6, [moveSliding, 244, 276]);
     pushPreTree(288, 8, 7);
     pushPreThing(Coin, 298, 55);
     fillPreThing(Coin, 337, 55, 3, 1, 8);
@@ -56,7 +57,7 @@ map.areas = [
     pushPreTree(864, 48, 3);
     pushPreThing(Coin, 873, 55);
     
-    pushPreThing(Koopa, 912, 66, true, [66, map.floor - 14]);
+    pushPreThing(Koopa, 912, 66, true, [14, 66]);
     pushPreTree(928, 0, 3);
     pushPreTree(952, 24, 12);
     fillPreThing(Koopa, 992, 36, 2, 1, 14, 0, true); 

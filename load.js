@@ -11,12 +11,14 @@
   window.requestAnimationFrame = window.requestAnimationFrame
                            || window.mozRequestAnimationFrame
                            || window.webkitRequestAnimationFrame
-                           || window.msRequestAnimationFrame;
+                           || window.msRequestAnimationFrame
+                           || function(func) { setTimeout(func, timer); };
   window.cancelAnimationFrame = window.cancelAnimationFrame
                            || window.webkitCancelRequestAnimationFrame
                            || window.mozCancelRequestAnimationFrame
                            || window.oCancelRequestAnimationFrame
-                           || window.msCancelRequestAnimationFrame;
+                           || window.msCancelRequestAnimationFrame
+                           || clearTimeout;
   
   // Don't attempt to ajax if on a local system, it'll just crash and you'll look like a fool
   if(window.location.protocol != "file:") {
@@ -31,7 +33,8 @@
       // sprites: new setWorker("Sprites"),
       // sounds: new setWorker("Sounds")
     };
-    passivelyLoadMap();
+    // After a little bit, start loading maps
+    setTimeout(function() { addEvent(passivelyLoadMap, 1); }, 700);
   }
   
   // Once preloading has commenced, go to the real start() function
@@ -48,8 +51,11 @@ function passivelyLoadMap() {
     // Map file found, load it up!
     if(x.status == 200) {
       mapfuncs[loader.map[0]][loader.map[1]] = Function(x.responseText);
-      // console.log("Loaded map [" + loader.map[0] + "," + loader.map[1] + "]");
-      if(window.parentwindow && parentwindow.onmapload) parentwindow.onmapload(loader.map[0],loader.map[1]);
+      console.log("Loaded map [" + loader.map[0] + "," + loader.map[1] + "]");
+      if(window.parentwindow && parentwindow.onmapload) {
+        parentwindow.onmapload(loader.map[0],loader.map[1]);
+        setTimeout(function() { parentwindow.onmapload(loader.map[0],loader.map[1]); }, 2100); // just in case
+      }
     }
     
     else if(x.status != 404) return; // Otherwise, unless it just was a 404, return

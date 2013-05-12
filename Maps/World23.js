@@ -1,3 +1,4 @@
+map.time = 300;
 map.locs = [
   new Location(0, true)
 ];
@@ -9,7 +10,7 @@ map.areas = [
     pushPrePattern("backcloud", 0, 4, 5);
     
     pushPreFloor(0, 0, 7);
-    zoneStartCheeps(0);
+    zoneStartCheeps(64);
     pushPreTree(64, 0, 8);
     pushPreThing(Stone, 80, 8);
     pushPreThing(Stone, 88, 16, 1, 2);
@@ -17,21 +18,21 @@ map.areas = [
     pushPreThing(Stone, 104, 24, 1, 3);
     pushPreThing(Stone, 112, 24, 1, 3);
     pushPreBridge(120, 24, 16);
-    pushPreThing(Stone, 248, 24, 1, 64);
+    pushPreThing(Stone, 248, 24, 1, DtB(24, 8));
     pushPreBridge(256, 24, 15);
     fillPreThing(Coin, 290, 63, 4, 1, 8, 8);
-    pushPreThing(Stone, 376, 24, 1, 64);
+    pushPreThing(Stone, 376, 24, 1, DtB(24, 8));
     pushPreBridge(384, 24, 16);
     fillPreThing(Coin, 441, 63, 3, 1, 16);
     fillPreThing(Coin, 449, 55, 2, 1, 16);
-    pushPreThing(Stone, 504, 24, 1, 64);
+    pushPreThing(Stone, 504, 24, 1, DtB(24, 8));
 
     
-    pushPreThing(Stone, 544, 24, 1, 64);
+    pushPreThing(Stone, 544, 24, 1, DtB(24, 8));
     pushPreBridge(552, 24, 10);
     fillPreThing(Coin, 578, 63, 2, 1, 24);
     fillPreThing(Coin, 586, 71, 2, 1, 8);
-    pushPreThing(Stone, 632, 24, 1, 64);
+    pushPreThing(Stone, 632, 24, 1, DtB(24, 8));
     
     
     pushPreThing(Stone, 672, 24, 1, 64);

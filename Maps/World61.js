@@ -78,7 +78,7 @@ map.areas = [
     pushPreThing(GenericStone, 1384, 40, 1, 5);
     
     pushPreFloor(1408, 0, 30);
-    zoneStopLakitu(1408);
+    pushPreFuncCollider(1408, zoneDisableLakitu);
     pushPreThing(GenericStone, 1408, 64, 2, 8);
     endCastleOutside(1484, 0, castlev);
   })

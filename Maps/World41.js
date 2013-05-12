@@ -43,7 +43,7 @@ map.areas = [
     pushPreThing(GenericStone, 1512, 24, 1, 3);
     
     pushPreFloor(1536, 0, 48);
-    pushPreFuncSpawner(1600, zoneDisableLakitu); // not sure if accurate
+    pushPreFuncCollider(1664, zoneDisableLakitu); // not sure if accurate
     pushPreThing(GenericStone, 1664, 8);
     pushPreThing(GenericStone, 1672, 16, 1, 2);
     pushPreThing(GenericStone, 1680, 24, 1, 3);

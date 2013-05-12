@@ -124,11 +124,11 @@ map.areas = [
     pushPreThing(Coral, 160, 32, 4);
     fillPreThing(Coin, 177, 47, 10, 1, 8, 8);
     
-    pushPreThing(Platform, 182, 56, 6/*, [moveFloating, 16, 80, 1]*/);
+    pushPrePlatformGenerator(186, 4, 1);
     pushPreFloor(208, 24, 2);
     pushPreThing(GenericStone, 208, 88, 2, 3);
     pushPreThing(CheepCheep, 220, 60);
-    pushPreThing(Platform, 230, 22, 6/*, [moveFloating, 16, 80, 1]*/);
+    pushPrePlatformGenerator(234, 4, 1);
     pushPreFloor(256, 24, 2);
     pushPreThing(GenericStone, 256, 88, 2, 3);
     pushPreFloor(272, 0, 4);

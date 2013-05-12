@@ -3,11 +3,11 @@ function Mario(me) {
   me.width = 7;
   me.height = 8;
   me.walkspeed = unitsized2;
-  me.canjump = me.nofiredeath = me.nofire = me.mario = 1;
-  me.numballs = me.moveleft = me.star = me.dieing = me.nofall = me.maxvel = me.paddling = 0;
+  me.canjump = me.nofiredeath = me.nofire = me.mario = me.nokillend = 1;
+  me.numballs = me.moveleft = me.star = me.dieing = me.nofall = me.maxvel = me.paddling = me.jumpers = me.landing = 0;
   me.running = ''; // Evalues to false for cycle checker
+  me.collide = function() { alert("yeah"); };
   me.power = data.mariopower;// 1 for normal, 2 for big, 3 for fiery
-  me.collide = function(one, two) { two.collide(two, one); };
   me.maxspeed = me.maxspeedsave = unitsize * 1.35; // Really only used for timed animations
   me.scrollspeed = unitsize * 1.75;
   me.keys = new Keys();
@@ -16,9 +16,12 @@ function Mario(me) {
   me.death = killMario;
   setCharacter(me, name);
   me.tolx = unitsizet2;
-  me.toly = unitsize;
+  me.toly = 0;
   me.gravity = map.gravity;
-  if(map.underwater) addSpriteCycle(me, ["swim1", "swim2"]);
+  if(map.underwater) {
+    me.swimming = true;
+    addSpriteCycle(me, ["swim1", "swim2"], "swimming");
+  }  
 }
 
 function checkReset() {
@@ -52,7 +55,7 @@ function Keys() {
 
 function removeCrouch() {
   mario.crouching = false;
-  mario.toly = unitsize;
+  mario.toly = mario.tolyold || 0;
   if(mario.power != 1) {
     removeClass(mario, "crouching");
     mario.height = 16;
@@ -67,44 +70,52 @@ function marioShroom(me) {
   score(me, 1000, true);
   if(me.power == 3) return;
   me.shrooming = true;
-  ++me.power;
-  if(me.power == 2) marioGetsBig(me);
-  else marioGetsFire(me);
+  (++me.power == 2 ? marioGetsBig : marioGetsFire)(me);
   storeMarioStats();
 }
 // These three modifiers don't change power levels.
 function marioGetsBig(me, noanim) {
-  me.height = 16;
-  me.width = 8;
+  setSize(me, 8, 16);
   me.keys.down = 0;
   removeClass(mario, "crouching");
   updateBottom(me, 0);
-  updateDisplay(me);
   updateSize(me);
   if(!noanim) {
-    pause();
-    // Manual is used because the game is paused
-    var stages = [1,2,1,2,3,2,3];
+    // pause();
+    // Mario cycles through 'shrooming1', 'shrooming2', etc.
+    var stages = [1,2,1,2,3,2,3,3];
     for(var i = stages.length - 1; i >= 0; --i)
       stages[i] = "shrooming" + stages[i];
+    
+    // Clear Mario's movements
+    mario.xvelold = mario.xvel;
+    mario.yvelold = mario.yvel;
+    mario.xvel = mario.yvel = mario.movement = false;
+    mario.nofall = mario.nocollide = true;
+    
+    // The last event in stages clears it, resets Mario's movements, and stops
     stages.push(function(me, settings) {
-      me.shrooming = false;
-      settings.length = 0;
-      me.element.className += " large";
-      unpause();
+      me.shrooming = settings.length = 0;
+      addClass(me, "large");
+      mario.nofall = mario.nocollide = false;
+      mario.xvel = mario.xvelold;
+      mario.yvel = mario.yvelold;
+      mario.movement = moveMario;
+      delete mario.xvelold; 
+      delete mario.yvelold;
       return "";
     });
-    addSpriteCycleManual(me, stages, "shrooming", 7);
-  } else me.element.className += " large";
+    
+    addSpriteCycle(me, stages, "shrooming", 6);
+  }
+  else addClass(me, "large");
 }
 function marioGetsSmall(me) {
   pause();
-  me.element.className += " shrooming";
+  addClass(me, "shrooming");
   flicker(me, 140);
   setTimeout(function() {
-    removeClass(me,"large");
-    removeClass(me,"fiery");
-    removeClass(me,"shrooming");
+    removeClasses(me, ["large", "fiery", "shrooming"]);
     me.width = 7;
     me.height = 8;
     updateSize(me);
@@ -112,37 +123,43 @@ function marioGetsSmall(me) {
     unpause();
   }, timer * 70);
 }
-function marioGetsFire() {
-  mario.element.className += " fiery";
-  removeClass(mario, "intofiery");
-  mario.element.className.replace("intofiery");
+function marioGetsFire(me) {
+  removeClass(me, "intofiery");
+  addClass(me, "fiery");
+  mario.element.className.replace("intofiery"); // To do: why did I put this in...?
   mario.shrooming = false;
 }
 
+// To do: add in unitsize measurement?
 function moveMario(me) {
-  // Jumping
+  // Not jumping
   if(!me.keys.up) me.keys.jump = 0;
-  if(me.keys.up && me.keys.jump > 0 && (me.yvel <= 0 || map.underwater) ) {
+  
+  // Jumping
+  else if(me.keys.jump > 0 && (me.yvel <= 0 || map.underwater) ) {
     if(map.underwater) marioPaddles(me);
     if(me.resting) {
       if(me.resting.xvel) me.xvel += me.resting.xvel;
       me.resting = false;
     }
+    // Jumping, not resting
     else {
-      if(!me.jumping) me.element.className += " jumping";
+      if(!(me.jumping || map.underwater)) addClass(me, "jumping");
       me.jumping = true;
     }
     if(!map.underwater) {
       var dy = unitsize / (Math.pow(++me.keys.jumplev, map.jumpmod - .0014 * me.xvel));
       me.yvel = max(me.yvel - dy, map.maxyvelinv);
     }
-  } 
+  }
+  
   // Crouching
-  else if(me.keys.crouch && !me.crouching) {
+  if(me.keys.crouch && !me.crouching && me.resting) {
     if(me.power != 1) {
       me.crouching = true;
-      me.element.className += " crouching";
+      addClass(me, "crouching");
       me.height = 11;
+      me.tolyold = me.toly;
       me.toly = unitsizet4;
       updateBottom(me, 0);
       updateSize(me);
@@ -151,29 +168,36 @@ function moveMario(me) {
     if(me.resting.actionTop)
       me.resting.actionTop(me, me.resting, me.resting.transport);
   }
+  
   // Running
   var decel = .03;
+  // If a button is pressed, hold/increase speed
   if(me.keys.run != 0 && !me.crouching) {
     var adder = (.084 * (me.keys.sprint + 1)) * me.keys.run;
     me.xvel += adder; me.xvel *= .98;
     mario.maxvel = max(mario.xvel, mario.maxvel);
     decel = .0007;
-  } else me.xvel *= .96;
+  }
+  // Otherwise slow down a bit
+  else me.xvel *= .96;
   
   if(me.xvel > 0) me.xvel = max(0, me.xvel - decel);
   else me.xvel = min(0, me.xvel + decel);
   
   // Movement mods
-  // To do: add in unitsize measurement?
+  // Slowing down
   if(Math.abs(me.xvel) < .14) {
     removeClass(me, "running");
     me.running.length = 0;
     me.running = false;
     if(Math.abs(me.xvel) < .049) me.xvel = 0;
-  } else if(!me.running) {
-    // me.running = true;
+  }
+  // Not moving slowly
+  else if(!me.running) {
+    me.running = true;
     addClass(me, "running");
-    me.running = addSpriteCycle(me, ["one", "two", "three"], "running", 5);
+    // setMarioRunningCycler sets the time between cycles
+    me.running = addSpriteCycle(me, ["one", "two", "three", "two"], "running", setMarioRunningCycler);
   }
   if(me.xvel > 0) {
     me.xvel = min(me.xvel, me.maxspeed);
@@ -185,34 +209,46 @@ function moveMario(me) {
   else if(me.xvel < 0) {
     me.xvel = max(me.xvel, me.maxspeed * -1);
     if(!me.moveleft && (me.resting || map.underwater)) {
-      me.element.className += " flipped";
+      addClass(me, "flipped");
       me.moveleft = true;
     }
   }
   
-  // Etc
-  // To do: isn't me never reached?
+  // Resting stops a bunch of other stuff
   if(me.resting) {
+    // Hopping
+    if(me.hopping) {
+      removeClass(me, "hopping");
+      if(me.xvel != 0) addClass(me, "running");
+      me.hopping = false;
+    }
+    // Jumping
     me.keys.jumplev = me.yvel = me.jumpcount = 0;
     if(me.jumping) {
       me.jumping = false;
       removeClass(me, "jumping");
     }
+    // Paddling
+    if(me.swimming || me.paddling) {
+      me.paddling = me.swimming = false;
+      removeClasses(me, "paddling swim1 swim2");
+      clearClassCycles(me, "paddling");
+      addClass(me, "running");
+    }
   }
 }
 
+function setMarioRunningCycler(event) {
+  event.timeout = 5 + ceil(mario.maxspeedsave - abs(mario.xvel));
+}
+
 function marioPaddles(me) {
-  ++me.paddling;
-  me.element.className += " paddling";
-  addEvent(function(me) {
-    removeClass(me, "paddling")
-    addEvent(function(me) {
-      me.element.className += " paddling";
-      addEvent(function(me) {
-        removeClass(me, "paddling");
-      }, 3, me);
-    }, 3, me);
-  }, 3, me);
+  if(!me.paddling) {
+    addClass(me, "paddling");
+    addSpriteCycle(me, ["paddle1", "paddle2", "paddle1", "paddle2", function() { return me.paddling = false; }], "paddling", 7);
+    removeClasses(me, "running");
+  }
+  me.paddling = me.swimming = true;
   me.yvel = unitsize * -.84;
 }
 
@@ -223,58 +259,77 @@ function marioBubbles() {
 }
 
 function moveMarioVine(me) {
-  if(me.bottom < me.attached.top) return unattachMario(me);
+  var attached = me.attached;
+  if(me.bottom < attached.top) return unattachMario(me);
   if(me.keys.run == me.attachoff) {
-    while(objectsTouch(me, me.attached))
+    while(objectsTouch(me, attached))
       shiftHoriz(me, me.keys.run, true);
     return unattachMario(me);
   }
+  
+  // If Mario is moving up, simply move up
   if(me.keys.up) {
+    me.animatednow = true;
     shiftVert(me, unitsized4 * -1, true);
-  } else if(me.keys.crouch) {
-    // something
   }
+  // If mario is moving down, move down and check for unattachment
+  else if(me.keys.crouch) {
+    me.animatednow = true;
+    shiftVert(me, unitsized2, true);
+    if(me.bottom > attached.bottom - unitsizet4) return unattachMario(me);
+  }
+  else me.animatednow = false;
+  
+  if(me.animatednow && !me.animated) {
+    addClass(me, "animated");
+  } else if(!me.animatednow && me.animated) {
+    removeClass(me, "animated");
+  }
+  
+  me.animated = me.animatednow;
   
   if(me.bottom < -16) { // ceilmax (104) - ceillev (88)
     locMovePreparations(me);
-    shiftToLocation(me.attached.locnum);
+    shiftToLocation(attached.locnum);
     return unattachMario(me);
   }
 }
 
 function unattachMario(me) {
   me.movement = moveMario;//me.movementsave;
-  me.attached.attached = false;
-  me.attached = me.yvel = me.attachoff = me.nofall = false;
+  removeClasses(me, "climbing", "animated");
+  clearClassCycle(me, "climbing");
+  me.yvel = me.skipoverlaps = me.attachoff = me.nofall = me.climbing = me.attached = me.attached.attached = false;
   me.xvel = me.keys.run;
 }
 
-function marioHopsOff(me, solid) {
+function marioHopsOff(me, solid, addrun) {
   removeClasses(me, "climbing running");
-  me.element.className += " jumping";
+  addClass(me, "jumping");
   
   me.piping = me.nocollide = me.nofall = false;
-  me.xvel = 3.5;
   me.gravity = gravity /= 2;
+  me.xvel = 3.5;
   me.yvel = -2.1;
   addEvent(function(me) {
     removeClass(me, "flipped");
     me.gravity = gravity *= 2;
+    if(addrun) addClass(me, "running");
   }, 21, me);
   
   unpause();
 }
 
 function marioFires() {
-  if(this.numballs >= 2) return;
-  ++this.numballs;
-  this.element.className += " firing";
-  var ball = new Thing(FireBall, this.moveleft, true);
+  if(mario.numballs >= 2) return;
+  ++mario.numballs;
+  addClass(mario, "firing");
+  var ball = new Thing(FireBall, mario.moveleft, true);
   ball.yvel = unitsize
-  placeThing(ball, this.right + unitsized4, this.top + unitsizet8);
+  placeThing(ball, mario.right + unitsized4, mario.top + unitsizet8);
   if(mario.moveleft) setRight(ball, mario.left - unitsized4, true);
   ball.animate(ball);
-  addEvent(function(me) { removeClass(me, "firing"); }, 7, this);
+  addEvent(function(mario) { removeClass(mario, "firing"); }, 7, mario);
 }
 function emergeFire(me) {
   play("Fireball.wav");
@@ -284,64 +339,66 @@ function emergeFire(me) {
 function marioStar(me) {
   if(me.star) return;
   me.star = true;
-  me.element.className += " star";
   play("Starman.mp3", true, true);
   play("Powerup.wav");
-  addEvent(marioRemoveStar, 560, me );
+  addEvent(marioRemoveStar, 560, me);
+  addClass(me, "star");
   addSpriteCycle(me, ["star1", "star2", "star3", "star4"], "star", 5);
 }
 function marioRemoveStar(me) {
   if(!me.star) return;
   me.star = false;
-  removeClasses(me, "star1 star2 star3 star4");
-  removeClass(me, "star");
-  me.cycles["star"].length = 0;
+  removeClasses(me, "star star1 star2 star3 star4");
+  if(me.cycles.star) me.cycles.star.length = 0;
   play(map.areas[map.areanum].setting + ".mp3", true, true);
 }
 
+// Big means it must happen: 2 means no animation
 function killMario(me, big) {
   if(!me.alive || me.flickering || me.dying) return;
-  if(!big && mario.power > 1) {
-    play("Power Down.wav");
-    me.power = 1;
-    storeMarioStats();
-    return marioGetsSmall(me);
+  // If this is an auto kill, it's for rizzles
+  if(big == 2) {
+    notime = true;
+    me.element.style.visibility = "hidden";
+    me.dead = me.dying = true;
   }
+  // Otherwise it's just a regular (enemy, time, etc.) kill
+  else {
+    // If Mario can survive this, just power down
+    if(!big && me.power > 1) {
+      play("Power Down.wav");
+      me.power = 1;
+      storeMarioStats();
+      return marioGetsSmall(me);
+    }
+    // Otherwise, if this isn't a big one, animate
+    else if(big != 2) {
+      me.element.className = "character mario dead";
+      me.dying = true;
+      me.xvel = me.resting = me.movement = 0;
+      me.element.style.zIndex = 14;
+      me.gravity = gravity / 2.1;
+      me.yvel = unitsize * -1.4;
+    }
+  }
+  
+  // Clear and reset
   pauseTheme();
   play("Mario Dies.wav", false, true);
-  me.nocollide = me.nofall = me.nomove = nokeys = me.dead = me.dying = 1;
-  me.xvel = me.yvel = me.resting = 0;
-  me.element.className = "character mario dead";
-  me.element.style.zIndex = 14;
+  me.nocollide = me.nomove = nokeys = 1;
   --data.lives.amount;
   if(!map.random) data.score.amount = data.scoreold;
-  
-  // If Mario is killed normally, animate him
-  if(big != 2) {
-    notime = true;
-    // if(!map.random) {
-      // // pause();
-      // notime = true;
-    // }
-    setTimeout(function() {
-      me.counter = -1.4;
-      me.dying = setInterval(function() {
-        me.counter += .0117;
-        shiftVert(me, me.counter, true);
-      });
-    }, timer * 14);
-  }
   
   // If the map is normal, or failing that a game over is reached, timoeut a reset
   if(!map.random || data.lives.amount == 0) {
     reset = setTimeout(data.lives.amount ? setMap : gameOver, timer * 280);
   }
-  // If it's random, spawn him again
+  // Otherwise it's random; spawn him again
   else {
     reset = setTimeout(function() {
       clearOldMario();
       mario = addThing(new Thing(Mario), unitsizet16, unitsizet8 * -1 + map.underwater * unitsize * 24);
-      nokeys = false;
+      nokeys = notime = false;
       setAreaSettings();
       updateDataElement(data.score);
       updateDataElement(data.lives);
@@ -365,20 +422,19 @@ function gameOver() {
   pauseTheme();
   play("Game Over.mp3");
   
-  var innerHTML = "<div style='padding-top: " + (innerHeight / 2 - 49) + "px'>GAME OVER</div>";
-  innerHTML += "<p style='font-size:14px;opacity:.49;width:490px;margin:auto;margin-top:49px;'>";
-  innerHTML += "You have run out of lives. Maybe you're not ready for playing real games...";
+  var innerHTML = "<div style='font-size:49px;padding-top: " + (innerHeight / 2 - 28/*49*/) + "px'>GAME OVER</div>";
+  // innerHTML += "<p style='font-size:14px;opacity:.49;width:490px;margin:auto;margin-top:49px;'>";
+  // innerHTML += "You have run out of lives. Maybe you're not ready for playing real games...";
   innerHTML += "</p>";
   
-  body.className = "Night"; // makes it black
+  body.className = "Night"; // to make it black
   body.innerHTML = innerHTML;
-  body.style.fontSize = "49px";
   
   gamecount = Infinity;
   clearMarioStats();
   game.data = new Data();
   
-  setTimeout(gameRestart, 4900);
+  setTimeout(gameRestart, 7000);
 }
 
 function gameRestart() {
@@ -401,6 +457,7 @@ function Data() {
   this.world = new dataObject(0, 0, "WORLD");
   this.coins = new dataObject(0, 0, "COINS");
   this.lives = new dataObject(3, 1, "LIVES");
+  this.time.dir = -1;
 }
 function dataObject(amount, length, name) {
   this.amount = amount;
@@ -412,7 +469,7 @@ function dataObject(amount, length, name) {
 
 function score(me, amount, appears) {
   if(amount <= 0) return;
-  data.score.amount += amount;
+  localStorage.highscore = max(localStorage.highscore, data.score.amount += amount);
   if(appears) {
     var div = {
       element: document.createElement("div"),
@@ -481,9 +538,9 @@ function setDataDisplay() {
   var d = document.createElement("table"),
       elems = ["score", "coins", "world", "time", "lives"];
   d.id = "data_display";
-  d.style.width = "110%";
-  d.style.marginLeft = "-5%";
-  d.style.marginRight = "-5%";
+  d.style.width = (screen.right + 14) + "px";
+  // d.style.marginLeft = "-14px";
+  // d.style.marginRight = "-14px";
   document.body.appendChild(d);
   data.display = d;
   for(var i in elems) {
@@ -499,24 +556,22 @@ function clearDataDisplay() {
 }
 
 function startDataTime() {
-  addEvent(
-    function(me) {
-      if(!notime) {
-        map.time = --me.amount;
-        updateDataElement(me);
-      }
-      switch(data.time.amount) {
-        case 100:
-          play("Hurry " + map.areas[map.areanum].setting + ".mp3", true, true);
-        break;
-        case 0:
-          killMario(mario, true);
-        break;
-        default:
-          startDataTime();
-        break;
-      }
-    },
-    25, data.time
-  );
+  addEventInterval(updateDataTime, 25, Infinity, data.time);
+}
+
+function updateDataTime(me) {
+  if(!notime) {
+    map.time = me.amount += me.dir;
+    updateDataElement(me);
+  }
+  if(me.dir != -1) return;
+  switch(data.time.amount) {
+    case 100:
+      playCurrentThemeHurry();
+      // play("Hurry " + map.areas[map.areanum].setting + ".mp3", true, true);
+    break;
+    case 0:
+      killMario(mario, true);
+    break;
+  }
 }

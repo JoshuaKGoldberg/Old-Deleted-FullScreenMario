@@ -1,3 +1,4 @@
+map.time = 300;
 map.locs = [
   new Location(0, true),
   new Location(0, exitPipeVert),

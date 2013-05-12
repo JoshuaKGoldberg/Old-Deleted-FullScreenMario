@@ -1,13 +1,36 @@
 ﻿// To do: don't really need to instantiate all global variables...?
-var data, characters, solids, map, Scenery, sounds, quads, screen, paused, nokeys,
+var data, characters, solids, map, sounds, quads, screen, paused, nokeys, update, updateskip,
   gravity, Scenery, player, nextupk, timenext, spawning, spawnon, reset, editing, mapinput,
-  jumplev1, jumplev2, ceillev, castlev, mapfuncs, ajax, loader, loadmap, deleted, elems;
+  jumplev1, jumplev2, ceillev, castlev, mapfuncs, ajax, loader, loadmap, deleted, divs;
  
 function start() {
-  window.updated = false;
-  startReset();
-  createMaps();
-  setMap();
+  try {
+    if(!window.screen) return setTimeout(start, 70);
+    window.updated = false;
+    startReset();
+    createMaps();
+    divs = createDivs(screen.width);
+    setMap();
+  }
+  catch(err) { setTimeout(start, 70); }
+}
+
+function setBodyEvents() {
+  body.style.height = innerHeight + "px";
+  body.oncontextmenu = function(event) {
+    if(editing) {
+      bottomBarExpand();
+      bottombar.onmouseover();
+    }
+    event.preventDefault();
+  }
+  body.onmousedown = function(event) {
+    if(event.which == 3) {
+      if(paused) unpause();
+      else if(!editing) pause(true);
+      event.preventDefault();
+    }
+  }
 }
 
 function startReset() {
@@ -24,17 +47,10 @@ function startReset() {
 
 function resetUnitsize(num) {
   window.unitsize = num;
-  window.unitsizet2 = unitsize * 2;
-  window.unitsizet4 = unitsize * 4;
-  window.unitsizet8 = unitsize * 8;
-  window.unitsizet16 = unitsize * 16;
-  window.unitsizet32 = unitsize * 32;
-  window.unitsized2 = unitsize / 2;
-  window.unitsized4 = unitsize / 4;
-  window.unitsized8 = unitsize / 8;
-  window.unitsized16 = unitsize / 16;
-  window.unitsized32 = unitsize / 32;
-  window.unitsized64 = unitsize / 64;
+  for(var i = 2; i <= 64; ++i) {
+    window["unitsizet" + i] = unitsize * i;
+    window["unitsized" + i] = unitsize / i;
+  }
 }
 function resetTimer(num) {
   window.timer = window.timernorm = num;
@@ -42,7 +58,9 @@ function resetTimer(num) {
   window.timerd2 = num / 2;
 }
 function resetVariables() {
+  clearAllTimeouts();
   body.innerHTML = "";
+  setBodyEvents();
   // window.scroll();
   if(!data) {
     data = new Data();
@@ -50,6 +68,7 @@ function resetVariables() {
     muted = 0;
   }
   paused = true;
+  updateskip = Infinity;
   nokeys = spawning = spawnon = gamecount = notime = qcount = editing = 0;
   if(sounds) {
     if(sounds[0]) {
@@ -69,7 +88,6 @@ function resetVariables() {
   setBStretch();
   
   deleted = [];
-  elems = [];
   // window.onblur = function() { if(!nokeys) pause(true); };
   // window.onfocus = function() { unpause(true); };
 }
@@ -86,43 +104,46 @@ function setScreen() {
   
   // This is the bottom of the screen - water, pipes, etc. go until here
   botmax = this.height - ceilmax;
-  if(botmax < 0) {
-    body.innerHTML = "<div>Your screen isn't high enough. Make it taller, then refresh.</div>";
+  if(botmax < unitsize) {
+    body.innerHTML = "<div><br>Your screen isn't high enough. Make it taller, then refresh.</div>";
     doGarbageFunction();
   }
+  
+  // The distance at which die from falling
+  this.deathheight = this.bottom + 64;
 }
 
 function upkeep() {
   if(paused) return;
   nextupk = requestAnimationFrame(upkeep);
+  update = gamecount % updateskip != 0;
+  // console.log(update);
   
   // Quadrants upkeep
   determineAllQuadrants();
   
   // Solids upkeep
-  maintainSolids();
+  maintainSolids(update);
   
   // Character upkeep
-  maintainCharacters();
+  maintainCharacters(update);
   
   // Mario specific
-  maintainMario();
+  maintainMario(update);
   
   // Events upkeep
   handleEvents();
   
-  // if(++updated > 2) updated = 0;
+  /*if(update) */updateAllDisplays();
 }
 
-function maintainSolids() {
-  var solid;
-  for(var i = 0; i<solids.length; ++i) {
+function maintainSolids(update) {
+  var solid, i = 0;
+  for(; i < solids.length; ++i) {
     solid = solids[i];
     if(solid.alive) {
       if(solid.movement) solid.movement(solid);
-      updateDisplay(solid);
-      // if(window.updated) updateDisplay(solid);
-      // if(gamecount % 2) updateDisplay(solid);
+      // if(update) updateDisplay(solid);
     }
     if(!solid.alive || solid.right < quads.delx) {
       deleteThing(solid, solids, i);
@@ -131,21 +152,19 @@ function maintainSolids() {
   }
 }
 
-function maintainMario() {
+function maintainMario(update) {
   if(mario.alive) {
+    // Mario is falling
     if(mario.yvel > 0) {
-      // Mario is falling
       if(!map.underwater) mario.keys.jump = 0;
       if(!mario.jumping) {
         addClass(mario, "jumping");
         mario.jumping = true;
       }
-      // To do: use a variable for the > ....
-      if(!mario.piping && mario.top > (screen.bottom - screen.top)) {
+      // Mario has fallen too far
+      if(!mario.piping && mario.top > screen.deathheight) {
         // If the map has an exit loc (cloud world), transport there
-        if(map.exitloc) {
-          return (map.random ? setMapRandom : shiftToLocation)(map.exitloc);
-        }
+        if(map.exitloc) return (map.random ? setMapRandom : shiftToLocation)(map.exitloc);
         // Otherwise, since Mario is below the screen, kill him dead
         clearMarioStats();
         killMario(mario, 2);
@@ -165,15 +184,17 @@ function maintainMario() {
     if(mario.under) mario.jumpcount = 0;
     // Scrolloffset is how far over the middle mario's right is
     // It's multiplied by 0 or 1 for map.canscroll
-    scrolloffset = (map.canscroll || (map.random && !map.noscroll)) * (mario.right - screen.middlex);
+    scrolloffset = (map.canscroll/* || (map.random && !map.noscroll)*/) * (mario.right - screen.middlex);
     if(scrolloffset > 0 && !map.shifting)
       scrollWindow(Math.round(min(mario.scrollspeed, scrolloffset)));
   }
+  
+  // updateDisplay(mario); // for update
 }
 
-function maintainCharacters() {
-  var character;
-  for(var i = 0; i<characters.length; ++i) {
+function maintainCharacters(update) {
+  var character, delx = screen.right + quads.rightdiff, i = 0;
+  for(; i < characters.length; ++i) {
     character = characters[i];
     // Gravity
     if(!character.resting) {
@@ -203,14 +224,14 @@ function maintainCharacters() {
     // To do: is map.shifting needed?
     if(character.alive) {
       if(character.type != "mario" && !map.shifting && 
-          (character.numquads == 0 || character.left > screen.right + quads.rightdiff)) {
+          (character.numquads == 0 || character.left > delx)) {
           // (character.top > screen.bottom - screen.top || character.left < + quads.width * -1)) {
         deleteThing(character, characters, i);
       }
       else {
         if(!character.nomove && character.movement)
           character.movement(character);
-        /*if(window.updated) */updateDisplay(character);
+        // if(update) updateDisplay(character);
       }
     }
     else if(!map.shifting) deleteThing(character, characters, i);
@@ -242,7 +263,7 @@ function unpause() {
 
 function scrollWindow(x, y) {
   x = x || 0; y = y || 0;
-  var xinv = x * -1, yinv = y * -1;
+  var xinv = -x, yinv = -y;
   
   screen.left += x; screen.right += x;
   screen.top += y; screen.bottom += y;
@@ -264,10 +285,11 @@ function shiftAll(stuff, x, y, update) {
 // Similar to scrollWindow, but saves mario's x-loc
 function scrollMario(x, y, see) {
   pause();
-  var saveleft = mario.left, savetop = mario.top, y = y || 0;
+  var saveleft = mario.left, savetop = mario.top;
+  y = y || 0;
   scrollWindow(x,y);
   setLeft(mario, saveleft, see);
-  setTop(mario, savetop, see);
+  setTop(mario, savetop + y * unitsize, see);
   createQuadrants();
   unpause();
 }
@@ -280,9 +302,9 @@ function keydown(event) {
       mario.keys.run = -1;
     break;
     
-    case 38: case 87: // up
+    case 38: case 87: case 32: // up
       mario.keys.up = true;
-      if(mario.canjump && (mario.resting || map.underwater)) {
+      if(mario.canjump && !mario.crouching && (mario.resting || map.underwater)) {
         mario.keys.jump = 1;
         mario.canjump = mario.keys.jumplev = 0;
         // To do: can mario make a jumping sound during the spring?
@@ -335,6 +357,7 @@ function keydown(event) {
   }
   // e.preventDefault(); // not necessary, but just so I don't forget...
 }
+
 function keyup(event) {
   if(nokeys) return;
   switch(event.which) {
@@ -342,7 +365,7 @@ function keyup(event) {
       mario.keys.run = 0;
     break;
     
-    case 38: case 87: // up
+    case 38: case 87: case 32: // up
       if(!map.underwater) mario.keys.jump = mario.keys.up = 0;
       mario.canjump = true;
     break;

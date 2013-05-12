@@ -94,7 +94,7 @@ map.areas = [
         // end cheeps here
         fillPreWater(xloc + 200, 0, 8);
         pushPreFloor(xloc + 232, 24, 4);
-        pushPrePipe(xloc + 264, 40, Infinity, true); // To Underwater (Area 3)
+        pushPrePipe(xloc + 264, 40, Infinity, true, 4); // To Underwater (Area 3)
         pushPreFloor(xloc + 280, 24, bstretch);
         pushPreFloor(xloc + 280 + bstretch * 8, 0, 3);
         pushCastleDecider(xloc + 304 + bstretch * 8, 0);
@@ -126,7 +126,7 @@ map.areas = [
     pushPreThing(CastleBlock, 512, 44, [6, 1], true);
     pushPreThing(GenericStone, 536, 32, 5, 4);
     pushPreThing(GenericStone, 536, 80, 5, 3);
-    pushPreThing(PipeSide, 544, 48, 1);
+    pushPreThing(PipeSide, 544, 48, 5);
     pushPreThing(GenericStone, 552, 56, 3, 3);
   }),
   new Area("Castle", function() { // Area 4

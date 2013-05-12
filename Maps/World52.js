@@ -13,11 +13,11 @@ map.areas = [
     pushPrePattern("backfence", -384, 0, 4);
     pushPrePattern("backfence", 1152, 0, 2);
     pushPreFloor(0, 0, 26);
-    pushPreThing(GenericStone, 96, 8);
-    pushPreThing(GenericStone, 104, 16, 1, 2);
-    pushPreThing(GenericStone, 112, 24, 1, 3);
-    pushPreThing(GenericStone, 120, 24, 1, 3);
-    pushPreThing(GenericStone, 120, 32, 4);
+    pushPreThing(Stone, 96, 8);
+    pushPreThing(Stone, 104, 16, 1, 2);
+    pushPreThing(Stone, 112, 24, 1, 3);
+    pushPreThing(Stone, 120, 24, 1, 3);
+    pushPreThing(Stone, 120, 32, 4);
     pushPreThing(Cannon, 136, 48, 2);
     fillPreThing(Coin, 169, 71, 3, 1, 8);
     pushPreThing(Koopa, 184, 12);
@@ -29,23 +29,23 @@ map.areas = [
     fillPreThing(Coin, 233, 39, 3, 1, 8);
     pushPreThing(Brick, 272, jumplev2, Mushroom);
     pushPreThing(Koopa, 320, 32, false, true);
-    pushPreThing(GenericStone, 352, 8);
-    pushPreThing(GenericStone, 360, 16, 1, 2);
-    pushPreThing(GenericStone, 368, 24, 1, 3);
+    pushPreThing(Stone, 352, 8);
+    pushPreThing(Stone, 360, 16, 1, 2);
+    pushPreThing(Stone, 368, 24, 1, 3);
     pushPreThing(HammerBro, 368, 36);
-    pushPreThing(GenericStone, 376, 32, 2, 4);
-    pushPreThing(GenericStone, 392, 16, 1, 2);
+    pushPreThing(Stone, 376, 32, 2, 4);
+    pushPreThing(Stone, 392, 16, 1, 2);
     pushPrePipe(440, 0, 24, true, 3);
-    pushPreThing(GenericStone, 496, 8);
-    pushPreThing(GenericStone, 504, 16, 1, 2);
+    pushPreThing(Stone, 496, 8);
+    pushPreThing(Stone, 504, 16, 1, 2);
     pushPreThing(Goomba, 504, 24);
-    pushPreThing(GenericStone, 512, 24, 1, 3);
-    pushPreThing(GenericStone, 520, 32, 1, 4);
+    pushPreThing(Stone, 512, 24, 1, 3);
+    pushPreThing(Stone, 520, 32, 1, 4);
     pushPreThing(Goomba, 520, 40);
     
     pushPreFloor(544, 0, 24);
-    pushPreThing(GenericStone, 544, 40, 1, 5);
-    pushPreThing(GenericStone, 552, 48, 2, 6);
+    pushPreThing(Stone, 544, 40, 1, 5);
+    pushPreThing(Stone, 552, 48, 2, 6);
     fillPreThing(Block, 624, jumplev1, 5, 1, 8);
     pushPreThing(HammerBro, 648, 46);
     pushPreThing(Block, 672, jumplev1, Coin, true);
@@ -66,7 +66,7 @@ map.areas = [
     pushPreThing(Brick, 1000, jumplev2, Star);
     
     pushPreFloor(1032, 0, 15);
-    pushPreThing(GenericStone, 1032, 24, 1, 3);
+    pushPreThing(Stone, 1032, 24, 1, 3);
     fillPreThing(Beetle, 1088, 8.5, 3, 1, 8.5);
     pushPreThing(Brick, 1128, 16, Coin);
     pushPreThing(Brick, 1136, 16, Mushroom);
@@ -86,17 +86,18 @@ map.areas = [
     pushPrePipe(1384, 0, 16);
     
     pushPreFloor(1416, 0, 8);
-    pushPreThing(GenericStone, 1464, 8);
-    pushPreThing(GenericStone, 1472, 16, 1, 2);
+    pushPreThing(Stone, 1464, 8);
+    pushPreThing(Stone, 1472, 16, 1, 2);
     
+    pushPreThing(SceneryBlocker, 1480, 8);
     pushPreFloor(1488, 0, 2);
-    pushPreThing(GenericStone, 1488, 32, 1, 4);
+    pushPreThing(Stone, 1488, 32, 1, 4);
     pushPreThing(Koopa, 1488, 64, false, true);
-    pushPreThing(GenericStone, 1496, 40, 1, 5);
+    pushPreThing(Stone, 1496, 40, 1, 5);
     
     pushPreFloor(1512, 0, 35);
-    pushPreThing(GenericStone, 1512, 56, 1, 7);
-    pushPreThing(GenericStone, 1520, 64, 2, 8);
+    pushPreThing(Stone, 1512, 56, 1, 7);
+    pushPreThing(Stone, 1520, 64, 2, 8);
     endCastleOutside(1596, 0, castlev);
   }),
   new Area("Underwater", function() {
@@ -105,25 +106,25 @@ map.areas = [
     goUnderWater();
     
     pushPreFloor(0, 0, 22);
-    pushPreThing(GenericStone, 88, 56, 5);
+    pushPreThing(Stone, 88, 56, 5);
     pushPreThing(Coral, 96, 24, 3);
     pushPreThing(Coral, 120, 72, 2);
     pushPreThing(Blooper, 136, 24);
     pushPreThing(Coral, 160, 32, 4);
     fillPreThing(Coin, 177, 47, 10, 1, 8, 8);
     
-    pushPreThing(Platform, 182, 56, 6/*, [moveFloating, 16, 80, 1]*/);
+    pushPrePlatformGenerator(182, 6, 1);
     pushPreFloor(208, 24, 2);
-    pushPreThing(GenericStone, 208, 88, 2, 3);
+    pushPreThing(Stone, 208, 88, 2, 3);
     pushPreThing(CheepCheep, 220, 60);
-    pushPreThing(Platform, 230, 22, 6/*, [moveFloating, 16, 80, 1]*/);
+    pushPrePlatformGenerator(230, 6, 1);
     pushPreFloor(256, 24, 2);
-    pushPreThing(GenericStone, 256, 88, 2, 3);
+    pushPreThing(Stone, 256, 88, 2, 3);
     pushPreFloor(272, 0, 4);
     pushPreThing(Blooper, 272, 24);
     
     pushPreThing(Coral, 304, 64, 4);
-    pushPreThing(GenericStone, 304, 72, 6);
+    pushPreThing(Stone, 304, 72, 6);
     pushPreThing(CheepCheep, 312, 20);
     pushPreFloor(320, 0, 2);
     fillPreThing(Coin, 321, 7, 2, 1, 8);
@@ -133,18 +134,18 @@ map.areas = [
     pushPreThing(Coral, 368, 16, 2);
     
     pushPreThing(CheepCheep, 388, 40, true);
-    pushPreThing(GenericStone, 400, 32, 4);
+    pushPreThing(Stone, 400, 32, 4);
     fillPreThing(Coin, 401, 39, 4, 1, 8);
     pushPreThing(CheepCheep, 424, 84);
-    pushPreThing(GenericStone, 432, 56, 4);
+    pushPreThing(Stone, 432, 56, 4);
     fillPreThing(Coin, 433, 63, 4, 1, 8);
     
-    pushPreThing(GenericStone, 472, 8);
-    pushPreThing(GenericStone, 480, 16, 1, 2);
-    pushPreThing(GenericStone, 488, 32, 2, 4);
-    pushPreThing(GenericStone, 488, 88, 2, 4);
+    pushPreThing(Stone, 472, 8);
+    pushPreThing(Stone, 480, 16, 1, 2);
+    pushPreThing(Stone, 488, 32, 2, 4);
+    pushPreThing(Stone, 488, 88, 2, 4);
     pushPreThing(PipeSide, 496, 48, 1);
-    pushPreThing(GenericStone, 504, 88, 2, 11);
+    pushPreThing(Stone, 504, 88, 2, 11);
   }),
   new Area("Sky", function() {
     setLocationGeneration(4);

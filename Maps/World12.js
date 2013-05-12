@@ -19,7 +19,8 @@ map.areas = [
   new Area("Underworld", function() {
     setLocationGeneration(1);
   
-    pushPreThingsVert(Brick, 0, 0, 8, 11);
+    // pushPreThingsVert(Brick, 0, 0, 8, 11);
+    fillPreThing(Brick, 0, 8, 1, 11, 8, 8);
     pushPreFloor(0, 0, 80);
     makeCeiling(48, 83);
     pushPreThing(Block, 80, jumplev1, Mushroom);
@@ -51,7 +52,7 @@ map.areas = [
     pushPreThing(Coin, 352, 62);
     pushPreThing(Brick, 358, 32);
     pushPreThing(Koopa, 360, 12);
-    pushPreThingsVert(Brick, 366, 24, 8, 3);
+    fillPreThing(Brick, 366, 32, 1, 2, 8, 8);
     pushPreThing(Coin, 359, 39, 8, 4);
     pushPreThing(Brick, 366, 48, Star);
     fillPreThing(Brick, 414, 32, 2, 5, 8, 8);

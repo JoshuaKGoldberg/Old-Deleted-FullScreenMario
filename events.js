@@ -90,9 +90,13 @@ function handleEvents() {
     // The event is done if result is true: (by default, it's null - nothing returned)
     if(event.repeat && !event.func.apply(undefined, event.args)) {
       
+      // If it has a count changer (Mario's running), do that
+      if(event.count_changer) event.count_changer(event);
+      
       // If repeat is a function, then running it determines whether to repeat
       if(event.repeat instanceof Function) {
-        repfunc = event.repeat.bind(event);
+        // Binding then calling is what actually runs the function
+        repfunc = event.repeat.bind(event); 
         if(repfunc()) {
           event.count += event.timeout;
           insertSortedEvent(events, event, event.count);
@@ -122,8 +126,10 @@ function insertSortedEvent(events, contents, count) {
  * Sprite Cycles
  */
 function addSpriteCycle(me, settings, name, timing) {
-  if(!me.cycles) me.cycles = {}
-  var cycle = me.cycles[name || 0] = setSpriteCycle(me, settings, timing);
+  if(!me.cycles) me.cycles = {};
+  clearClassCycle(me, name);
+  var cycle = me.cycles[name || 0] = setSpriteCycle(me, settings, typeof(timing) == "function" ? 0 : timing);
+  if(typeof(timing) == "function") cycle.event.count_changer = timing;
   cycleClass(me, settings);
   return cycle;
 }
@@ -131,21 +137,38 @@ function addSpriteCycleSynched(me, settings, name, timing) {
   if(!me.cycles) me.cycles = {}
   settings = settings || ["one", "two"];
   var cycle = me.cycles[name || 0] = setSpriteCycle(me, settings, timing, true);
+  clearClassCycle(me, name);
   cycleClass(me, settings);
   return cycle;
 }
 
 // Repeated usage: setSpriteCycle(me, ["one", "two"]);
-// To cancle, make settings false
+// To cancle, make settings or something in settings false
 function setSpriteCycle(me, settings, timing, synched) {
   settings.loc = -1;
   settings.oldclass = "761deadsoldiers"; // never reached - too inconspicuous
   me.onadding = function() { 
-    if(synched) addEventIntervalSynched(cycleClass, timing || 9, Infinity, me, settings);
-    else addEventInterval(cycleClass, timing || 9, Infinity, me, settings);
+    if(synched) settings.event = addEventIntervalSynched(cycleClass, timing || 9, Infinity, me, settings);
+    else settings.event = addEventInterval(cycleClass, timing || 9, Infinity, me, settings);
   }
   if(me.placed) me.onadding();
   return settings;
+}
+
+function clearClassCycles(me, names) {
+  names = names.split(" ");
+  for(var i = names.length - 1; i >= 0; --i)
+    clearClassCycle(me, names[i]);
+}
+function clearClassCycle(me, name) {
+  if(!characterIsAlive(me) || !me.cycles[name]) return;
+  me.cycles[name][0] = false;
+  me.cycles[name].length = 1;
+  delete me.cycles[name];
+}
+function clearAllCycles(me) {
+  for(var i in me.cycles)
+    clearClassCycle(me, i);
 }
 
 function cycleClass(me, settings) {
@@ -153,15 +176,20 @@ function cycleClass(me, settings) {
   
   if(settings.oldclass != "") removeClass(me, settings.oldclass);
   settings.loc = ++settings.loc % settings.length;
+  // Current is the sprite, bool, or function currently being added and/or run
   var current = settings[settings.loc];
   if(current) {
     var name = current instanceof Function ? current(me, settings) : current;
-    me.element.className += " " + name;
-    settings.oldclass = name;
+    if(typeof(name) == "string") {
+      settings.oldclass = name;
+      addClass(me, name);
+      return false;
+    } 
+    else return (name === false);
   }
   // If it's false, this will stop the loop
-  else {
-    return current === false;
+  else { 
+    return (current === false);
   }
 }
 
@@ -180,6 +208,10 @@ function setSpriteCycleManual(me, settings, timing) {
   return settings;
 }
 
+function removeSpriteCycle(me, name) {
+  // yeah...
+}
+
 /*
    "But you were dead a thousand times. Hopeless encounters successfully won.
     A man long dead, grafted to machines your builders did not understand. You follow
@@ -195,7 +227,7 @@ function scrollTime(dx) {
   addEventInterval(scrollMario, 1, Infinity, dx);
   
   mario.oldtop = mario.top;
-  mario.siny = Math.PI * -1;
+  mario.siny = -Math.PI;
   addEventInterval(function() {
     setTop(mario, mario.oldtop - Math.sin(mario.siny -= .125) * unitsizet8);
   }, 1, Infinity);
@@ -203,22 +235,6 @@ function scrollTime(dx) {
     shiftVert(mario, -1.4);
     mario.oldtop -= 1.4;
   }, 1, 49);
-  
-  setTimeout(function() {
-    body.style.transition = "background 14s"
-    body.style.background = "black";
-    var backbool = true;
-    setInterval(function() {
-      if(backbool) {
-        body.style.background = "black";
-        body.className = "Night";
-      } else {
-        body.style.background = "#5c94fc";
-        body.className = "Overworld Night";
-      }
-      backbool = !backbool;
-    }, 14000);
-  }, 7000);
   
   addEventInterval(function() {
     if(map.has_lakitu) killFlip(map.has_lakitu);

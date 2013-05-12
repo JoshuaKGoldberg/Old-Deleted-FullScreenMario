@@ -1,3 +1,4 @@
+map.time = 300;
 map.locs = [
   new Location(0, true),
   new Location(0, exitPipeVert),
@@ -6,7 +7,7 @@ map.locs = [
   new Location(2, enterCloudWorld)
 ];
 map.areas = [
-  new Area("Overworld Night Alt", function() {
+  new Area("Overworld Night", function() {
     setLocationGeneration(0);
     
     pushPreScenery("Castle", -1 * unitsizet4, 0);

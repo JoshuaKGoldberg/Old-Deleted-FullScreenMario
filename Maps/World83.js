@@ -1,3 +1,4 @@
+map.time = 300;
 map.locs = [
   new Location(0, true)
 ];
@@ -5,9 +6,10 @@ map.areas = [
   new Area("Overworld", function() {
     setLocationGeneration(0);
     
-    pushPrePattern("backfence", -384, 0, 7);
+    pushPrePattern("backfencemin3", -384, 0, 7);
     pushPreScenery("Castle", -16, castlev);
     pushPreFloor(0, 0, 69);
+    // pushPreScenery("Fence", 120, 0);
     pushPreThing(Cannon, 144, 16, 2);
     pushPreScenery("CastleWall", 192, 0, 8);
     pushPreThing(Koopa, 240, 32, false, true);
@@ -16,25 +18,26 @@ map.areas = [
     pushPrePipe(424, 0, 32, true);
     fillPreThing(Brick, 480, jumplev1, 8, 1, 8);
     fillPreThing(Brick, 480, jumplev2, 6, 1, 8);
+    // pushPreScenery("Fence", 504, 0);
     pushPreThing(HammerBro, 504, 12);
     pushPreThing(HammerBro, 520, 44);
     pushPreThing(Brick, 528, jumplev2, Mushroom);
     pushPreThing(Brick, 536, jumplev2);
     
     pushPreFloor(568, 0, 4);
-    pushPreThing(GenericStone, 568, 32, 1, 4);
-    pushPreThing(GenericStone, 576, 24, 1, 3);
-    pushPreThing(GenericStone, 584, 16, 1, 2);
-    pushPreThing(GenericStone, 592, 8, 1, 1);
+    pushPreThing(Stone, 568, 32, 1, 4);
+    pushPreThing(Stone, 576, 24, 1, 3);
+    pushPreThing(Stone, 584, 16, 1, 2);
+    pushPreThing(Stone, 592, 8, 1, 1);
     
     pushPreFloor(616, 0, 47);
     pushPreScenery("CastleWall", 632, 0, 6);
     pushPreThing(Cannon, 688, 16, 2);
     pushPreScenery("CastleWall", 704, 0, 6);
     pushPreThing(Koopa, 744, 24, false, true);
-    pushPreThing(GenericStone, 760, 24, 1, 3);
+    pushPreThing(Stone, 760, 24, 1, 3);
     pushPreScenery("CastleWall", 776, 0, 10);
-    pushPreThing(GenericStone, 872, 32, 2, 4);
+    pushPreThing(Stone, 872, 32, 2, 4);
     fillPreThing(Brick, 920, jumplev1, 8, 1, 8);
     pushPreThing(Brick, 920, jumplev2);
     pushPreThing(Brick, 928, jumplev2, Mushroom);
@@ -55,12 +58,13 @@ map.areas = [
     pushPreThing(HammerBro, 1416, 12);
     pushPreThing(HammerBro, 1480, 12);
     pushPreThing(Brick, 1520, jumplev1, Coin);
-    pushPreThing(GenericStone, 1560, 16, 1, 2);
-    pushPreThing(GenericStone, 1584, 16);
-    pushPreThing(GenericStone, 1600, 32);
-    pushPreThing(GenericStone, 1616, 48);
-    pushPreThing(GenericStone, 1632, 64, 2, 1);
+    pushPreThing(Stone, 1560, 16, 1, 2);
     
+    pushPreThing(Stone, 1584, 16);
+    pushPreThing(Stone, 1600, 32);
+    pushPreThing(Stone, 1616, 48);
+    pushPreThing(SceneryBlocker, 1624, 24, 40, 24);
+    pushPreThing(Stone, 1632, 64, 2, 1);
     pushPreFloor(1664, 0, 32);
     endCastleOutside(1708, 0, 0, 11, 44);
   })
