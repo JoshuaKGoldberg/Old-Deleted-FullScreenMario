@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <title>Image Parser</title>
+    
+    <link href="parser.css" rel="stylesheet">
+    
+    <script src="parser.js"></script>
+
+</head>
+<body onload="load()">
+  <h1>Sprite Image Converter</h1>
+  
+  <div id="sources" style="float:left" >
+    <div id="left" class="column">
+      <h2>Upload files</h2>
+      <!-- <input type="file" multiple id="dropzone"></input> -->
+      <div id="dropzone">Drag & drop here</div>
+<!--       <div id="scaler">
+        <h3>Scale sizes</h3>
+        <div>x: <input id="scalex" value="1"></input></div>
+        <div>y: <input id="scaley" value="1"></input></div>
+      </div> -->
+      <ol id="curlist"></ol>
+    </div>
+    
+    <div id="middle" class="column" style="max-width:420px">
+      <h2>Select your color palette</h2>
+      <div id="palettes">
+        
+      </div>
+    </div>
+  </div>
+  
+  <div id="right" class="column">
+    <h2>Get your output</h2>
+    <!-- <div id="num_files">No files converted so far!</div> -->
+    <ol id="outlist"></ol>
+  </div>
+  
+</body>
+</html>

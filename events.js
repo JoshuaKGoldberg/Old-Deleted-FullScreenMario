@@ -1,4 +1,6 @@
-// Events! Fancy function parameters!
+/* Events.js */
+// Contains functions that deal with in-game timeouts and intervals
+
 // Parameters are given as:
 //// addEvent(
 ////   function(name, of, arguments) {
@@ -14,11 +16,11 @@ function addEvent(func, count) {
   count = count || 1;
   
   // Get the first two arguments out of there, as they're stored in func & count
-  var args = [].splice.call(arguments, 0);
+  var args = arrayMake(arguments);
   args.splice(0, 2);
   
   // Create the event, insert it into events, then return it.
-  contents = {
+  var contents = {
     func: func,
     count: gamecount + count,
     args: args,
@@ -35,11 +37,11 @@ function addEventInterval(func, count, reptimes) {
   if(!(func instanceof Function)) return false;
   count = count || 1;
   
-  args = Array.prototype.splice.call(arguments, 0);
+  var args = arrayMake(arguments);
   // Reptimes is an extra parameter, so chop the first 3 instead of 2
   args.splice(0, 3);
   
-  contents = {
+  var contents = {
     func: func,
     count: gamecount + count,
     args: args,
@@ -57,9 +59,9 @@ function addEventIntervalSynched(func, count, reptimes, me, settings) {
   var calctime = count * settings.length,
       entry = ceil(gamecount / calctime) * calctime,
       scope = this,
-      addfunc = function(scope, arguments, me) {
+      addfunc = function(scope, args, me) {
         me.startcount = gamecount;
-        return addEventInterval.apply(scope, arguments);
+        return addEventInterval.apply(scope, args);
       };
   
   // There is no difference in times, you're good to go
@@ -77,7 +79,9 @@ function addEventIntervalSynched(func, count, reptimes, me, settings) {
 // While the most recent event is at exec time, it's run, then deleted
 function handleEvents() {
   ++gamecount;
-  var i, len, events_current = events[gamecount], event, repfunc;
+  var events_current = events[gamecount],
+      event, repfunc,
+      len, i;
   
   // If there are no events on this timer, return
   if(!events_current) return;
@@ -88,7 +92,7 @@ function handleEvents() {
     
     // Call the function - apply is used to pass in the arguments dynamically
     // The event is done if result is true: (by default, it's null - nothing returned)
-    if(event.repeat && !event.func.apply(undefined, event.args)) {
+    if(event.repeat && !event.func.apply(null, event.args)) {
       
       // If it has a count changer (Mario's running), do that
       if(event.count_changer) event.count_changer(event);
@@ -121,6 +125,15 @@ function insertSortedEvent(events, contents, count) {
   events[count].push(contents);
 }
 
+function clearEvent(event) {
+  if(!event) return;
+  event.repeat = false;
+}
+function clearEventInterval(event) {
+  if(!event) return;
+  event.repeat = false;
+}
+
 
 /*
  * Sprite Cycles
@@ -129,7 +142,7 @@ function addSpriteCycle(me, settings, name, timing) {
   if(!me.cycles) me.cycles = {};
   clearClassCycle(me, name);
   var cycle = me.cycles[name || 0] = setSpriteCycle(me, settings, typeof(timing) == "function" ? 0 : timing);
-  if(typeof(timing) == "function") cycle.event.count_changer = timing;
+  if(cycle.event && typeof(timing) == "function") cycle.event.count_changer = timing;
   cycleClass(me, settings);
   return cycle;
 }
@@ -172,7 +185,7 @@ function clearAllCycles(me) {
 }
 
 function cycleClass(me, settings) {
-  if(!me || !me.element || !settings || !settings.length) return true;
+  if(!me || !settings || !settings.length) return true;
   
   if(settings.oldclass != "") removeClass(me, settings.oldclass);
   settings.loc = ++settings.loc % settings.length;
@@ -211,6 +224,7 @@ function setSpriteCycleManual(me, settings, timing) {
 function removeSpriteCycle(me, name) {
   // yeah...
 }
+
 
 /*
    "But you were dead a thousand times. Hopeless encounters successfully won.

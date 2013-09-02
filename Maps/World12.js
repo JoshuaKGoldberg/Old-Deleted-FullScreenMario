@@ -10,7 +10,7 @@ map.areas = [
   new Area("Overworld", function() {
     setLocationGeneration(0);
     
-    pushPreScenery("Castle", -16, castlev);
+    pushPreCastle();
     pushPrePattern("backcloud", 0, 4, 1);
     pushPreFloor(0, 0, 24);
     pushPreThing(PipeSide, 80, 16, 1);
@@ -19,7 +19,6 @@ map.areas = [
   new Area("Underworld", function() {
     setLocationGeneration(1);
   
-    // pushPreThingsVert(Brick, 0, 0, 8, 11);
     fillPreThing(Brick, 0, 8, 1, 11, 8, 8);
     pushPreFloor(0, 0, 80);
     makeCeiling(48, 83);
@@ -38,47 +37,48 @@ map.areas = [
     pushPreThing(Brick, 232, 40, Coin);
     pushPreThing(Stone, 248, 24, 1, 3);
     pushPreThing(Stone, 264, 16, 1, 2);
-    fillPreThing(Brick, 310, 32, 1, 3, 8, 8);
-    pushPreThing(Brick, 318, 32);
-    pushPreThing(Coin, 319, 39);
-    fillPreThing(Brick, 326, 32, 1, 3, 8, 8);
-    pushPreThing(Coin, 328, 62);
-    pushPreThing(Brick, 334, 48);
-    pushPreThing(Coin, 336, 62);
-    pushPreThing(Brick, 342, 48);
-    pushPreThing(Coin, 344, 62);
-    pushPreThing(Koopa, 350, 12);
-    fillPreThing(Brick, 350, 32, 1, 3, 8, 8);
-    pushPreThing(Coin, 352, 62);
-    pushPreThing(Brick, 358, 32);
-    pushPreThing(Koopa, 360, 12);
-    fillPreThing(Brick, 366, 32, 1, 2, 8, 8);
-    pushPreThing(Coin, 359, 39, 8, 4);
-    pushPreThing(Brick, 366, 48, Star);
-    fillPreThing(Brick, 414, 32, 2, 5, 8, 8);
-    fillPreThing(Brick, 430, 16, 2, 3, 8, 8);
-    fillPreThing(Brick, 430, 72, 2, 2, 8, 8);
-    pushPreThing(Koopa, 462, 12);
-    fillPreThing(Brick, 462, 32, 4, 1, 8, 8);
-    fillPreThing(Brick, 462, 72, 5, 2, 8, 8);
-    fillPreThing(Coin, 463, 39, 4, 1, 8, 8);
-    fillPreThing(Brick, 494, 32, 2, 7, 8, 8);
+    
+    fillPreThing(Brick, 312, 32, 1, 3, 8, 8);
+    pushPreThing(Brick, 320, 32);
+    pushPreThing(Coin, 321, 39);
+    fillPreThing(Brick, 328, 32, 1, 3, 8, 8);
+    fillPreThing(Coin, 330, 63, 4, 1, 8, 8);
+    pushPreThing(Brick, 336, 48);
+    pushPreThing(Brick, 344, 48);
+    fillPreThing(Koopa, 352, 12, 2, 1, 12);
+    fillPreThing(Brick, 352, 32, 1, 3, 8, 8);
+    
+    // pushPreThing(Coin, 360, 62);
+    pushPreThing(Brick, 360, 32);
+    fillPreThing(Brick, 368, 32, 1, 2, 8, 8);
+    pushPreThing(Coin, 361, 39);
+    pushPreThing(Brick, 368, 48, Star);
+    fillPreThing(Brick, 416, 32, 2, 5, 8, 8);
+    fillPreThing(Brick, 432, 16, 2, 3, 8, 8);
+    fillPreThing(Brick, 432, 72, 2, 2, 8, 8);
+    fillPreThing(Brick, 464, 32, 4, 1, 8, 8);
+    fillPreThing(Brick, 464, 72, 5, 2, 8, 8);
+    fillPreThing(Coin, 465, 39, 4, 1, 8, 8);
+    pushPreThing(Koopa, 472, 12);
+    fillPreThing(Brick, 496, 32, 2, 7, 8, 8);
     pushPreThing(Goomba, 494, 8);
     pushPreThing(Goomba, 510, 8);
-    fillPreThing(Brick, 534, 72, 4, 2, 8, 8);
-    fillPreThing(Brick, 542, 32, 1, 5, 8, 8);
-    fillPreThing(Brick, 550, 32, 2, 1, 8, 8);
-    pushPreThing(Coin, 551, 39);
-    pushPreThing(Brick, 558, 40, Mushroom);
-    fillPreThing(Brick, 582, 32, 2, 1, 8, 8);
-    pushPreThing(Brick, 582, 40);
-    fillPreThing(Brick, 582, 48, 2, 3, 8, 8);
-    pushPreThing(Brick, 590, 40, Coin);
-    pushPreThing(Goomba, 590, 72);
-    fillPreThing(Brick, 608, 32, 4, 1, 8, 8);
-    fillPreThing(Brick, 608, 72, 4, 2, 8, 8);
-    pushPreThing(Goomba, 608, 40);
-    pushPreThing(Goomba, 618, 40);
+    
+    fillPreThing(Brick, 528, 72, 4, 2, 8, 8);
+    fillPreThing(Brick, 536, 32, 1, 5, 8, 8);
+    fillPreThing(Brick, 544, 32, 2, 1, 8, 8);
+    pushPreThing(Coin, 545, 39);
+    pushPreThing(Brick, 552, 40, Mushroom);
+    
+    fillPreThing(Brick, 576, 32, 2, 1, 8, 8);
+    pushPreThing(Brick, 576, 40);
+    fillPreThing(Brick, 576, 48, 2, 3, 8, 8);
+    pushPreThing(Brick, 584, 40, Coin);
+    pushPreThing(Goomba, 584, 72);
+    
+    fillPreThing(Brick, 608, 32, 4, 1, 8);
+    fillPreThing(Brick, 608, 72, 4, 2, 8);
+    fillPreThing(Goomba, 608, 40, 2, 1, 12);
     
     pushPreFloor(664, 0, 34);
     fillPreThing(Brick, 672, 40, 6, 2, 8, 8);
@@ -148,6 +148,6 @@ map.areas = [
     pushPreThing(Stone, 56, 48, 1, 6);
     pushPreThing(Stone, 64, 56, 1, 7);
     pushPreThing(Stone, 72, 64, 2, 8);
-    endCastleOutside(148, 0, castlev);
+    endCastleOutside(148);
   })
 ];

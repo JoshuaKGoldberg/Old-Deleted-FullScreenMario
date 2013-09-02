@@ -1,94 +1,116 @@
-// Main is whether it should override the main background music
-// Override is...
-//// ...Main = true: whether it loops
-//// ...Main = false: whether the main music pauses
-function play(name, main, override) {
-  // return false;
-  var div = new Audio("Sounds/" + name);  
-  div.name = name;
+/* Sounds.js */
+// Stores sounds in a global sounds object, to be played back on command
+
+// Starts pre-emptively loading sounds (see load.js::startLoadingSOunds)
+// All sounds are stored in library.sounds, while ones used in this run are also in window.sounds
+function resetSounds() {
+  window.sounds = {};
+  window.theme = false;
+  window.muted = (localStorage.muted == "true");
+}
+
+
+// Override is whether the main music pauses
+function play(name_raw, override) {
+  // First check if this is already in sounds
+  var name = "Sounds/" + name_raw,
+      sound = sounds[name_raw];
   
-  // This does become the main theme
-  if(main) {
-    pauseTheme();
-    if(sounds[0]) {
-      // if(sounds[0].name == name) return;
-      pauseTheme();
-      sounds.splice(sounds.indexOf(div), 1);
+  // Is this even needed?
+  if(override) log("Play as override?!", arguments);
+  
+  // If it's not already being played,
+  if(!sound) {
+    // Check for it in the library
+    if(sound = library.sounds[name_raw]) {
+      sounds[name_raw] = sound;
     }
-    theme = sounds[0] = div;
-    div.loop = override;
-  }
-  
-  // This does not become the main theme
-  else {
-    div.addEventListener("canplaythrough", function() {
-      setTimeout(function() {
-        div.pause();
-        sounds.splice(sounds.indexOf(div), 1);
-      }, div.duration * 1000);
-    });
-    sounds.push(div);
-    // The main theme is paused during this
-    if(override && sounds[0]) {
-      pauseTheme();
+    // Otherwise it's not known, complain
+    else {
+      log("Unknown sound: '" + name_raw + "'");
+      return sound;
     }
   }
   
-  div.volume = muted ? 0 : 1;
-  div.volume_real = 1;
-  div.play();
-  return div;
+  // Reset the sound, then play it
+  if(sound.readyState) {
+    sound.pause();
+    sound.currentTime = 0;
+  }
+  sound.volume = !muted;
+  sound.play();
+  
+  // If this is the first time the sound was added, let it know how to stop
+  if(!(sound.used++)) sound.addEventListener("ended", function() { mlog("Sounds", sound); soundFinish(sound, name_raw); });
+  
+  return sound;
 }
 
 // The same as regular play, but with lower volume when further from Mario
 function playLocal(name, xloc, main, override) {
-  var sound = play(name, main, override);
-  if(!sound) return;
-  if(!mario) sound.volume = sound.volume_real = 1;
-  else {
-    var volume_real;
-    if(xloc < screen.left || xloc > screen.right) volume_real = 0;
-    else volume_real = min(1, 1.4 * (screen.width - abs(xloc - mario.left)) / screen.width);
-    // IndexSizeError: DOM Exception 1 pops up a lot without the try brackets
-    try {
-      sound.volume = volume_real;
-      sound.volume_real = volume_real;
-    }
-    catch(err) {
-      // console.log("Error in playLocal: " + err);
-    }
+  var sound = play(name, main, override),
+      volume_real;
+  // Don't do anything without having played a sound, or if there's no actual Mario
+  if(!sound || !window.mario) return;
+  
+  // If it's out of bounds (or muted), the volume is 0
+  if(muted || xloc < gamescreen.left || xloc > gamescreen.right) volume_real = 0;
+  // Otherwise it's a function of how far the thing is from Mario
+  else volume_real = max(.14, min(.84, 1.4 * (gamescreen.unitwidth - abs(xloc - mario.left)) / gamescreen.unitwidth));
+  
+  sound.volume = volume_real;
+  sound.volume_real = volume_real;
+}
+
+
+// Plays a theme as sounds.theme via play()
+// If no theme is provided, it plays the area's theme
+function playTheme(name_raw, resume) {
+  // First make sure there isn't already a theme playing
+  if(sound = sounds.theme) {
+    soundStop(sound);
+    delete sounds.theme;
+    delete sounds[sound.name_raw];
   }
+  
+  // If the name doesn't exist, get it from the current area
+  if(!name_raw) name_raw = area.theme;
+  // They all happen to end with .mp3...
+  name_raw += ".mp3";
+  
+  // This creates the sound.
+  var sound = sounds.theme = play(name_raw);
+  sound.loop = true;
+  
+  // If it's only used once, add the event listener to resume theme
+  if(sound.used == 1) sound.addEventListener("ended", playTheme);
+  
   return sound;
 }
-
-function playCurrentTheme() {
-  window.theme = play(map.areas[map.areanum].setting.split(" ")[0] + ".mp3", true, true);
-}
-function playCurrentThemeHurry() {
-  window.theme = play("Hurry " + map.areas[map.areanum].setting.split(" ")[0] + ".mp3", true, true);
-  // var hurry = play("Hurry.mp3", true);
-  // hurry.addEventListener("ended", function() {
-    // playCurrentTheme();
-    // theme.playbackRate = 1.25;
-  // });
+// The equivalent of playTheme with Hurry added on
+function playCurrentThemeHurry(name_raw) {
+  playTheme("Hurry " + (name_raw || area.theme));
 }
 
-// Messes up pipe sounds
-function clearSounds() {
-  if(!sounds || sounds.length == 0) return;
-  for(var i=sounds.length-1; i>=0; --i)
-    if(sounds[i])
-      sounds[i].pause();
+// Called when a sound is done to get it out of sounds
+function soundFinish(sound, name_raw) {
+  if(sounds[name_raw]) delete sounds[name_raw];
 }
 
-function pauseTheme() {
-  if(sounds && sounds[0]) sounds[0].pause();
-  if(window.theme) theme.pause();
+function soundStop(sound) {
+  // If this sound has a readyState, stop it
+  if(sound) {
+    sound.pause();
+    if(sound.readyState) sound.currentTime = 0;
+  }
 }
 
 function toggleMute() {
-  var level = !(data.muted = muted = !muted);
-  for(var i = sounds.length - 1; i >= 0; --i)
-    sounds[i].volume = level ? sounds[i].volume_real : 0;
-  theme.volume = level;
+  var level = !(localStorage.muted = data.muted = muted = !muted);
+  for(var i in sounds) sounds[i].volume = level;
 }
+
+function pauseAllSounds() { for(var i in sounds) sounds[i].pause(); }
+function resumeAllSounds() { for(var i in sounds) sounds[i].play(); }
+function pauseTheme() { if(sounds.theme) sounds.theme.pause(); }
+function resumeTheme() { if(sounds.theme) sounds.theme.play(); }

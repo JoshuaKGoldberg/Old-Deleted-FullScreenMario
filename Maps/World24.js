@@ -13,17 +13,17 @@ map.areas = [
     
     fillPreWater(128, 0, 32);
     pushPreThing(Podoboo, 128, -32);
-    pushPreThing(GenericStone, 144, 32, 2, 1);
-    pushPreThing(GenericStone, 176, 48, 3, 1);
+    pushPreThing(Stone, 144, 32, 2, 1);
+    pushPreThing(Stone, 176, 48, 3, 1);
     pushPreThing(CastleBlock, 184, 48);
     pushPreThing(Block, 184, 80, Mushroom);
-    pushPreThing(GenericStone, 216, 32, 2, 1);
+    pushPreThing(Stone, 216, 32, 2, 1);
     pushPreThing(Podoboo, 240, -32);
     
     pushPreFloor(256, 0, 52);
-    pushPreThing(GenericStone, 256, 24, 2, 3);
+    pushPreThing(Stone, 256, 24, 2, 3);
     makeCeilingCastle(272, 49, 4);
-    pushPreThing(GenericStone, 296, jumplev1, 36, 1);
+    pushPreThing(Stone, 296, jumplev1, 36, 1);
     pushPreThing(CastleBlock, 344, 0);
     pushPreThing(CastleBlock, 392, jumplev1, 6);
     pushPreThing(CastleBlock, 440, 0);
@@ -31,28 +31,28 @@ map.areas = [
     pushPreThing(CastleBlock, 488, jumplev1, 6);
     pushPreThing(CastleBlock, 536, 0);
     pushPreThing(CastleBlock, 584, jumplev1, 6);
-    pushPreThing(GenericStone, 640, 24, 4, 3)
+    pushPreThing(Stone, 640, 24, 4, 3)
     pushPreThing(CastleBlock, 656, 56, 6);
     
     pushPrePlatformGenerator(686, 3, -1);
     pushPrePlatformGenerator(710, 3, 1);
     
     pushPreFloor(736, 16);
-    pushPreThing(CastleBlock, 736, 24, 6);
+    pushPreThing(CastleBlock, 736, 24, 6, true);
     pushPreFloor(744, 24, 6);
     makeCeilingCastle(744, 6, 3);
     pushPreFloor(792, 0, 10);
     fillPreThing(Coin, 817, 7, 3, 2, 8, 32);
     pushPreThing(CastleBlock, 824, 16);
     fillPreWater(872, 0, 4);
-    pushPreThing(GenericStone, 864, 24, 1, 3);
+    pushPreThing(Stone, 864, 24, 1, 3);
     pushPreFloor(888, 24, 2);
     fillPreWater(904, 0, 4);
     
     pushPreFloor(920, 0, 13);
-    pushPreThing(GenericStone, 920, 24, 5, 3);
+    pushPreThing(Stone, 920, 24, 5, 3);
     makeCeilingCastle(920, 13, 3);
-    fillPreThing(GenericStone, 976, 24, 2, 1, 32, 0, 2, 3);
+    fillPreThing(Stone, 976, 24, 2, 1, 32, 0, 2, 3);
     
     fillPreThing(Brick, 1024, 64, 6, 1, 8);
     endCastleInside(1024);

@@ -3,9 +3,9 @@ map.locs = [
   new Location(0, true)
 ];
 map.areas = [
-  new Area("Overworld Night Alt", function() {
+  new Area("Overworld Night Alt2", function() {
     setLocationGeneration(0);
-    pushPreScenery("Castle", -16, castlev);
+    pushPreCastle();
     pushPrePattern("backcloud", 0, 4, 4);
     pushPreFloor(0, 0, 16);
     
@@ -17,7 +17,7 @@ map.areas = [
     
     pushPreTree(248, 32, 4);
     pushPreTree(296, 0, 3);
-    pushPreThing(Springboard, 304, 15.5);
+    pushPreThing(Springboard, 304, 14.5);
     pushPreTree(344, 0, 3);
     fillPreThing(Coin, 345, 71, 7, 1, 8);
     pushPreThing(Platform, 348, 64, 4, [moveSliding, 312, 364]);
@@ -42,7 +42,7 @@ map.areas = [
     pushPreTree(824, 0, 3);
     pushPreTree(856, 32, 5);
     pushPreTree(904, 0, 5);
-    pushPreThing(Springboard, 928, 15.5);
+    pushPreThing(Springboard, 928, 14.5);
     
     pushPreThing(Platform, 972, 63, 4, [moveSliding, 940, 992]);
     pushPreTree(984, 0, 3);
@@ -60,6 +60,6 @@ map.areas = [
     pushPreTree(1248, 64, 3);
     
     pushPreFloor(1280, 0, 32);
-    endCastleOutside(1332, 0, 0, 13, 28);
+    endCastleOutside(1332, 0, true, 13, 28);
   })
 ];

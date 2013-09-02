@@ -9,6 +9,7 @@ map.areas = [
   new Area("Overworld Alt", function() {
     setLocationGeneration(0);
     
+    pushPreCastle();
     pushPreScenery("Castle", -1 * unitsizet4, castlev);
     pushPrePattern("backfence", -384, 0, 4);
     pushPrePattern("backfence", 1152, 0, 2);
@@ -21,7 +22,7 @@ map.areas = [
     pushPreThing(Cannon, 136, 48, 2);
     fillPreThing(Coin, 169, 71, 3, 1, 8);
     pushPreThing(Koopa, 184, 12);
-    pushPreThing(Springboard, 200, 15.5);
+    pushPreThing(Springboard, 200, 14.5);
     
     pushPreFloor(232, 0, 37);
     fillPreThing(Brick, 232, jumplev1, 6, 1, 8);
@@ -98,7 +99,7 @@ map.areas = [
     pushPreFloor(1512, 0, 35);
     pushPreThing(Stone, 1512, 56, 1, 7);
     pushPreThing(Stone, 1520, 64, 2, 8);
-    endCastleOutside(1596, 0, castlev);
+    endCastleOutside(1596);
   }),
   new Area("Underwater", function() {
     setLocationGeneration(3);

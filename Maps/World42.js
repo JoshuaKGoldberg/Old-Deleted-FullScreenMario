@@ -9,7 +9,7 @@ map.locs = [
 map.areas = [
   new Area("Overworld", function() { // entrance - loc 0
     setLocationGeneration(0);
-    pushPreScenery("Castle", -16, castlev);
+    pushPreCastle();
     pushPrePattern("backcloud", 0, 4, 1);
     pushPreFloor(0, 0, 24);
     pushPreThing(PipeSide, 80, 16, 1);
@@ -18,7 +18,7 @@ map.areas = [
   new Area("Underworld", function() { // main underworld - locs 1 (entryNormal), 2 (exitPipeVert)
     setLocationGeneration(1);
 
-    pushPreThingsVert(Brick, 0, 0, 8, 11);
+    fillPreThing(Brick, 0, 0, 1, 11, 8, 8);
     pushPreFloor(0, 0, 11);
     makeCeiling(48, 51);
     
@@ -65,14 +65,14 @@ map.areas = [
     pushPreThing(Beetle, 704, 8.5);
     pushPrePipe(712, 0, 24);
     fillPreThing(Koopa, 800, 12, 2, 1, 12);
-    pushPreThing(GenericStone, 824, 16, 1, 2);
-    pushPreThing(GenericStone, 832, 24, 1, 3);
+    pushPreThing(Stone, 824, 16, 1, 2);
+    pushPreThing(Stone, 832, 24, 1, 3);
     
     pushPreFloor(856, 0, 2);
     pushPrePipe(856, 0, 32, true, false, 2);
     
     pushPreFloor(888, 0, 2);
-    pushPreThing(GenericStone, 888, 24, 2, 3);
+    pushPreThing(Stone, 888, 24, 2, 3);
     
     pushPrePlatformGenerator(918, 6, 1);
     // pushPreThing(PlatformGenerator, 918, ceilmax, 6, 1);
@@ -94,9 +94,9 @@ map.areas = [
     pushPrePipe(1136, 0, 32, true);
     
     pushPreFloor(1168, 0, 9);
-    pushPreThing(GenericStone, 1216, 8);
-    pushPreThing(GenericStone, 1224, 16, 1, 2);
-    pushPreThing(GenericStone, 1232, 24, 1, 3);
+    pushPreThing(Stone, 1216, 8);
+    pushPreThing(Stone, 1224, 16, 1, 2);
+    pushPreThing(Stone, 1232, 24, 1, 3);
     pushPreThing(Beetle, 1232, 32.5);
     
     pushPrePlatformGenerator(1246, 6, 1);
@@ -110,10 +110,10 @@ map.areas = [
     fillPreThing(Brick, 1296, jumplev1, 10, 1, 8);
     fillPreThing(Coin, 1297, 39, 10, 1, 8);
     fillPreThing(Koopa, 1344, 12, 2, 1, 12);
-    pushPreThing(GenericStone, 1384, 8);
-    pushPreThing(GenericStone, 1392, 16, 1, 2);
-    pushPreThing(GenericStone, 1400, 24, 1, 3);
-    pushPreThing(GenericStone, 1408, 32, 1, 4);
+    pushPreThing(Stone, 1384, 8);
+    pushPreThing(Stone, 1392, 16, 1, 2);
+    pushPreThing(Stone, 1400, 24, 1, 3);
+    pushPreThing(Stone, 1408, 32, 1, 4);
     pushPreThing(Beetle, 1432, 8.5);
     pushPrePipe(1440, 0, 56, true);
     
@@ -159,7 +159,7 @@ map.areas = [
     pushPreThing(Stone, 56, 48, 1, 6);
     pushPreThing(Stone, 64, 56, 1, 7);
     pushPreThing(Stone, 72, 64, 2, 8);
-    endCastleOutside(148, 0, castlev);
+    endCastleOutside(148);
   }), 
   new Area("Overworld", function() { // bonus world! - loc 5
     setLocationGeneration(5);
@@ -182,18 +182,18 @@ map.areas = [
     pushPreShroom(248, 24, 7);
     fillPreThing(Coin, 281, 31, 2, 1, 8);
     
-    pushPreThing(GenericStone, 320, 8);
-    pushPreThing(GenericStone, 328, 16, 1, 2);
-    pushPreThing(GenericStone, 336, 24, 1, 3);
-    pushPreThing(GenericStone, 344, 32, 1, 4);
-    pushPreThing(GenericStone, 352, 40, 1, 5);
-    pushPreThing(GenericStone, 360, 48, 1, 6);
-    pushPreThing(GenericStone, 368, 56, 1, 7);
-    pushPreThing(GenericStone, 376, 64, 1, 8);
-    pushPreThing(GenericStone, 384, 72, 1, 9);
-    pushPreThing(GenericStone, 392, 72, 11);
+    pushPreThing(Stone, 320, 8);
+    pushPreThing(Stone, 328, 16, 1, 2);
+    pushPreThing(Stone, 336, 24, 1, 3);
+    pushPreThing(Stone, 344, 32, 1, 4);
+    pushPreThing(Stone, 352, 40, 1, 5);
+    pushPreThing(Stone, 360, 48, 1, 6);
+    pushPreThing(Stone, 368, 56, 1, 7);
+    pushPreThing(Stone, 376, 64, 1, 8);
+    pushPreThing(Stone, 384, 72, 1, 9);
+    pushPreThing(Stone, 392, 72, 11);
     pushPreWarpWorld(390, 0, [[8,1],[7,1],[6,1]]);
-    pushPreThing(GenericStone, 496, 88, 2, 11);
+    pushPreThing(Stone, 496, 88, 2, 11);
     pushPreThing(ScrollBlocker, 512, 88);
   })
 ];

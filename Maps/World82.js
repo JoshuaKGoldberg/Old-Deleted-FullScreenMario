@@ -8,23 +8,23 @@ map.areas = [
     setLocationGeneration(0);
     
     pushPrePattern("backfencemin2", 0, 0, 5);
-    pushPreScenery("Castle", -16, castlev, 0);
+    pushPreCastle();
     pushPreFloor(0, 0, 15);
     pushPreFloor(128, 0, 5);
     pushPreThing(Lakitu, 128, 84);
-    pushPreThing(GenericStone, 136, 8, 1);
-    pushPreThing(GenericStone, 144, 16, 1, 2);
-    pushPreThing(GenericStone, 152, 24, 1, 3);
-    pushPreThing(GenericStone, 160, 32, 1, 4);
+    pushPreThing(Stone, 136, 8, 1);
+    pushPreThing(Stone, 144, 16, 1, 2);
+    pushPreThing(Stone, 152, 24, 1, 3);
+    pushPreThing(Stone, 160, 32, 1, 4);
     pushPreFloor(176, 0, 14);
-    pushPreThing(GenericStone, 176, 48, 1, 6);
-    pushPreThing(GenericStone, 184, 56, 1, 7);
-    pushPreThing(GenericStone, 192, 64, 2, 8);
+    pushPreThing(Stone, 176, 48, 1, 6);
+    pushPreThing(Stone, 184, 56, 1, 7);
+    pushPreThing(Stone, 192, 64, 2, 8);
     fillPreThing(Block, 232, 32, 4, 1, 8);
     
     pushPreFloor(296, 0, 8);
     pushPreThing(Brick, 344, 64);
-    pushPreThing(Springboard, 352, 15.5);
+    pushPreThing(Springboard, 352, 14.5);
     pushPreThing(Brick, 352, 64, [Mushroom, 1]);
     fillPreThing(Brick, 360, 64, 31, 1, 8);
     pushPreFloor(368, 0, 4);
@@ -52,7 +52,7 @@ map.areas = [
     pushPreThing(Cannon, 920, 8, 1);
     pushPreThing(Brick, 944, jumplev1);
     pushPreScenery("PlantLarge", 936, 0);
-    pushPreThing(GenericStone, 952, jumplev1);
+    pushPreThing(Stone, 952, jumplev1);
     pushPreThing(Cannon, 952, 40);
     pushPreThing(Brick, 960, jumplev1, Mushroom);
     pushPreThing(Beetle, 968, 8.5);
@@ -78,29 +78,29 @@ map.areas = [
     pushPreThing(Koopa, 1400, 48, false, true);
     
     pushPreFloor(1432, 0, 23);
-    pushPreThing(GenericStone, 1456, 8, 1);
-    pushPreThing(GenericStone, 1464, 16, 1, 2);
-    pushPreThing(GenericStone, 1472, 24, 1, 3);
+    pushPreThing(Stone, 1456, 8, 1);
+    pushPreThing(Stone, 1464, 16, 1, 2);
+    pushPreThing(Stone, 1472, 24, 1, 3);
     pushPreThing(Goomba, 1472, 32);
-    pushPreThing(GenericStone, 1480, 32, 1, 4);
-    pushPreThing(GenericStone, 1488, 40, 1, 5);
+    pushPreThing(Stone, 1480, 32, 1, 4);
+    pushPreThing(Stone, 1488, 40, 1, 5);
     pushPreThing(Goomba, 1488, 48);
     pushPreThing(Beetle, 1512, 8.5);
     pushPreThing(Cannon, 1528, 8, 1, true);
     pushPreThing(Cannon, 1528, 24, 2);
-    pushPreThing(GenericStone, 1592, 8);
-    pushPreThing(GenericStone, 1600, 16, 1, 2);
-    pushPreThing(GenericStone, 1608, 24, 1, 3);
+    pushPreThing(Stone, 1592, 8);
+    pushPreThing(Stone, 1600, 16, 1, 2);
+    pushPreThing(Stone, 1608, 24, 1, 3);
     pushPreFloor(1624, 0, 1);
-    pushPreThing(GenericStone, 1624, 40, 1, 5);
+    pushPreThing(Stone, 1624, 40, 1, 5);
     pushPreThing(Koopa, 1624, 72, false, true);
     
     pushPreThing(SceneryBlocker, 1640, 24, 8, 24);
     pushPreFloor(1648, 0, 40);
     pushPreFuncCollider(1648, zoneDisableLakitu);
-    pushPreThing(GenericStone, 1648, 64, 2, 8);
-    endCastleOutside(1724, 0, castlev);
+    pushPreThing(Stone, 1648, 64, 2, 8);
     pushPreScenery("PlantLarge", 1704, 0);
+    endCastleOutside(1724);
   }),
   new Area("Underworld", function() {
       setLocationGeneration(2);

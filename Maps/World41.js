@@ -7,7 +7,7 @@ map.areas = [
   new Area("Overworld", function() {
     setLocationGeneration(0);
     
-    pushPreScenery("Castle", -16, 0);
+    pushPreCastle(0, 0, true);
     pushPrePattern("backreg", 0, 0, 5);
     pushPreFloor(0, 0, 32);
     pushPrePipe(168, 0, 24, true);
@@ -23,7 +23,7 @@ map.areas = [
     pushPreFloor(656, 0, 67);
     fillPreThing(Block, 720, jumplev1, 4, 1, 8);
     pushPreThing(Block, 736, jumplev2, [Mushroom, 1], true);
-    pushPreThing(GenericStone, 824, 24, 1, 3);
+    pushPreThing(Stone, 824, 24, 1, 3);
     fillPreThing(Coin, 841, 55, 4, 1, 8);
     pushPrePipe(928, 0, 32, true);
     fillPreThing(Coin, 953, 55, 4, 1, 8);
@@ -40,20 +40,20 @@ map.areas = [
     
     pushPreFloor(1416, 0, 3);
     pushPreFloor(1456, 0, 8);
-    pushPreThing(GenericStone, 1512, 24, 1, 3);
+    pushPreThing(Stone, 1512, 24, 1, 3);
     
     pushPreFloor(1536, 0, 48);
     pushPreFuncCollider(1664, zoneDisableLakitu); // not sure if accurate
-    pushPreThing(GenericStone, 1664, 8);
-    pushPreThing(GenericStone, 1672, 16, 1, 2);
-    pushPreThing(GenericStone, 1680, 24, 1, 3);
-    pushPreThing(GenericStone, 1688, 32, 1, 4);
-    pushPreThing(GenericStone, 1696, 40, 1, 5);
-    pushPreThing(GenericStone, 1704, 48, 1, 6);
-    pushPreThing(GenericStone, 1712, 56, 1, 7);
-    pushPreThing(GenericStone, 1720, 64, 2, 8);
+    pushPreThing(Stone, 1664, 8);
+    pushPreThing(Stone, 1672, 16, 1, 2);
+    pushPreThing(Stone, 1680, 24, 1, 3);
+    pushPreThing(Stone, 1688, 32, 1, 4);
+    pushPreThing(Stone, 1696, 40, 1, 5);
+    pushPreThing(Stone, 1704, 48, 1, 6);
+    pushPreThing(Stone, 1712, 56, 1, 7);
+    pushPreThing(Stone, 1720, 64, 2, 8);
     pushPreThing(Brick, 1760, jumplev1, Coin);
-    endCastleOutside(1796, 0, castlev);
+    endCastleOutside(1796);
   }),
   new Area("Underworld", function() {
     setLocationGeneration(2);

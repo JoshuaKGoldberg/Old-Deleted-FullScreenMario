@@ -1,9 +1,13 @@
+/* Generator.js */
+// Contains functions that procedurally generate maps
+// To do: make this entirely state-based and contained
+
 // jsperf.com/josh-random-number-generators
 // It's only 7 lines, who cares if it's ~393 x slower than Math.random()? lulz
-function setSeed() {
-  seeder = 1777771 / (seed = (Math.round(Math.random() * 10000000))); // 1777771 is prime
-  seedlast = .007;
-  getSeed = function() { 
+function resetSeed() {
+  window.seeder = 1777771 / (window.seed = (round(random() * 10000000))); // 1777771 is prime
+  window.seedlast = .007;
+  window.getSeed = function() { 
     return seedlast = "0." + String(seeder / seedlast).substring(4).replace('.', '');
   }
 }
@@ -156,7 +160,7 @@ function pushRandomSectionBridge(xloc, bheight, nofirstcol) {
     pushPreTree(xloc + 16, randTrue() * 8, bwidth);
   }
   
-  prepareNextGeneratorStandard(xloc, bwidth + 2, randTrue(3) ? pushRandomSectionBridge : pushRandomSectionOverworld, false, next_no_unusuals);
+  prepareNextGeneratorStandard(xloc, bwidth + 2, randTrue() ? pushRandomSectionBridge : pushRandomSectionOverworld, false, next_no_unusuals);
 }
 
 function pushRandomSectionPreCastle(xloc, num) {
@@ -250,7 +254,7 @@ function pushRandomSectionPreCastle(xloc, num) {
   pushPreFloor(xloc + bwidth * 8, 0, i + 3 - bwidth);
   
   var next = 4 + randTrue(3);
-  if(num >= (7 + randTrue(3))) endCastleOutsideRandom(xloc + (bwidth + next + 1) * 8);
+  if(num >= (4 + randTrue(3))) endCastleOutsideRandom(xloc + (bwidth + next + 1) * 8, true);
   else pushRandomSectionPreCastle(xloc + (bwidth + next) * 8, num + 1);
   
   spawnMap();
@@ -288,8 +292,8 @@ function endCastleOutsideRandom(xloc) {
     break;
   }
   
-  pushPreFloor(xloc + (leadwidth + 2) * 8, 0, round(screen.width / 8));
-  endCastleOutside(xloc + (leadwidth + nextwidth) * 8 + 4, 0, 0, round(screen.width / 8));
+  pushPreFloor(xloc + (leadwidth + 2) * 8, 0, round(gamescreen.width / 8));
+  endCastleOutside(xloc + (leadwidth + nextwidth) * 8 + 4, 0, 0, round(gamescreen.width / 8));
 }
 
 function startRandomSectionCastle(xloc) {
@@ -449,7 +453,9 @@ function endCastleInsideRandom(xloc) {
   var end = xloc + num * each * 8,
       extra = randTrue(7) * 8;
   fillPreWater(end, 0, extra/* * 2*/);
+  // endCastleInsideFinal(end + extra);
   endCastleInsideRandomFinal(end + extra);
+  spawnMap();
 }
 
 function endCastleInsideRandomFinal(xloc) {
@@ -459,7 +465,6 @@ function endCastleInsideRandomFinal(xloc) {
   if(randTrue()) pushPreThing(Podoboo, xloc + 72 + randTrue(3) * 8, -32);
   if(randTrue()) fillPreThing(Brick, xloc + 56 + randTrue(3) * 8, 64, 3 + randTrue(3), 1, 8);
   if(randTrue()) pushPreThing(CastleBlock, xloc + 56 + randTrue(2) * 8, 24, [6, randSign()], true);
-  
   spawnMap();
 }
 
@@ -467,9 +472,9 @@ function endCastleInsideRandomFinal(xloc) {
 function placeRandomCastleNPC(xloc) {
   var npc = pushPreThing(Toad, xloc + 194, 12).object;
   npc.text = [
-    pushPreThing(text, xloc + 160, 66, ["THANK YOU MARIO!", 88, 24, true]).object,
-    pushPreThing(text, xloc + 148, 50, ["LOL YOU THOUGHT THERE WOULD BE SOMETHING HERE DIDN'T YOU", 88, 24, true]).object
-  ];
+      pushPreText({innerHTML: "THANK YOU MARIO!"}, xloc + 160, 66).object,
+      pushPreText({innerHTML: "LOL YOU THOUGHT THERE WOULD BE SOMETHING HERE DIDN'T YOU!"}, xloc + 148, 50).object
+    ];
 }
 
 function pushRandomCoinRow(xloc, yloc, size) {
@@ -493,7 +498,7 @@ function pushRandomCoinRow(xloc, yloc, size) {
       break;
     }
   }
-  else pattern = arrayof(true, size);
+  else pattern = arrayOf(true, size);
   
   for(var i=0; i<size; ++i)
     if(pattern[i])
@@ -775,7 +780,7 @@ function pushRandomSectionUnderwater(xloc) {
   var bwidth = max(randTrue(117),7);
   bwidth -= bwidth % 3;
   pushPreFloor(xloc, 0, bwidth);
-  pushPreScenery("Water", xloc, ceilmax - 21.5, bwidth * 8 / 3, 1)
+  pushPreScenery("Water", xloc, ceilmax - 21, bwidth * 8 / 3, 1)
   pushPreThing(WaterBlock, xloc, ceilmax, bwidth * 8);
   window.randcount_powerup = 3;
   
@@ -840,7 +845,7 @@ function pushRandomSectionUnderwater(xloc) {
   
   if(++map.sincechange < 7) {
     var tonext = prepareNextGeneratorStandard(xloc, bwidth, pushRandomSectionUnderwater, false, true);
-    pushPreScenery("Water", xloc + bwidth * 8, ceilmax - 21.5, (tonext + 1) * 8 / 3, 1)
+    pushPreScenery("Water", xloc + bwidth * 8, ceilmax - 21, (tonext + 1) * 8 / 3, 1)
     pushPreThing(WaterBlock, xloc + bwidth * 8, ceilmax, (tonext + 1) * 8);
   }
   else endRandomSectionUnderwater(xloc + bwidth * 8);
@@ -849,7 +854,7 @@ function pushRandomSectionUnderwater(xloc) {
 function endRandomSectionUnderwater(xloc) {
   // 1488 is xloc............1488
   pushPreFloor(xloc, 0, 19);
-  pushPreScenery("Water", xloc, ceilmax - 21.5, 10.5 * 8 / 3, 1);
+  pushPreScenery("Water", xloc, ceilmax - 21, 10.5 * 8 / 3, 1);
   pushPreThing(WaterBlock, xloc, ceilmax, 10.5 * 15);
   pushPreThing(Stone, xloc, 8, 5, 1); // 88
   pushPreThing(Stone, xloc + 8, 16, 4, 1); // 96
@@ -873,7 +878,6 @@ function startRandomSectionSky(xloc) {
 
 function pushRandomSectionSky(xloc, num) {
   if(num++ > 7) {
-    pushPreThing(LocationShifter, xloc - 128, -32, ["Random", "Overworld", "Down"], [window.innerWidth / unitsized2, 16]);
     fillPreThing(Coin, xloc + 8, 8, 3, 1, 8);
     return spawnMap();
   }
@@ -923,7 +927,7 @@ function prepareNextGeneratorStandard(xloc, bwidth, func, allow_platforms, no_un
       case 0:
         if(bwidth > 7 && map.underwater && !randTrue(7)) {
           nextdist = randTrue(3) + 7;
-          pushPreThing(Springboard, xloc + (bwidth - 1) * 8, 15.5);
+          pushPreThing(Springboard, xloc + (bwidth - 1) * 8, 14.5);
         }
         else nofancy = true;
       break;
@@ -1050,7 +1054,8 @@ function getRandomTransport() {
 function getAfterSkyTransport() {
   switch(randTrue(3)) {
     case 0: return ["Random", "Underworld", "Down"];
-    default: return ["Random", "Overworld" + (stringIncludes(body.className, "Night") ? " Night" : ""), "Down"];
+    default: 
+      return ["Random", "Overworld" + (body.className.indexOf("Night" != -1) ? " Night" : ""), "Down"];
   }
 }
 
@@ -1100,6 +1105,7 @@ function pushRandomObstacle(xloc, i) {
             break;
           }
         case 2:
+          // If it's not underwater, add a pipe at jumplev1
           if(!map.underwater) {
             var offx = randTrue();
             if(!offx)
@@ -1124,8 +1130,7 @@ function pushRandomSolidRow(xloc, yloc, len) {
 
 function getRandomBrickItem(higher, something) {
   if(higher && !randTrue(14)) return [Vine, ["Random", "Sky", "Vine"]];
-  // return [Vine, ["Random", "Sky", "Vine"]];
-  return (something || !randTrue(7)) ? (randTrue(3) ? Coin : Star) : randTrue(3) ? false : Mushroom;
+  return (something || !randTrue(7)) ? (randTrue(3) ? Coin : Star) : false;
 }
 function getRandomBlockItem() {
   ++randcount_powerup;
@@ -1155,20 +1160,22 @@ function pushRandomSkyScenery(xloc) {
 }
 
 function addDistanceCounter() {
-  counter = document.createElement("div");
-  counter.className = "indisplay counter";
-  counter.innerText = data.traveledold + " blocks traveled";
+  counter = createElement("div", {
+              className: "indisplay counter randomdisplay",
+              innerText: data.traveledold + " blocks traveled"
+            });
   body.appendChild(counter);
   addEventInterval(function(counter) {
-    data.traveled = max(0,Math.round((mario.right + screen.left) / unitsizet8) - 3);
+    data.traveled = max(0,Math.round((mario.right + gamescreen.left) / unitsizet8) - 3);
     counter.innerText = (data.traveledold + data.traveled) + " blocks traveled";
   }, 3, Infinity, counter);
 }
 function addSeedDisplay() {
-  counter = document.createElement("div");
-  counter.className = "indisplay seed";
-  counter.innerText = "This map's seed is " + seed;
-  body.appendChild(counter);
+  // counter = createElement("div", {
+              // className: "indisplay seed randomdisplay",
+              // innerText: "This map's seed is " + seed
+            // });
+  // body.appendChild(counter);
 }
 
 function createTunnel(xloc, width, btype) {
@@ -1181,4 +1188,12 @@ function createTunnel(xloc, width, btype) {
   }
   // fillPreThing(btype, xloc, 8, width, bottom, 8, 8);
   // fillPreThing(btype, xloc, 96 - top * 8, width, top, 8, 8);
+}
+
+// Get rid of previous elements
+function removeRandomDisplays() {
+var elems = body.getElementsByClassName("randomdisplay"),
+    i;
+for(i = elems.length - 1; i >= 0; --i)  
+  body.removeChild(elems[i]);
 }

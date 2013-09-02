@@ -7,10 +7,10 @@ map.locs = [
   new Location(2, enterCloudWorld)
 ];
 map.areas = [
-  new Area("Overworld Night", function() {
+  new Area("Overworld Night Alt", function() {
     setLocationGeneration(0);
     
-    pushPreScenery("Castle", -1 * unitsizet4, 0);
+    pushPreCastle(0, 0, true);
     pushPrePattern("backfence", 0, 0, 5);
     
     pushPreFloor(0, 0, 45);
@@ -58,21 +58,21 @@ map.areas = [
     pushPreThing(HammerBro, 936, 12);
     pushPreThing(Block, 936, jumplev2, Mushroom);
     fillPreThing(Brick, 944, jumplev2, 3, 1, 8);
-    pushPreThing(Springboard, 1008, 15.5);
+    pushPreThing(Springboard, 1008, 14.5);
     
     fillPreThing(Brick, 1032, 40, 3, 1, 8);
     fillPreThing(Brick, 1032, 64, 2, 1, 8);
     pushPreThing(Brick, 1048, 64, [Vine, 4]);
     
     pushPreFloor(1056, 0, 10);
-    pushPreThing(GenericStone, 1088, 8);
-    pushPreThing(GenericStone, 1096, 16, 1, 2);
-    pushPreThing(GenericStone, 1104, 24, 1, 3);
-    pushPreThing(GenericStone, 1112, 32, 1, 4);
+    pushPreThing(Stone, 1088, 8);
+    pushPreThing(Stone, 1096, 16, 1, 2);
+    pushPreThing(Stone, 1104, 24, 1, 3);
+    pushPreThing(Stone, 1112, 32, 1, 4);
     pushPreThing(Goomba, 1112, 40);
-    pushPreThing(GenericStone, 1120, 40, 1, 5);
+    pushPreThing(Stone, 1120, 40, 1, 5);
     pushPreThing(Goomba, 1120, 48);
-    pushPreThing(GenericStone, 1128, 48, 1, 6);
+    pushPreThing(Stone, 1128, 48, 1, 6);
     
     pushPreFloor(1152, 0, 33);
     pushPreThing(Koopa, 1192, 12);
@@ -90,22 +90,22 @@ map.areas = [
     fillPreThing(Brick, 1344, jumplev1, 3, 1, 8);
     pushPreThing(Koopa, 1360, 44);
     pushPreThing(Koopa, 1368, 12, false, true);
-    pushPreThing(GenericStone, 1392, 24, 1, 3);
-    pushPreThing(GenericStone, 1400, 48, 1, 6);
+    pushPreThing(Stone, 1392, 24, 1, 3);
+    pushPreThing(Stone, 1400, 48, 1, 6);
     
     pushPreFloor(1440, 0, 40);
-    pushPreThing(GenericStone, 1464, 8);
-    pushPreThing(GenericStone, 1472, 16, 1, 2);
-    pushPreThing(GenericStone, 1480, 24, 1, 3);
-    pushPreThing(GenericStone, 1488, 32, 1, 4);
-    pushPreThing(GenericStone, 1496, 40, 1, 5);
-    pushPreThing(GenericStone, 1504, 48, 1, 6);
+    pushPreThing(Stone, 1464, 8);
+    pushPreThing(Stone, 1472, 16, 1, 2);
+    pushPreThing(Stone, 1480, 24, 1, 3);
+    pushPreThing(Stone, 1488, 32, 1, 4);
+    pushPreThing(Stone, 1496, 40, 1, 5);
+    pushPreThing(Stone, 1504, 48, 1, 6);
     pushPreThing(Koopa, 1504, 60);
-    pushPreThing(GenericStone, 1512, 56, 1, 7);
-    pushPreThing(GenericStone, 1520, 64, 2, 8);
+    pushPreThing(Stone, 1512, 56, 1, 7);
+    pushPreThing(Stone, 1520, 64, 2, 8);
     pushPreThing(Koopa, 1528, 76);
     
-    endCastleOutside(1596, 0, castlev);
+    endCastleOutside(1596);
   }),
   new Area("Underworld", function() {
     setLocationGeneration(3);
@@ -128,17 +128,17 @@ map.areas = [
   }),
   new Area("Sky Night", function() {
     setLocationGeneration(4);
-    pushPreThing(GenericStone, 0, 0, 4);
-    pushPreThing(GenericStone, 40, 0, 78);
+    pushPreThing(Stone, 0, 0, 4);
+    pushPreThing(Stone, 40, 0, 78);
     pushPreThing(PlatformTransport, 128, 24, 6, "cloud");
     fillPreThing(Coin, 121, 55, 16, 1, 8);
-    pushPreThing(GenericStone, 256, 40);
+    pushPreThing(Stone, 256, 40);
     fillPreThing(Coin, 273, 55, 16, 1, 8);
-    pushPreThing(GenericStone, 408, 48, 1, 2);
+    pushPreThing(Stone, 408, 48, 1, 2);
     fillPreThing(Coin, 425, 63, 7, 1, 8);
-    pushPreThing(GenericStone, 488, 48, 1, 2);
-    pushPreThing(GenericStone, 536, 56, 2);
-    fillPreThing(GenericStone, 568, 56, 5, 1, 16);
+    pushPreThing(Stone, 488, 48, 1, 2);
+    pushPreThing(Stone, 536, 56, 2);
+    fillPreThing(Stone, 568, 56, 5, 1, 16);
     fillPreThing(Coin, 569, 63, 10, 1, 8);
     fillPreThing(Coin, 681, 15, 3, 1, 8);
     

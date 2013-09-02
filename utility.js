@@ -1,22 +1,15 @@
-/* 
- * General stuff
- */
-max = Math.max;
-min = Math.min
-abs = Math.abs
-floor = Math.floor;
-ceil = Math.ceil;
-round = Math.round;
+/* Utility.js */
+// Contains all needed helper functions not in toned.js
 
-function sign(a) { return a ? a < 0 ? -1 : 1 : 0; }
-
-function roundDigit(num, digit) { return round(num / digit) * digit; }
-
-function stringIncludes(haystack, needle) { return haystack.indexOf(needle) != -1; }
-
-function preventEvent(event) { if(event && event.preventDefault) event.preventDefault(); }
-
-function getFirst(me) { for(var i in me) return me[i]; }
+/* General stuff */
+ 
+// Recursively goes down sub-objects of obj
+// Path is ["path", "to", "target"], where num is how far along the path it is
+function followPath(obj, path, num) {
+  if(path[num] != null && obj[path[num]] != null)
+    return followPath(obj[path[num]], path, ++num);
+  return obj;
+}
 
 // Expensive - use only on clearing
 function clearAllTimeouts() {
@@ -24,17 +17,27 @@ function clearAllTimeouts() {
   while(id--) clearTimeout(id);
 }
 
-function createDivs(num) {
-  var divs = [];
-  while(--num) divs.push(document.createElement("div"));
-  return divs;
-}
-function getDiv() { return divs.length > 0 ? divs.pop() : document.createElement("div"); }
-function clearDiv(div) {
-  var i, style = div.style;
-  for(i = style.length - 1; i >= 0; --i) div.style[div.style[i]] = "";
-  div.className = div.id = div.innerHTML = "";
-  return div;
+// Width and height are given as number of pixels (to scale; unitsize) 
+function getCanvas(width, height, stylemult) {
+  var canv = createElement("canvas", {
+    width: width,
+    height: height
+  });
+  
+  // If necessary, make this thing's visual style
+  if(stylemult) {
+    // stylemult is 1 by default, but may be something else (typically unitsize)
+    stylemult = stylemult || unitsize;
+    proliferate(canv.style, {
+      width: (width * stylemult) + "px",
+      height: (height * stylemult) + "px"
+    });
+  }
+  
+  // For speed
+  canv.getContext("2d").webkitImageSmoothingEnabled = false
+  
+  return canv;
 }
 
 function step(num) {
@@ -71,7 +74,7 @@ function changeUnitsize(num) {
   function setter(arr) {
     for(i in arr) {
       updateSize(arr[i]);
-      updateLocation(arr[i]);
+      updatePosition(arr[i]);
     }
   }
   
@@ -84,54 +87,37 @@ function changeUnitsize(num) {
 // 2 = floor(0->3) = 67% chance
 // 3 = floor(0->4) = 75% chance
 function randTrue(num) {
-  return Math.floor(getSeed() * ((num || 1) + 1));
-  // return Math.floor(Math.random() * ((num || 1) + 1));
+  return floor(getSeed() * ((num || 1) + 1));
+  // return floor(random() * ((num || 1) + 1));
 }
 function randSign(num) {
   return randTrue(num) * 2 - 1;
 }
 function randBoolJS(num) {
-  return Math.floor(Math.random() * 2);
-}
-
-function prethingsorter(a,b) {
-  if(a.xloc == b.xloc) return b.yloc - a.yloc;
-  else return a.xloc - b.xloc;
-};
-
-function arrayof(contents, num) {
-  var arr = [];
-  for(var i=num; i>0; --i)
-    arr.push(contents);
-  return arr;
+  return floor(random() * 2);
 }
 
 /*
  * Basic object positioning helper functions
  */
-function updateLocation(me) {
-  updatePosition(me);
-  updateDisplay(me);
-}
 function updatePosition(me) {
+  // if(!me.nomove) shiftHoriz(me, me.xvel * realtime);
+  // if(!me.nofall) shiftVert(me, me.yvel * realtime);
   if(!me.nomove) shiftHoriz(me, me.xvel);
   if(!me.nofall) shiftVert(me, me.yvel);
 }
-// To do: measure whether rounding improves or hurts performance
-function updateDisplay(me) {
-  if(!me.element) return;
-  // me.style.marginTop = me.top + "px";
-  // me.style.marginLeft = me.left + "px";
-  me.style.marginTop = round(me.top) + "px";
-  me.style.marginLeft = round(me.left) + "px";
-}
-function updateAllDisplays() {
-  for(i in solids) updateDisplay(solids[i]);
-  for(i in characters) updateDisplay(characters[i]);
-}
 function updateSize(me) {
-  me.element.style.width =  me.width * unitsize + "px";
-  me.element.style.height =  me.height * unitsize + "px";
+  me.unitwidth = me.width * unitsize;
+  me.unitheight = me.height * unitsize;
+  me.spritewidthpixels = me.spritewidth * unitsize;
+  me.spriteheightpixels = me.spriteheight * unitsize;
+  var canvas;
+  if(canvas = me.canvas) {
+    canvas.width = me.spritewidthpixels;
+    canvas.height = me.spriteheightpixels;
+    // me.context = canvas.getContext("2d");
+    refillThingCanvas(me);
+  }
 }
 function reduceHeight(me, dy, see) {
   me.top += dy;
@@ -139,48 +125,67 @@ function reduceHeight(me, dy, see) {
   
   if(see) {
     updateSize(me);
-    updateDisplay(me);
   }
 }
-function shiftBoth(me, dx, dy, see) {
+function shiftBoth(me, dx, dy) {
   if(!me.noshiftx) shiftHoriz(me, dx);
   if(!me.noshifty) shiftVert(me, dy);
-  if(see) updateDisplay(me);
 }
-function shiftHoriz(me, dx, see) {
+function shiftHoriz(me, dx) {
   me.left += dx;
   me.right += dx;
-  if(see) updateDisplay(me);
 }
-function shiftVert(me, dy, see) {
+function shiftVert(me, dy) {
   me.top += dy;
   me.bottom += dy;
-  if(see) updateDisplay(me);
 }
-function setLeft(me, left, see) {
+function setLeft(me, left) {
   me.left = left;
   me.right = me.left + me.width * unitsize;
-  if(see) updateDisplay(me);
 }
-function setRight(me, right, see) {
+function setRight(me, right) {
   me.right = right;
   me.left = me.right - me.width * unitsize;
-  if(see) updateDisplay(me);
 }
-function setTop(me, top, see) {
+function setTop(me, top) {
   me.top = top;
   me.bottom = me.top + me.height * unitsize;
-  if(see) updateDisplay(me);
 }
-function setBottom(me, bottom, see) {
+function setBottom(me, bottom) {
   me.bottom = bottom;
   me.top = me.bottom - me.height * unitsize;
-  if(see) updateDisplay(me);
 }
-function setSize(me, width, height, see) {
-  if(width) me.width = width;
-  if(height) me.height = height;
-  if(see) updateDisplay(me);
+function setWidth(me, width, spriter, updater) {
+  me.width = width;
+  me.unitwidth = width * unitsize;
+  if(spriter) {
+    me.spritewidth = width;
+    me.spritewidthpixels = width * unitsize;
+  }
+  if(updater) {
+    updateSize(me);
+    setThingSprite(me);
+  }
+}
+function setHeight(me, height, spriter, updater) {
+  me.height = height;
+  me.unitheight = height * unitsize;
+  if(spriter) {
+    me.spriteheight = height;
+    me.spriteheightpixels = height * unitsize;
+  }
+  if(updater) {
+    updateSize(me);
+    setThingSprite(me);
+  }
+}
+function setSize(me, width, height, spriter, updater) {
+  if(width) setWidth(me, width, spriter);
+  if(height) setHeight(me, height, spriter);
+  if(updater) {
+    updateSize(me);
+    setThingSprite(me);
+  }
 }
 function setMidX(me, left, see) {
   setLeft(me, left + me.width * unitsized2, see);
@@ -202,28 +207,31 @@ function slideToXLoc(me, xloc, maxspeed, see) {
     shiftHoriz(me, min(maxspeed, (xloc - midx)), see);
   } else {
     // Me is the right
-    shiftHoriz(me, max(maxspeed * -1, (xloc - midx)), see);
+    shiftHoriz(me, max(-maxspeed, (xloc - midx)), see);
   }
 }
-function updateLeft(me, dx, see) {
+function updateLeft(me, dx) {
   me.left += dx;
   me.right = me.left + me.width * unitsize;
-  if(see) updateDisplay(me);
 }
-function updateRight(me, dx, see) {
+function updateRight(me, dx) {
   me.right += dx;
   me.left = me.right - me.width * unitsize;
-  if(see) updateDisplay(me);
 }
-function updateTop(me, dy, see) {
+function updateTop(me, dy) {
   me.top += dy;
   me.bottom = me.top + me.height * unitsize;
-  if(see) updateDisplay(me);
 }
-function updateBottom(me, dy, see) {
+function updateBottom(me, dy) {
   me.bottom += dy;
   me.top = me.bottom - me.height * unitsize;
-  if(see) updateDisplay(me);
+}
+// Increases the height, keeping the bottom the same
+// dy comes in as factored for unitsize... e.g. increaseHeightTop(me, unitsized4)
+function increaseHeightTop(me, dy, spriter) {
+  me.top -= dy;
+  me.height += dy / unitsize;
+  me.unitheight = me.height * unitsize;
 }
 
 /*
@@ -234,28 +242,31 @@ function determineThingCollisions(me) {
   else if(!me.resting || me.resting.yvel == 0) me.resting = false;
   
   // Cur is each quadrant this object is in, and other is each other object in them.
-  var cur, other, contents;
+  var cur, others, other, contents,
+      i, j, leni, lenj;
   
-  checkOverlap(me);
+  // Unless directed not to, make sure this doesn't overlap anything
+  // Overlaps are actually added a few lines down, under collisions for solids
+  if(!me.skipoverlaps) checkOverlap(me);
   
   // For each quadrant the thing is in:
-  for(var i = 0, len = me.numquads; i < len; ++i) {
+  for(i = 0, leni = me.numquads; i < leni; ++i) {
     cur = me.quads[i];
     others = cur.things;
-    // For each other thin in that quadrant:
-    for(var j = 0, lenj = cur.numthings; j < lenj; ++j) {
+    // For each other thing in that quadrant:
+    for(j = 0, lenj = cur.numthings; j < lenj; ++j) {
       other = others[j];
-      // to do: get nocollide working on scenery for performance's sake
-      if(me == other) break; // breaking should prevent double collisions
+      
+      if(me == other) break; // breaking prevents double collisions
       if(!other.alive || other.scenery || other.nocollide) continue; // not removed in upkeep
       
       // The .hidden check is required. Try the beginning of 2-1 without it.
-      if(objectsTouch(me, other) && (me.mario || !other.hidden || solidOnCharacter(other, me))) {
+      // visual_scenery is also necessary because of Pirhanas (nothing else uses that)
+      if(objectsTouch(me, other) && (me.mario || (!other.hidden || !(other.visual_scenery && other.visual_scenery.hidden)) || solidOnCharacter(other, me))) {
         // Collisions for characters are simple
-        if(other.character) {
+        if(other.character)
           // if(charactersTouch(me, other))
             objectsCollided(me, other);
-        }
         
         // Collisions for solids, slightly less so (overlaps)
         else if(!me.nocollidesolid) {
@@ -285,7 +296,11 @@ function checkOverlap(me) {
   }
   else if(me.overlaps.length > 0) {
     // mid = me.omid is the midpoint of what is being overlapped
-    var overlaps = me.overlaps, mid = 0, right = {right: -Infinity}, left = {left: Infinity}, over;
+    var overlaps = me.overlaps,
+        right = {right: -Infinity},
+        left = {left: Infinity}, 
+        mid = 0, over,
+        i;
     me.overlapfix = true;
     
     for(i in overlaps) {
@@ -332,13 +347,16 @@ function objectInQuadrant(one, quad) {
 
 function objectsCollided(one, two) {
   // Assume that if there's a solid, it's two. (solids don't collide with each other)
-  if(one.solid) return objectsCollided(two, one);
+  if(one.solid) {
+    if(!two.solid) return objectsCollided(two, one);
+  }
   
   // Up solids are special
   if(two.up && one != two.up) return characterTouchesUp(one, two);
   
   // Otherwise, regular collisions
-  if(two.solid || one.mario) two.collide(one, two);
+  if(two.solid || one.mario)
+    two.collide(one, two);
   else one.collide(two, one);
 }
 
@@ -354,16 +372,16 @@ function objectOnTop(one, two) {
   if(one.yvel < two.yvel && two.type != "solid") return false;
   if(one.mario && one.bottom < two.bottom && two.group == "enemy") return true;
   return(  (one.left + unitsize < two.right && one.right - unitsize > two.left) && 
-  (one.bottom - two.yvel <= two.top + two.toly || one.bottom <= two.top + two.toly + Math.abs(one.yvel - two.yvel)));
+  (one.bottom - two.yvel <= two.top + two.toly || one.bottom <= two.top + two.toly + abs(one.yvel - two.yvel)));
 }
-// Like objectOnTop, but more specifically used for characterOnSolid and characterOnRestig
+// Like objectOnTop, but more specifically used for characterOnSolid and characterOnResting
 function objectOnSolid(one, two) {
   return(
     ( one.left + unitsize < two.right &&
       one.right - unitsize > two.left )
     && 
     ( one.bottom - one.yvel <= two.top + two.toly || 
-      one.bottom <= two.top + two.toly + Math.abs(one.yvel - two.yvel) )
+      one.bottom <= two.top + two.toly + abs(one.yvel - two.yvel) )
   );
 }
 function solidOnCharacter(solid, me) {
@@ -393,6 +411,8 @@ function characterTouchedSolid(me, solid) {
   if(characterOnSolid(me, solid)) {
     if(solid.hidden) return;
     me.resting = solid;
+    // Meh.
+    if(me.mario && map.underwater) removeClass(me, "paddling");
   }
   
   // Solid on top of me
@@ -402,7 +422,10 @@ function characterTouchedSolid(me, solid) {
     else if(solid.hidden) return;
     if(!me.under) me.under = [solid];
     else me.under.push(solid);
-    setTop(me, solid.bottom - me.toly + solid.yvel, true);
+    // To do: make this not so obviously hardcoded
+    if(me.mario) {
+      setTop(me, solid.bottom - me.toly + solid.yvel, true);
+    }
     me.yvel = solid.yvel;
     if(me.mario) me.keys.jump = 0;
   }
@@ -411,24 +434,29 @@ function characterTouchedSolid(me, solid) {
   
   // Character bumping into the side
   //// .midx is given by solidOnCharacter
-  if(!objectOnTop(me, solid) && !objectOnTop(solid, me) && !me.under
-   && !(solid.up && me == solid.up)) {
+  if(!characterNotBumping(me, solid) && !objectOnTop(me, solid) && !objectOnTop(solid, me) && !me.under && me != solid.up) {
     if(me.right <= solid.right) { // To left of solid
       me.xvel = min(me.xvel, 0);
-      shiftHoriz(me, max(solid.left + unitsize - me.right, unitsized2 * -1), true);
+      shiftHoriz(me, max(solid.left + unitsize - me.right, -unitsized2), true);
     } else if(me.left >= solid.left) { // To right of solid
       me.xvel = max(me.xvel, 0);
       shiftHoriz(me, min(solid.right - unitsize - me.left, unitsized2), true);
     }
     
+    // Non-Marios are instructed to flip
     if(!me.mario) {
       me.moveleft = !me.moveleft;
       if(me.group == "item") me.collide(solid, me);
     }
-    // PipeSide
+    // Mario uses solid.actionLeft (e.g. Pipe -> intoPipeHoriz)
     else if(solid.actionLeft)
       solid.actionLeft(me, solid, solid.transport);
   }
+}
+// Really just for koopas
+function characterNotBumping(me, solid) {
+  if(me.top + me.toly + abs(me.yvel) > solid.bottom) return true;
+  return false;
 }
 
 function characterTouchesUp(me, solid) {
@@ -453,23 +481,30 @@ function characterHops(me) {
 }
 
 function characterIsAlive(me) {
-  return !(!me || me.dead || !me.alive || !me.element);
+  return !(!me || me.dead || !me.alive);
 }
 
 /*
  * Scoring on enemies
  */
+function scoreMarioShell(mario, shell) {
+  // Star Mario gets 200
+  if(mario.star) return score(shell, 200, true);
+  // Shells in the air cause 8000 points, oh lawdy
+  if(!shell.resting) return score(shell, 8000, true);
+  // Peeking shells are also more
+  if(shell.peeking) return score(shell, 1000, true);
+  // Regular points are just 100
+  return score(shell, 100, true);
+}
 function scoreEnemyStomp(enemy) {
   var amount = 100;
   switch(enemy.type.split(" ")[0]) {
-    case "koopa": 
-      if(enemy.fly) amount = 400;
-      else amount = 100;
-    break;
+    case "koopa": amount = enemy.fly ? 400 : 100; break;
+    case "bulletbill": amount = 200; break;
     case "cheepcheep": amount = 200; break;
     case "hammerbro": amount = 1000; break;
     case "lakitu": amount = 800; break;
-    case "bulletbill": amount = 200; break;
     default: amount = 100; break;
   }
   // scoreEnemyFin(enemy, amount);
@@ -514,9 +549,9 @@ function moveSimple(me) {
   if(me.direction != me.moveleft) {
     if(me.moveleft) {
       me.xvel = -me.speed;
-      if(!me.noflip) removeClass(me, "flipped");
+      if(!me.noflip) unflipHoriz(me);
     } else {
-      if(!me.noflip) addElementClass(me.element, "flipped");
+      if(!me.noflip) flipHoriz(me);
       me.xvel = me.speed; 
     }
     me.direction = me.moveleft;
@@ -528,7 +563,7 @@ function moveSmart(me) {
   
   if(me.yvel == 0 && (!me.resting || (offResting(me)))) {
     if(me.moveleft) shiftHoriz(me, unitsize, true);
-    else shiftHoriz(me, unitsize * -1, true);
+    else shiftHoriz(me, -unitsize, true);
     me.moveleft = !me.moveleft;
   }
 }
@@ -539,9 +574,8 @@ function offResting(me) {
 
 function moveJumping(me) {
   moveSimple(me);
-  
   if(me.resting) {
-    me.yvel = -Math.abs(me.jumpheight);
+    me.yvel = -abs(me.jumpheight);
     me.resting = false;
   }
 }
@@ -570,9 +604,9 @@ function moveSliding(me) {
   (me.movement = moveSlidingReal)(me);
 }
 function moveSlidingReal(me) {
-  if(screen.left + me.left < me.begin)
+  if(gamescreen.left + me.left < me.begin)
     me.xvel = min(me.xvel + unitsized32, me.maxvel);
-  else if(screen.left + me.right > me.end)
+  else if(gamescreen.left + me.right > me.end)
     me.xvel = max(me.xvel - unitsized32, -me.maxvel);
   movePlatformNorm(me);
 }
@@ -641,20 +675,18 @@ function shiftScaleStringVert(me, string, yvel) {
   string.bottom = me.top;
   string.height = (string.bottom - string.top) / unitsize;
   updateSize(string);
-  updateDisplay(string); 
 }
 
-
-function addClass(me, strin) { me.element.className += " " + strin; }
-function removeClass(me, strin) { me.element.className = me.element.className.replace(new RegExp(" " + strin,"gm"),''); }
-function switchClass(me, str1, str2) { removeClass(me, str1); addClass(me, str2); }
-function addElementClass(element, strin) { element.className += " " + strin; }
-function removeElementClass(element, strin) { element.className = element.className.replace(new RegExp(" " + strin,"gm"),''); }
-function removeClasses(me, strings) {
+function setClass(me, strin) { me.className = strin; setThingSprite(me); }
+function setClassInitial(me, strin) { me.className = strin; }
+function addClass(me, strin) { me.className += " " + strin; setThingSprite(me); }
+function removeClass(me, strout) { me.className = me.className.replace(new RegExp(" " + strout,"gm"),''); setThingSprite(me); }
+function switchClass(me, strout, strin) { removeClass(me, strout); addClass(me, strin); }
+function removeClasses(me) {
   var strings, arr, i, j;
   for(i = 1; i < arguments.length; ++i) {
-    strings = arguments[i];
-    arr = strings instanceof Array ? strings : strings.split(" ");
+    arr = arguments[i];
+    if(!(arr instanceof Array)) arr = arr.split(" ");
     for(j = arr.length - 1; j >= 0; --j)
       removeClass(me, arr[j]);
   }
@@ -664,6 +696,14 @@ function addClasses(me, strings) {
   for(var i = arr.length - 1; i >= 0; --i)
     addClass(me, arr[i]);
 }
+// Used in Editor
+function addElementClass(element, strin) { element.className += " " + strin; }
+function removeElementClass(element, strin) { element.className = element.className.replace(new RegExp(" " + strin,"gm"),''); }
+
+function flipHoriz(me) { addClass(me, "flipped"); }
+function flipVert(me) { addClass(me, "flip-vert"); }
+function unflipHoriz(me) { removeClass(me, "flipped"); }
+function unflipVert(me) { removeClass(me, "flip-vert"); }
 
 /*
  * Deaths & removing
@@ -671,25 +711,25 @@ function addClasses(me, strings) {
 
 // Javascript memory management, you are bad and should feel bad.
 function deleteThing(me, array, arrayloc) {
-  deleted.push(array.splice(arrayloc,1));
-  if(me) removeElement(me);
+  array.splice(arrayloc, 1);
+  if(me.ondelete) me.ondelete();
 }
-function removeElement(me) {
-  if(!me.element) return;
-  me.element.style.visibility = "hidden";
-  divs.push(clearDiv(me.element));
-  body.removeChild(me.element);
-  delete me.element;
-  if(me.type == "fireball") --mario.numballs; // To do: make this part of fireball
+function switchContainers(me, outer, inner) {
+  outer.splice(outer.indexOf(me), 1);
+  inner.push(me);
+}
+function containerForefront(me, container) {
+  container.splice(container.indexOf(me), 1);
+  container.unshift(me);
 }
 function killNormal(me) {
-  if(!me || !me.alive) return;
+  if(!me) return;
+  me.hidden = me.dead = true;
   me.alive = me.resting = me.movement = false;
-  removeElement(me);
   clearAllCycles(me);
 }
 function killFlip(me, extra) {
-  addElementClass(me.element, "flip-vert");
+  flipVert(me);
   me.bottomBump = function() {};
   me.nocollide = me.dead = true;
   me.resting = me.movement = me.speed = me.xvel = me.nofall = false;
@@ -721,50 +761,57 @@ function blockBumpMovement(me) {
 
 function emergeUp(me, solid) {
   play("Powerup Appears.wav");
-  addClass(me, "flipped");
+  flipHoriz(me);
   me.nomove = me.nocollide = me.alive = me.nofall = me.emerging = true;
   determineThingQuadrants(me);
+  switchContainers(me, characters, scenery);
+  // Start moving up
   var move = setInterval(function() {
-    shiftVert(me, -unitsized8, true);
-    if(me.bottom <= solid.top) {
-      clearInterval(move);
-      me.nocollide = me.nomove = me.moveleft = me.nofall = me.emerging = false;
-      if(me.movement) {
-        me.movementsave = me.movement;
-        me.movement = moveSimple;
-        me.moving = setInterval(function() {
-          if(me.resting != solid) {
-            clearTimeout(me.moving);
-            addEvent(function(me) { me.movement = me.movementsave; }, 1, me);
+        shiftVert(me, -unitsized8);
+        // Stop once the bottom is high enough
+        if(me.bottom <= solid.top) {
+          clearInterval(move);
+          switchContainers(me, scenery, characters);
+          me.nocollide = me.nomove = me.moveleft = me.nofall = me.emerging = false;
+          // If it has a function to call after being completely out (vines), do it
+          if(me.emergeOut) me.emergeOut(me, solid);
+          // If there's movement, don't do it at first
+          if(me.movement) {
+            me.movementsave = me.movement;
+            me.movement = moveSimple;
+            // Wait until it's off the solid
+            me.moving = addEventInterval(function(me, solid) {
+              if(me.resting != solid) {
+                addEvent(function(me) { me.movement = me.movementsave; }, 1, me);
+                return true;
+              }
+            }, 1, Infinity, me, solid);
           }
-        }, timer);
-      }
-    }
-  }, timer);
+        }
+      }, timer);
 }
 
-// To do: make this use events
-function flicker(me, cleartime) {
+function flicker(me, cleartime, interval) {
+  var cleartime = round(cleartime) || 21,
+      interval = round(interval) || 3;
   me.flickering = true;
-  var on = me.element.style.visibility == "visible", timing = timer * 8,
-  flick = setInterval(function() {
-    if(on) me.element.style.visibility = "hidden";
-    else me.element.style.visibility = "visible";
-    on = !on;
-  }, timing);
-  addEvent(function() {
-    clearInterval(flick);
-    me.element.style.visibility = "visible";
-    me.flickering = false;
-  }, cleartime);
+  addEventInterval(function(me) { me.hidden = !me.hidden; }, interval, cleartime, me);
+  addEvent(function(me) { me.flickering = me.hidden = false; }, cleartime * interval + 1, me);
 }
 
 // Kills all characters other than mario
 // Used in endCastleOutside/Inside
+// Also kills all moving solids
 function killOtherCharacters() {
-  for(var i = characters.length - 1; i >= 0; --i)
-    if(!characters[i].nokillend)
-      deleteThing(characters[i], characters, i);
+  var thing, i;
+  for(i = characters.length - 1; i >= 0; --i) {
+    thing = characters[i];
+    if(!thing.nokillend) deleteThing(thing, characters, i);
+    else if(thing.killonend) thing.killonend(thing);
+  }
+  for(i = solids.length - 1; i >= 0; --i)
+    if(solids[i].killonend)
+      deleteThing(solids[i], solids, i);
 }
 
 function lookTowardMario(me, big) {
@@ -773,7 +820,7 @@ function lookTowardMario(me, big) {
     if(!me.lookleft || big) {
       me.lookleft = true;
       me.moveleft = false;
-      removeClass(me, "flipped");
+      unflipHoriz(me);
     }
   }
   // Mario is to the right
@@ -781,7 +828,7 @@ function lookTowardMario(me, big) {
     if(me.lookleft || big) {
       me.lookleft = false;
       me.moveleft = true;
-      addClass(me, "flipped");
+      flipHoriz(me);
     }
   }
 }
@@ -790,12 +837,12 @@ function lookTowardThing(me, thing) {
   if(thing.right <= me.left) {
     me.lookleft = true;
     me.moveleft = false;
-    removeClass(me, "flipped");
+    unflipHoriz(me);
   }
   // It's to the right
   else if(thing.left >= me.right) {
     me.lookleft = false;
     me.moveleft = true;
-    addClass(me, "flipped");
+    flipHoriz(me);
   }
 }

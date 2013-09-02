@@ -1,24 +1,11 @@
-/* How JSList quadrants work:
-
-Each quadrant keeps a list of the elements inside of it.
-Each element keeps a list of the quadrants it's in.
-Each element keeps a list of all the nodes pointing to it (these are in the quad lists)
-
-Each list has a head node, which contains the information about the list.
-
-Whenever an element rechecks which quads it's in:
-* Each node pointing to it is now .false
-* It checks all quadrants. For each one it's in:
-** It adds a node to the quadrant's list
-*** This adds a node to its own node list
-** It adds a node to its list of quadrants
-
-When a quadrant looks through its list of elements, starting with the head node:
-* If the next element is .false, the current element's .next is that one's .next
-
-Possible addition: make quadrants also use a JSList, for shifting / popping new ones
-
-*/
+// Quads has 7 cols and 6 rows
+function resetQuadrants() {
+  window.quads = [];
+  quads.rows = 5;
+  quads.cols = 6;
+  setQuadDimensions();
+  createQuads();
+}
 
 function Quadrant(row, left) {
   this.left = left;
@@ -75,42 +62,13 @@ function deleteQuad(quad) {
   return quad;
 }
 function updateQuads(xdiff) {
-  if(quads.visible) shiftAll(quads, 0, 0, true);
-  quads.rightdiff += xdiff;
-  if(quads.leftmost.left <= quads.delx) {
+  quads.rightdiff += xdiff || 0;
+  // if(quads.leftmost.left <= quads.delx) {
+  while(quads.leftmost.left <= quads.delx) {
     addQuadCol(quads.rightmost.right);
     shiftQuadCol();
     spawnMap();
-    if(quads.visible) {
-      hideQuads();
-      showQuads();
-    }
   }
-}
-
-function showQuads() {
-  quads.visible = true;
-  var quad, style;
-  for(var i=0; i<quads.length; ++i) {
-    quad = quads[i];
-    if(quad.element) continue;
-    var k = quad.element = document.createElement('div');
-    quad.style = style = quad.element.style;
-    k.className = "quad";
-    k.style.marginLeft = quads[i].left + "px";
-    k.style.marginTop = quads[i].top + "px";
-    k.style.width = quads.width + "px";
-    k.style.height = quads.height + "px";
-    document.body.appendChild(k);
-  }
-}
-function hideQuads() {
-  quads.visible = false;
-  for(var i=0; i<quads.length; ++i)
-    if(quads[i].element) {
-      body.removeChild(quads[i].element);
-      quads[i].element = quads[i].style = false;
-    }
 }
 
 function determineAllQuadrants() {

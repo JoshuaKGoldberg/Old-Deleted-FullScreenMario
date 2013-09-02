@@ -7,7 +7,7 @@ map.areas = [
     setLocationGeneration(0);
     
     pushPrePattern("backfencemin3", -384, 0, 7);
-    pushPreScenery("Castle", -16, castlev);
+    pushPreCastle();
     pushPreFloor(0, 0, 69);
     // pushPreScenery("Fence", 120, 0);
     pushPreThing(Cannon, 144, 16, 2);
@@ -66,6 +66,6 @@ map.areas = [
     pushPreThing(SceneryBlocker, 1624, 24, 40, 24);
     pushPreThing(Stone, 1632, 64, 2, 1);
     pushPreFloor(1664, 0, 32);
-    endCastleOutside(1708, 0, 0, 11, 44);
+    endCastleOutside(1708, 0, true, 11, 44);
   })
 ];

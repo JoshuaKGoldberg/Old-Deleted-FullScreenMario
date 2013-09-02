@@ -1,0 +1,17 @@
+This is by no means a complete project. By the time I'm ready for a true '1.0' release, it should be a completely flexible, performant project that can be easily adapted to other games.
+In the meantime:
+
+Maps
+----
+* It would be nice to store them in JSON so the Function constructor, which is basically eval in disguise, isn't used as a security risk. That gets tricky with the repeating Castle areas, but could probably be done by adding a 'repeat-offset' style variable.
+
+Things
+------
+* At the moment it looks like a high school senior skipped the OOP day of class. Thing constructors should be stored in JSON, not as functions.
+* Instead of having *.movementInit functions, turn the bland .onadding into a fancy .onAdding for this purpose, which would increase editor compatibility and make more sense for the game.
+
+Editor
+------
+* Bring back the erasor!
+* Give a way to set different areas in the map and ways to get around them
+* Time as an option under settings

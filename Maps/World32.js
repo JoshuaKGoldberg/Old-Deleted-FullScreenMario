@@ -6,7 +6,7 @@ map.areas = [
   new Area("Overworld Night Alt", function() {
     setLocationGeneration(0);
 
-    pushPreScenery("Castle", -1 * unitsizet4, castlev);
+    pushPreCastle();
     pushPrePattern("backfence", -384, 0, 6);
     pushPreFloor(0, 0, 80);
     pushPreThing(Koopa, 136, 12);
@@ -54,6 +54,6 @@ map.areas = [
     pushPreThing(Stone, 1592, 64, 1, 8);
     pushPreThing(Stone, 1600, 64, 1, 8);
     
-    endCastleOutside(1668, 0, castlev);
+    endCastleOutside(1668);
   })
 ];

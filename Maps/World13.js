@@ -6,14 +6,14 @@ map.areas = [
   new Area("Overworld", function() {
     setLocationGeneration(0);
 
-    pushPreScenery("Castle", -16, castlev);
+    pushPreCastle();
     pushPrePattern("backcloud", 0, 4, 5);
     pushPreFloor(0, 0, 16);
     
     pushPreTree(144, 8, 4);
     pushPreTree(192, 32, 8);
     pushPreTree(208, 64, 5);
-    fillPreThing(Coin, 217, 71, 3, 1, 8, 8);
+    fillPreThing(Coin, 217, 71, 3, 1, 8, 8, true);
     pushPreThing(Koopa, 240, 76, true);
     pushPreTree(256, 8, 3);
     pushPreThing(Coin, 266, 15);
@@ -58,6 +58,6 @@ map.areas = [
     pushPreThing(Stone, 1136, 64, 1, 8);
     pushPreThing(Stone, 1144, 64, 1, 8);
     
-    endCastleOutside(1220, 0, 0, 11);
+    endCastleOutside(1220, 0, true, 11);
   })
 ];
