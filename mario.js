@@ -2,7 +2,6 @@
 // Starts everything.
 
 function FullScreenMario() {
-  console.log("When update to alpha is done, change the map editor UI");
   var time_start = Date.now();
   
   // Thanks, Obama...
