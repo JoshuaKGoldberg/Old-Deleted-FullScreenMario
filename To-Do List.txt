@@ -15,3 +15,8 @@ Editor
 * Bring back the erasor!
 * Give a way to set different areas in the map and ways to get around them
 * Time as an option under settings
+
+Sounds
+------
+* Short-term: get standardized, cleaned versions of the audio files (and why the heck doesn't Firefox play the themes?)
+* Long-term: use https://github.com/meenie/band.js
