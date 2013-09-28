@@ -447,8 +447,8 @@ function enterCloudWorld(me, nopause) {
   // There are four cloud blocks to the left
   // The vine goes up until it has four blocks above the clouds, then waits 2 seconds
   // Mario climbs up the left until two blocks from the top, then switches & jumps
-  if(!nopause) pause();
-  else unpause();
+  /*if(!nopause) pause();
+  else */unpause();
   
   if(map.random) map.exitloc = getAfterSkyTransport();
   
@@ -906,7 +906,7 @@ function pushPreTree(xloc, yloc, width) {
 }
 function pushPreShroom(xloc, yloc, width) {
   pushPreThing(ShroomTop, xloc, yloc, width);
-  var dtb = DtB(yloc - 8);
+  var dtb = DtB(yloc - 4);
   pushPreScenery("ShroomTrunk", xloc + width * 4 - 4, yloc - dtb - 8, 1, dtb / 8);
 }
 
