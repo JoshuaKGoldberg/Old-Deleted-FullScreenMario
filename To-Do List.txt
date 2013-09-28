@@ -1,22 +1,40 @@
 This is by no means a complete project. By the time I'm ready for a true '1.0' release, it should be a completely flexible, performant project that can be easily adapted to other games.
 In the meantime:
 
+Gameplay
+-------
+* Standardize the darn speed already - make the game react to the framerate, not the other way around.
+** Typical movement
+** Mario movement
+** Moving solids
+* http://www.gamepadjs.com/
+
 Maps
 ----
 * It would be nice to store them in JSON so the Function constructor, which is basically eval in disguise, isn't used as a security risk. That gets tricky with the repeating Castle areas, but could probably be done by adding a 'repeat-offset' style variable.
 
 Things
 ------
-* At the moment it looks like a high school senior skipped the OOP day of class. Thing constructors should be stored in JSON, not as functions.
+* Thing constructors should be stored in JSON, not as functions. Right now it looks like a high school senior skipped the OOP day of class. 
 * Instead of having *.movementInit functions, turn the bland .onadding into a fancy .onAdding for this purpose, which would increase editor compatibility and make more sense for the game.
 
 Editor
 ------
 * Bring back the erasor!
 * Give a way to set different areas in the map and ways to get around them
+* Add in the few missing characters, solids, and scenery that were too glitchy the last time
+* Custom objects!
 * Time as an option under settings
+* Sharing (as a file attachment, or server-side storage?):
+** Facebook
+** URL shortener
+** Email
 
 Sounds
 ------
 * Short-term: get standardized, cleaned versions of the audio files (and why the heck doesn't Firefox play the themes?)
 * Long-term: use https://github.com/meenie/band.js
+
+Performance
+-----------
+* Look into asm.js
