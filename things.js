@@ -1795,6 +1795,7 @@ function marioDropsIn() {
   // Give a Resting Stone for him to land, unless it's underwater...
   if(!map.underwater) {
     mario.nocollide = true;
+    mario.gravity = gravity / 2.8;
     
     addEvent(function() {
       mario.nocollide = false;
