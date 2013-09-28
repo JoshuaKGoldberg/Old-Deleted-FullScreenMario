@@ -2557,30 +2557,43 @@ function endLevelPoints(me, detector) {
   var numfire = getLast(String(data.time.amount));
   if(!(numfire == 1 || numfire == 3 || numfire == 6)) numfire = 0;
   
-  // COunt down the points
+  // Count down the points (x50)
   var points = setInterval(function() {
     // 50 for each
     --data.time.amount;
     data.score.amount += 50;
     updateDataElement(data.score);
     updateDataElement(data.time);
+    // Each point(x50) plays the coin noise
+    play("Coin.wav");
     // Once it's done, move on to the fireworks.
     if(data.time.amount <= 0)  {
-      pause();
+      // pause();
       clearInterval(points);
       setTimeout(function() { endLevelFireworks(me, numfire, detector); }, timer * 49);
     }
-  }, timer);
+  }, timerd2);
 }
 function endLevelFireworks(me, numfire, detector) {
-  var i;
+  var nextnum, nextfunc,
+      i = 0;
   if(numfire) {
     // var castlemid = detector.castle.left + detector.castle.width * unitsized2;
     var castlemid = detector.left + 32 * unitsized2;
-    for(i = 0; i < numfire; ++i)
-      explodeFirework(i, castlemid);
+    while(i < numfire)
+      explodeFirework(i++, castlemid);
+    nextnum = timer * (i + 2) * 42;
   }
-  setTimeout(function() { endLevel(); }, timer * (i+2) * 42);
+  else nextnum = 0;
+  
+  // The actual endLevel happens after all the fireworks are done
+  nextfunc = function() { setTimeout(function() { endLevel(); }, nextnum); };
+  
+  // If the Stage Clear sound is still playing, wait for it to finish
+  if(sounds["Stage Clear.wav"] && !sounds["Stage Clear.wav"].paused)
+    sounds["Stage Clear.wav"].addEventListener("ended", function() { addEvent(nextfunc, 35); });
+  // Otherwise just start it immediately
+  else nextfunc();
 }
 function explodeFirework(num, castlemid) {
   setTimeout(function() {
