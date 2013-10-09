@@ -11,6 +11,7 @@ Gameplay
 * Multiplayer
 ** Local wouldn't be too bad (just fix the mairo-on-mario crashes, and make maintainMario happen for each mario
 ** LAN/Internet would be too bad
+* Crouch jumping!
 
 Maps
 ----
