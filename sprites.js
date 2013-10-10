@@ -582,9 +582,13 @@ function memcpyU8(source, destination, readloc, writeloc, writelength/*, thing*/
   if(readloc == null) readloc = 0;
   if(writeloc == null) writeloc = 0;
   if(writelength == null) writelength = max(0, min(source.length, destination.length));
-  while(writelength--)
-  // while(--writelength)
-    destination[writeloc++] = source[readloc++];
+
+  var lwritelength = writelength + 0; // Allow JIT integer optimization (Firefox needs this)
+  var lwriteloc = writeloc + 0;
+  var lreadloc = readloc + 0;
+  while(lwritelength--)
+  // while(--lwritelength)
+    destination[lwriteloc++] = source[lreadloc++];
 }
 
 // Somewhat cross-platform way to make a canvas' 2d context not smooth pixels
