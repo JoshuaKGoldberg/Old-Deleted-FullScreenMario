@@ -18,7 +18,7 @@ map.areas = [
   new Area("Underworld", function() { // main underworld - locs 1 (entryNormal), 2 (exitPipeVert)
     setLocationGeneration(1);
 
-    fillPreThing(Brick, 0, 0, 1, 11, 8, 8);
+    fillPreThing(Brick, 0, 8, 1, 11, 8, 8);
     pushPreFloor(0, 0, 11);
     makeCeiling(48, 51);
     

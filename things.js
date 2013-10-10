@@ -1795,7 +1795,6 @@ function marioDropsIn() {
   // Give a Resting Stone for him to land, unless it's underwater...
   if(!map.underwater) {
     mario.nocollide = true;
-    mario.gravity = gravity / 2.8;
     
     addEvent(function() {
       mario.nocollide = false;
@@ -1803,7 +1802,7 @@ function marioDropsIn() {
     }, map.respawndist || 17);
   }
   // ...in which case just fix his gravity
-  else mario.gravity = gravity;
+  else mario.gravity = gravity / 2.8;
 }
 
 function gameOver() {
@@ -1855,11 +1854,11 @@ function Floor(me, length, height) {
   setSolid(me, "floor");
 }
 
-// To do: stop using butts, and use Stone instead
-function Butts(me, length) {
+// To do: stop using clouds, and use Stone instead
+function Clouds(me, length) {
   me.width = length * 8;
   me.height = 8;
-  setSolid(me, "butts");
+  setSolid(me, "clouds");
 }
 
 function Brick(me, content) {
@@ -2695,9 +2694,9 @@ function resetScenery() {
       "CastleRailingFilled": [8, 4],
       "CastleTop": [12, 12],
       "CastleWall": [8, 48],
-      "Butt1": [16, 12],
-      "Butt2": [24, 12],
-      "Butt3": [32, 12],
+      "Cloud1": [16, 12],
+      "Cloud2": [24, 12],
+      "Cloud3": [32, 12],
       "HillSmall": [24, 9.5],
       "HillLarge": [40, 17.5],
       "Fence": [8, 8],
@@ -2721,99 +2720,99 @@ function resetScenery() {
     patterns: {
       backreg: [
         ["HillLarge", 0, 0],
-        ["Butt1", 68, 68],
+        ["Cloud1", 68, 68],
         ["Bush3", 92, 0],
         ["HillSmall", 128, 0],
-        ["Butt1", 156, 76],
+        ["Cloud1", 156, 76],
         ["Bush1", 188, 0],
-        ["Butt3", 220, 68],
-        ["Butt2", 292, 76],
+        ["Cloud3", 220, 68],
+        ["Cloud2", 292, 76],
         ["Bush2", 332, 0],
         ["Blank", 384]
       ],
-      backbutt: [
-        ["Butt2", 28, 64],
-        ["Butt1", 76, 32],
-        ["Butt2", 148, 72],
-        ["Butt1", 228, 0],
-        ["Butt1", 284, 32],
-        ["Butt1", 308, 40],
-        ["Butt1", 372, 0],
+      backcloud: [
+        ["Cloud2", 28, 64],
+        ["Cloud1", 76, 32],
+        ["Cloud2", 148, 72],
+        ["Cloud1", 228, 0],
+        ["Cloud1", 284, 32],
+        ["Cloud1", 308, 40],
+        ["Cloud1", 372, 0],
         ["Blank", 384]
       ],
-      backbuttmin: [ // used for random map generation
-        ["Butt1", 68, 68],
-        ["Butt1", 156, 76],
-        ["Butt3", 220, 68],
-        ["Butt2", 292, 76],
+      backcloudmin: [ // used for random map generation
+        ["Cloud1", 68, 68],
+        ["Cloud1", 156, 76],
+        ["Cloud3", 220, 68],
+        ["Cloud2", 292, 76],
         ["Blank", 384]
       ],
       backfence: [
         ["PlantSmall", 88, 0],
         ["PlantLarge", 104, 0],
         ["Fence", 112, 0, 4],
-        ["Butt1", 148, 68],
+        ["Cloud1", 148, 68],
         ["PlantLarge", 168, 0],
         ["PlantSmall", 184, 0],
         ["PlantSmall", 192, 0],
-        ["Butt1", 220, 76],
-        ["Butt2", 244, 68],
+        ["Cloud1", 220, 76],
+        ["Cloud2", 244, 68],
         ["Fence", 304, 0, 2],
         ["PlantSmall", 320, 0],
         ["Fence", 328, 0],
         ["PlantLarge", 344, 0],
-        ["Butt1", 364, 76],
-        ["Butt2", 388, 68],
+        ["Cloud1", 364, 76],
+        ["Cloud2", 388, 68],
         ["Blank", 384]
       ],
       backfencemin: [
         ["PlantLarge", 104, 0],
         ["Fence", 112, 0, 4],
-        ["Butt1", 148, 68],
+        ["Cloud1", 148, 68],
         ["PlantLarge", 168, 0],
         ["PlantSmall", 184, 0],
         ["PlantSmall", 192, 0],
-        ["Butt1", 220, 76],
-        ["Butt2", 244, 68],
+        ["Cloud1", 220, 76],
+        ["Cloud2", 244, 68],
         ["Fence", 304, 0, 2],
         ["PlantSmall", 320, 0],
         ["Fence", 328, 0],
-        ["Butt1", 364, 76],
-        ["Butt2", 388, 68],
+        ["Cloud1", 364, 76],
+        ["Cloud2", 388, 68],
         ["Blank", 384]
       ],
       backfencemin2: [
-        ["Butt2", 4, 68],
+        ["Cloud2", 4, 68],
         ["PlantSmall", 88, 0],
         ["PlantLarge", 104, 0],
         ["Fence", 112, 0, 1],
         ["Fence", 128, 0, 2],
-        ["Butt1", 148, 68],
+        ["Cloud1", 148, 68],
         // ["PlantLarge", 168, 0],
         ["PlantSmall", 184, 0],
         ["PlantSmall", 192, 0],
-        ["Butt1", 220, 76],
-        ["Butt2", 244, 68],
+        ["Cloud1", 220, 76],
+        ["Cloud2", 244, 68],
         ["Fence", 304, 0, 2],
         ["PlantSmall", 320, 0],
         ["Fence", 328, 0],
         ["PlantLarge", 344, 0],
-        ["Butt1", 364, 76],
-        ["Butt2", 388, 68],
+        ["Cloud1", 364, 76],
+        ["Cloud2", 388, 68],
         ["Blank", 384]
       ],
       backfencemin3: [
-        ["Butt2", 4, 68],
+        ["Cloud2", 4, 68],
         ["PlantSmall", 88, 0],
         ["PlantLarge", 104, 0],
         ["Fence", 112, 0, 4],
-        ["Butt1", 148, 68],
+        ["Cloud1", 148, 68],
         ["PlantSmall", 184, 0],
         ["PlantSmall", 192, 0],
-        ["Butt1", 220, 76],
-        ["Butt2", 244, 68],
-        ["Butt1", 364, 76],
-        ["Butt2", 388, 68],
+        ["Cloud1", 220, 76],
+        ["Cloud2", 244, 68],
+        ["Cloud1", 364, 76],
+        ["Cloud2", 388, 68],
         ["Blank", 384]
       ]
     }

@@ -318,27 +318,25 @@ canvas {
 
 
 
-/* Thanks so much to the people who made these fonts!
+/*
+  Thanks so much to the people who worked to recreate the 8-bit fonts!
   Super Plumber Brothers: http://www.fontspace.com/category/mario
-  Press Start 2P: http://www.zone38.net/font/
-  To do: add in other sites...?
+  Press Start: http://www.zone38.net/font/ (see Fonts/LICENSE-PS.txt)
 */
 
-@font-face {
-    font-family: 'Super Plumber Bros';
-    src: url('/Fonts/Plumber%20Bros/Super%20Plumber%20Brothers.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+/* Press Start (2P) is used for the vast majority of in-game fonts *//*
 @font-face {
     font-family: 'Press Start';
-    src: url('/Fonts/Pressstart2p/PressStart2P.ttf') format('truetype');
+    src: url('Fonts/PressStart2P.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
+
+/* Super Plumber Bros is used for the main title screen in World 1-1 *//*
 @font-face {
-    font-family: 'Super Mario Bros Alphabet';
-    src: url('/Fonts/super_mario_bros_alphabet/smbfont.ttf') format('truetype');
+    font-family: 'Super Plumber Bros';
+    src: url('Fonts/Super Plumber Brothers.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
+*/
