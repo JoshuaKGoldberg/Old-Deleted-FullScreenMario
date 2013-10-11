@@ -272,7 +272,7 @@ function Shell(me, smart) {
   me.group = "item";
   me.speed = unitsizet2;
   me.collide_primary = true;
-  me.moveleft = me.xvel = me.move = me.hitcount = me.peeking = me.counting = me.landing = me.hitcount = 0;
+  me.moveleft = me.xvel = me.move = me.hitcount = me.peeking = me.counting = me.landing = me.enemyhitcount = 0;
   me.smart = smart;
   me.movement = moveShell;
   me.collide = hitShell;
@@ -426,8 +426,8 @@ function hitShell(one, two) {
             else killFlip(one);
             
             play("Kick.wav");
-            score(one, findScore(two.hitcount), true);
-            ++two.hitcount;
+            score(one, findScore(two.enemyhitcount), true);
+            ++two.enemyhitcount;
           } // Otherwise the enemy just turns around
           else one.moveleft = objectToLeft(one, two);
         break;
@@ -446,7 +446,7 @@ function hitShell(one, two) {
 function moveShell(me) {
   if(me.xvel != 0) return;
   
-  if(++me.counting == 350) {
+  if(++me.counting == 350) { 
     addClass(me, "peeking");
     me.peeking = true;
     me.height += unitsized8;
@@ -1214,7 +1214,7 @@ function BeetleShell(me) {
   me.nofire = true;
   me.group = "item";
   me.speed = unitsizet2;
-  me.moveleft = me.xvel = me.move = me.hitcount = me.peeking = me.counting = me.landing = 0;
+  me.moveleft = me.xvel = me.move = me.hitcount = me.peeking = me.counting = me.landing = me.enemyhitcount = 0;
   me.movement = moveShell;
   me.collide = hitShell;
   me.death = killFlip;
