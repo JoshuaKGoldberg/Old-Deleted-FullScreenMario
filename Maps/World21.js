@@ -109,14 +109,9 @@ map.areas = [
     pushPreFloor(0, 0, 17);
     fillPreThing(Brick, 0, 8, 1, 11, 8, 8);
     fillPreThing(Brick, 32, 8, 7, 3, 8, 8);
-    pushPreThingsVert(Coin , 34, 17, 14, 2);
-    pushPreThingsVert(Coin , 42, 17, 14, 3);
-    pushPreThingsVert(Coin , 50, 17, 14, 3);
-    pushPreThingsVert(Coin , 58, 17, 14, 3);
-    pushPreThingsVert(Coin , 66, 17, 14, 3);
-    pushPreThingsVert(Coin , 74, 17, 14, 3);
-    pushPreThingsVert(Coin , 82, 17, 14, 2);
-    pushPreThing(PipeSide, 104, 16, 2);
+    fillPreThing(Coin, 33, 31, 7, 2, 8, 16);
+    fillPreThing(Coin, 41, 63, 5, 1, 8, 8);
+    pushPreThing(PipeSide, 104, 16, 1);
     pushPreThing(PipeVertical, 120, 88, 88);
   })
 ];
