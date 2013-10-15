@@ -117,6 +117,5 @@ Map Shifting
 
 Developers
 ----------
-For a list of issues, see To-Do List.txt. 
 
 This is released under the <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Attribution Non-Commercial Share-Alike</a> license. Full Screen Mario is meant to be both a proof of concept and an entertaining pasttime, not a source of income</a>.
