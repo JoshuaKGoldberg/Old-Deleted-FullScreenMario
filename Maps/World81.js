@@ -126,7 +126,7 @@ map.areas = [
     pushPreThing(Brick, 96, 32, Coin);
     fillPreThing(Brick, 24, 64, 10, 4, 8, 8);
     fillPreThing(Brick, 104, 24, 2, 9, 8, 8);
-    pushPreThing(PipeSide, 104, 16, 3);
+    pushPreThing(PipeSide, 104, 16, 1);
     pushPreThing(PipeVertical, 120, 100, 100);
   })
 ];
