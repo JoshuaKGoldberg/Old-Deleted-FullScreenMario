@@ -1527,9 +1527,9 @@ function moveMario(me) {
       me.skidding = false;
     }
   }
-  // Otherwise slow down a bit, with a little more if crouching
+  // Otherwise slow down a bit/*, with a little more if crouching*/
   else {
-    me.xvel *= (.98 - Boolean(me.crouching) * .07);
+    me.xvel *= (.98/* - Boolean(me.crouching) * .07*/);
     decel = .035;
   }
 

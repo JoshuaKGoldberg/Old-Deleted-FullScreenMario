@@ -17,36 +17,39 @@ function keydown(event) {
   if(typeof(event) != "number" || event.which)
     event = event.which;
   
+  var keys = mario.keys;
   switch(event) {
     case 37: case 65: // left
-      mario.keys.run = -1;
+      keys.run = -1;
+      keys.left_down = true; // independent of changes to mario.keys.run
     break;
     
     case 38: case 87: case 32: // up
-      mario.keys.up = true;
-      if(mario.canjump && !mario.crouching && (mario.resting || map.underwater)) {
-        mario.keys.jump = 1;
-        mario.canjump = mario.keys.jumplev = 0;
+      keys.up = true;
+      if(mario.canjump &&/* !mario.crouching &&*/ (mario.resting || map.underwater)) {
+        keys.jump = 1;
+        mario.canjump = keys.jumplev = 0;
         // To do: can mario make a jumping sound during the spring?
         if(mario.power > 1) play("Jump Super.wav");
         else play("Jump Small.wav");
         if(map.underwater) setTimeout(function() {
-          mario.jumping = mario.keys.jump = false;
+          mario.jumping = keys.jump = false;
         }, timer * 14);
       }
      break;
      
     case 39: case 68: // right
-      mario.keys.run = 1;
+      keys.run = 1;
+      keys.right_down = true; // independent of changes to mario.keys.run
     break;
     
     case 40: case 83: // down
-      mario.keys.crouch = 1;
+      keys.crouch = 1;
     break;
     
     case 16: // sprint
-      if(mario.power == 3 && mario.keys.sprint == 0) mario.fire();
-      mario.keys.sprint = 1;
+      if(mario.power == 3 && keys.sprint == 0) mario.fire();
+      keys.sprint = 1;
     break;
     
     case 80: // pause
@@ -92,27 +95,30 @@ function keyup(event) {
   if(typeof(event) != "number" || event.which)
     event = event.which;
   
+  var keys = mario.keys;
   switch(event) {
     case 37: case 65: // left
-      mario.keys.run = 0;
+      keys.run = 0;
+      keys.left_down = false; // independent of changes to mario.keys.run
     break;
     
     case 38: case 87: case 32: // up
-      if(!map.underwater) mario.keys.jump = mario.keys.up = 0;
+      if(!map.underwater) keys.jump = keys.up = 0;
       mario.canjump = true;
     break;
 
     case 39: case 68: // right
-      mario.keys.run = 0;
+      keys.run = 0;
+      keys.left_down = false; // independent of changes to mario.keys.run
     break;
 
     case 40: case 83: // down
-      mario.keys.crouch = 0;
+      keys.crouch = 0;
       removeCrouch();
     break;
     
     case 16: // sprint
-      mario.keys.sprint = 0;
+      keys.sprint = 0;
     break;
     
     case 80: // paused
