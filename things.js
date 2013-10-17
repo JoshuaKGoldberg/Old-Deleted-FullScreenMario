@@ -263,6 +263,7 @@ function Star(me) { // GOLDEEN GOLDEEN
   me.collide = collideFriendly;
   me.action = marioStar;
   me.death = killNormal;
+  me.nofire = true;
   setCharacter(me, "star item"); // Item class so mario's star isn't confused with this
   addSpriteCycle(me, ["one", "two", "three", "four"], 0, 7);
 }
