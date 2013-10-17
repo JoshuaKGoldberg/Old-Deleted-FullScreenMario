@@ -445,7 +445,7 @@ function editorFollowerShow() {
 function editorScrollingStart(event) {
   var scroller = event.target,
       dx = scroller.dx;
-  editorPeventClicks();
+  editorPreventClicks();
   editor.scrolling = addEventInterval(editorScrolling, 1, Infinity, dx);
   classRemove(editor.scrollers["left"], "off");
 }
