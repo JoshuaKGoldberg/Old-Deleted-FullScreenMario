@@ -109,7 +109,7 @@ function keyup(event) {
 
     case 39: case 68: // right
       keys.run = 0;
-      keys.left_down = false; // independent of changes to mario.keys.run
+      keys.right_down = false; // independent of changes to mario.keys.run
     break;
 
     case 40: case 83: // down
