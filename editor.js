@@ -44,6 +44,8 @@ function loadEditor(noreset) {
 function setEditorLibrary() {
   // The editor contains the placeable solids and characters
   window.editor = {
+    xloc: 0,
+    yloc: 0,
     playing: false,
     canplace: true,
     offset: { x: unitsizet2 }, // max is set upon running, if actually needed
@@ -446,7 +448,7 @@ function editorScrollingStart(event) {
   var scroller = event.target,
       dx = scroller.dx;
   editorPreventClicks();
-  editor.scrolling = addEventInterval(editorScrolling, 1, Infinity, dx);
+  editor.scrolling = addEventInterval(editorScrolling, 1, Infinity, -dx);
   classRemove(editor.scrollers["left"], "off");
 }
 function editorScrollingStop() {
@@ -455,8 +457,8 @@ function editorScrollingStop() {
 }
 function editorScrolling(dx) {
   scrollEditor(dx);
-  if(0 >= gamescreen.left) {
-    scrollEditor(-gamescreen.left);
+  if(editor.xloc >= 0) {
+    scrollEditor(-editor.xloc);
     editorScrollingStop();
     classAdd(editor.scrollers["left"], "off");
     return true;
@@ -1277,7 +1279,14 @@ function scrollEditor(xinv, yinv) {
   var follower = editor.follower;
   if(!follower) return;
   
-  shiftBoth(follower, xinv, yinv);
+  xinv = xinv || 0;
+  yinv = yinv || 0;
+  // shiftBoth(follower, xinv, yinv);
+  shiftAll(scenery, xinv, yinv);
+  shiftAll(solids, xinv, yinv);
+  shiftAll(characters, xinv, yinv);
+  editor.xloc += xinv;
+  editor.yloc += yinv;
 }
 
 function editorStoreLocally() {
