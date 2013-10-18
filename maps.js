@@ -500,9 +500,15 @@ function walkToPipe() {
   mario = placeMario();
   startWalking(mario);
   map.canscroll = false;
-  
+
+  var hasPipingStarted = false;
   var move = setInterval(function() {
-    if(mario.piping) {
+    if(mario.piping && !hasPipingStarted) {
+      // We have started piping
+      hasPipingStarted = true;
+    }
+    else if ( !mario.piping && hasPipingStarted ) {
+      // piping has finished
       if(sounds[0]) sounds[0].pause();
       nokeys = mario.keys.run = notime = false;
       clearInterval(move);
