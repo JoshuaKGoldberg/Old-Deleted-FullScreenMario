@@ -234,8 +234,12 @@ function FireBall(me, moveleft) {
 }
 function fireEnemy(enemy, me) {
   if(!me.alive || me.emerging || enemy.nofire || enemy.height <= unitsize) return;
-  playLocal("Kick.wav", me.right);
-  if(!enemy.solid) {
+
+  if(enemy.solid) {
+    playLocal("Bump.wav", me.right);
+  }
+  else {
+    playLocal("Kick.wav", me.right);
     enemy.death(enemy, 2);
     scoreEnemyFire(enemy);
   }
