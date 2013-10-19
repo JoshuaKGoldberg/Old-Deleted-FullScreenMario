@@ -16,7 +16,8 @@ function FullScreenMario() {
   
   // Know when to shut up
   window.verbosity = {Maps: false,
-                      Sounds: false};
+                      Sounds: false,
+                      };
   
   // Oh, HTML5.
   window.requestAnimationFrame = window.requestAnimationFrame

@@ -6,18 +6,14 @@
 function resetSounds() {
   window.sounds = {};
   window.theme = false;
-  window.muted = (localStorage.muted == "true");
+  window.muted = (localStorage && localStorage.muted == "true");
 }
 
 
 // Override is whether the main music pauses
-function play(name_raw, override) {
+function play(name_raw) {
   // First check if this is already in sounds
-  var name = "Sounds/" + name_raw,
-      sound = sounds[name_raw];
-  
-  // Is this even needed?
-  if(override) log("Play as override?!", arguments);
+  var sound = sounds[name_raw];
   
   // If it's not already being played,
   if(!sound) {
@@ -47,8 +43,8 @@ function play(name_raw, override) {
 }
 
 // The same as regular play, but with lower volume when further from Mario
-function playLocal(name, xloc, main, override) {
-  var sound = play(name, main, override),
+function playLocal(name, xloc, main) {
+  var sound = play(name, main),
       volume_real;
   // Don't do anything without having played a sound, or if there's no actual Mario
   if(!sound || !window.mario) return;
@@ -73,10 +69,8 @@ function playTheme(name_raw, resume) {
     delete sounds[sound.name_raw];
   }
   
-  // If the name doesn't exist, get it from the current area
+  // If the name isn't given, get it from the current area
   if(!name_raw) name_raw = area.theme;
-  // They all happen to end with .mp3...
-  name_raw += ".mp3";
   
   // This creates the sound.
   var sound = sounds.theme = play(name_raw);

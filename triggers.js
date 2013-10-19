@@ -30,8 +30,8 @@ function keydown(event) {
         keys.jump = 1;
         mario.canjump = keys.jumplev = 0;
         // To do: can mario make a jumping sound during the spring?
-        if(mario.power > 1) play("Jump Super.wav");
-        else play("Jump Small.wav");
+        if(mario.power > 1) play("Jump Super");
+        else play("Jump Small");
         if(map.underwater) setTimeout(function() {
           mario.jumping = keys.jump = false;
         }, timer * 14);

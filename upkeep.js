@@ -46,7 +46,7 @@ function pause(big) {
   cancelAnimationFrame(nextupk);
   pauseAllSounds();
   paused = true;
-  if(big) play("Pause.wav");
+  if(big) play("Pause");
 }
 
 function unpause() {

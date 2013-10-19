@@ -553,7 +553,7 @@ function intoPipeHoriz(me, pipe, transport) {
 }
 function pipePreparations(me) {
   pauseTheme();
-  play("Pipe.wav");
+  play("Pipe");
   locMovePreparations(me);
   me.nofall = me.nocollide = nokeys = notime = true;
   me.movement = me.xvel = me.yvel = 0;
@@ -581,7 +581,7 @@ function startCastle(me) {
 function exitPipeVert(me, pipe) {
   switchContainers(me, characters, scenery);
   me.nofall = nokeys = notime = true;
-  play("Pipe.wav");
+  play("Pipe");
   setTop(me, pipe.top);
   setMidXObj(me, pipe, true);
   var dy = unitsize / -4, move = setInterval(function() {

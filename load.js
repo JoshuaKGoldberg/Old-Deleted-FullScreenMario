@@ -69,20 +69,26 @@ function loadSounds(container, reference, prefix) {
       details = {
           preload: 'auto',
           prefix: '',
-          name_raw: '',
-          src: '',
           used: 0
         },
       len, i;
   for(i = 0, len = reference.length; i < len; ++i) {
     name_raw = reference[i];
-    details.name_raw = name_raw;
-    details.src = prefix + name_raw;
     
     // Create the sound and store it in the container
     sound = createElement("Audio", details);
     container[name_raw] = sound;
     mlog("Sounds", sound)
+    
+    // Create the MP3 and OGG sources for the audio
+    sound.appendChild(createElement("Source", {
+      type: "audio/mp3",
+      src: prefix + "mp3/" + name_raw + ".mp3"
+    }));
+    sound.appendChild(createElement("Source", {
+      type: "audio/ogg",
+      src: prefix + "ogg/" + name_raw + ".ogg"
+    }));
     
     // This preloads the sound.
     sound.volume = 0;
