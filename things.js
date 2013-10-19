@@ -234,8 +234,12 @@ function FireBall(me, moveleft) {
 }
 function fireEnemy(enemy, me) {
   if(!me.alive || me.emerging || enemy.nofire || enemy.height <= unitsize) return;
-  playLocal("Kick.wav", me.right);
-  if(!enemy.solid) {
+
+  if(enemy.solid) {
+    playLocal("Bump.wav", me.right);
+  }
+  else {
+    playLocal("Kick.wav", me.right);
     enemy.death(enemy, 2);
     scoreEnemyFire(enemy);
   }
@@ -2563,7 +2567,7 @@ function endLevelPoints(me, detector) {
   // Determine the number of fireballs (1, 3, and 6 become not 0)
   var numfire = getLast(String(data.time.amount));
   if(!(numfire == 1 || numfire == 3 || numfire == 6)) numfire = 0;
-  
+
   // Count down the points (x50)
   var points = setInterval(function() {
     // 50 for each
@@ -2588,7 +2592,7 @@ function endLevelFireworks(me, numfire, detector) {
     // var castlemid = detector.castle.left + detector.castle.width * unitsized2;
     var castlemid = detector.left + 32 * unitsized2;
     while(i < numfire)
-      explodeFirework(i++, castlemid);
+      explodeFirework(++i, castlemid); //pre-increment since explodeFirework expects numbers starting at 1
     nextnum = timer * (i + 2) * 42;
   }
   else nextnum = 0;
@@ -2604,7 +2608,6 @@ function endLevelFireworks(me, numfire, detector) {
 }
 function explodeFirework(num, castlemid) {
   setTimeout(function() {
-    if(!map.ending) return;
     var fire = new Thing(Firework, num);
     addThing(fire, castlemid + fire.locs[0] - unitsize * 6, unitsizet16 + fire.locs[1]);
     fire.animate();
