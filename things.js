@@ -1821,7 +1821,7 @@ function gameOver() {
   gameon = false;
   pause();
   pauseTheme();
-  play("Game Over.mp3");
+  play("Game Over");
   
   var innerHTML = "<div style='font-size:49px;padding-top: " + (innerHeight / 2 - 28/*49*/) + "px'>GAME OVER</div>";
   // innerHTML += "<p style='font-size:14px;opacity:.49;width:490px;margin:auto;margin-top:49px;'>";
