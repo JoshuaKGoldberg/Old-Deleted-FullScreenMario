@@ -1712,7 +1712,7 @@ function marioStar(me) {
   if(me.star) return;
   ++me.star;
   play("Powerup");
-  playTheme("Starman", true);
+  playTheme("Star", true);
   addEvent(marioRemoveStar, 560, me);
   switchClass(me, "normal", "star");
   addSpriteCycle(me, ["star1", "star2", "star3", "star4"], "star", 5);
