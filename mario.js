@@ -142,6 +142,11 @@ function resetGameState(nocount) {
   resetQuadrants();
   // Keep a history of pressed keys
   window.gamehistory = [];
+  // Keep a history of pressed keys
+  window.gamehistory = [];
+  // Clear audio
+  pauseAllSounds();
+  sounds = {};
 }
 
 function scrollWindow(x, y) {
