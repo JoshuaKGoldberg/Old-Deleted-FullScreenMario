@@ -683,11 +683,13 @@ function resetLibrary() {
         "Underwater",
         "Underworld",
         "Star",
+        "Sky",
         "Hurry Castle",
         "Hurry Overworld",
         "Hurry Underwater",
         "Hurry Underworld",
-        "Hurry Star"
+        "Hurry Star",
+        "Hurry Sky"
       ]
     }
   };
