@@ -1123,11 +1123,11 @@ function World11(map) {
       greeter += "</div>";
       greeter += "<div style='text-align:right;color:#ffcccc;margin-top:-7px'>&copy;1985 NINTENDO</div>";
       greeter += "<p id='explanation' style='text-align:center;<!--/*text-shadow:2px 2px 1px black;*/-->margin-left:7px;'>";
-      greeter += "  Arrow/WASD keys move";
+      greeter += "  Move: Arrows/WASD";
       greeter += "  <br>";
-      greeter += "  Shift to fire/sprint";
+      greeter += "  Fire/Sprint: Shift/CTRL";
       greeter += "  <br>";
-      greeter += "  P/M to pause/mute";
+      greeter += "  Pause/Mute: P/M ";
       // greeter += "  <br>";
       // greeter += "  TOP- " + (localStorage.highscore || "000000");
       greeter += "</p>";
