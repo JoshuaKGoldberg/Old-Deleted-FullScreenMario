@@ -81,8 +81,8 @@ function updateDataTime(me) {
 function updateDataElement(me) {
   var text = me.name + "<br />" + (me.amount == "Infinity" ? "Inf" : me.amount);
   me.element.innerHTML = text;
-  if(text.length > 14) me.element.style.width = "490px";
-  else me.element.style.width = "";
+  /*if(text.length > 14) me.element.style.width = "490px";
+  else */me.element.style.width = "";
 }
 
 
