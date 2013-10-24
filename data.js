@@ -79,8 +79,8 @@ function updateDataTime(me) {
 
 // Updates a typical DataObject to its value
 function updateDataElement(me) {
-  var text = me.name + "\n" + (me.amount == "Infinity" ? "Inf" : me.amount);
-  me.element.innerText = text;
+  var text = me.name + "<br />" + (me.amount == "Infinity" ? "Inf" : me.amount);
+  me.element.innerHTML = text;
   if(text.length > 14) me.element.style.width = "490px";
   else me.element.style.width = "";
 }
