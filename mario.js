@@ -69,14 +69,21 @@ function FullScreenMario() {
   log("It took " + (Date.now() - time_start) + " milliseconds to start.");
 }
 
-// There's no need for a real polyfill, this is just used as an array
+// To do: add in a real polyfill
 function ensureLocalStorage() {
-  if(!window.localStorage)
+  var ls_ok = false;
+  try {
+  if(!window.hasOwnProperty("localStorage"))
     window.localStorage = { crappy: true };
   
   // Some browsers (mainly IE) won't allow it on a local machine anyway
-  if(!window.localStorage) {
-    var nope = document.body.innerText = "It seems your browser does not allow localStorage locally!";
+  if(window.localStorage) ls_ok = true;
+ }
+ catch(err) {
+    ls_ok = false;
+  }
+  if(!ls_ok) {
+    var nope = document.body.innerText = "It seems your browser does not allow localStorage!";
     throw nope;
   }
 }
