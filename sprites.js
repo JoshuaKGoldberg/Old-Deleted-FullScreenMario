@@ -179,7 +179,7 @@ function getSpriteFromLibrary(thing) {
       return;
     }
     // If it's more complicated, search for it
-    if(sprite.constructor != Uint8ClampedArray) {
+    if(sprite.constructor.name != Uint8ArrayName) {
       sprite = findSpriteInLibrary(thing, sprite, classes);
     }
       
@@ -246,7 +246,7 @@ function expandObtainedSpriteMultiple(sprites, thing, width, height) {
   // Expand each array from the multiple sprites to parsed
   for(part in sprites) {
     // If it's an actual sprite array, parse it
-    if((sprite = sprites[part]) instanceof Uint8ClampedArray) {
+    if((sprite = sprites[part]).constructor.name == Uint8ArrayName) {
       ++thing.num_sprites;
       parsed[part] = expandObtainedSprite(sprite, thing, width, height, true);
     }
@@ -295,7 +295,7 @@ function findSpriteInLibrary(thing, current, classes) {
         nogood = false;
         switch(check.constructor.name) {
           // If it's a sprite array, you've found it.
-          case "Uint8ClampedArray":  case "SpriteMultiple":
+          case Uint8ArrayName:  case "SpriteMultiple":
             return check;
           // If it's an object, recurse normally
           case "Object": 
@@ -312,7 +312,7 @@ function findSpriteInLibrary(thing, current, classes) {
     if(!nogood && current) {
       switch(current.constructor.name) {
         // You did it!
-        case "Uint8ClampedArray": case "SpriteMultiple": return current;
+        case Uint8ArrayName: case "SpriteMultiple": return current;
         // Keep going
         case "Object": 
           continue;

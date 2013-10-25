@@ -32,8 +32,11 @@ function FullScreenMario() {
                            || window.msCancelRequestAnimationFrame
                            || clearTimeout;
 
-  // THANKS INTERNET EXPLORER
-  if(!window.Uint8ClampedArray) window.Uint8ClampedArray = Array;
+  window.Uint8ClampedArray = window.Uint8ClampedArray
+                          || window.Uint8Array
+                          || Array;
+  // Because the shiv will mess this up for sprites.js detection                          
+  window.Uint8ArrayName = Uint8ClampedArray.name || "Uint8Array"; // ie
 
   // Resetting everything may take a while
   resetMeasurements();

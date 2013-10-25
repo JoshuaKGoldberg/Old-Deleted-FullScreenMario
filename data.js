@@ -1,6 +1,6 @@
 /* Data.js */
 // A few functions to store and display ~persistent data
-"use strict";
+// "use strict";
 
 // window.data stores the references to data and elements
 function resetData() {
