@@ -1,10 +1,6 @@
 /* Load.js */
 // Maps and sounds are loaded via AJAX
 
-function load() {
-  log("Will have to take this out of ui.js...");
-}
-
 /* Maps */
 
 function startLoadingMaps() {

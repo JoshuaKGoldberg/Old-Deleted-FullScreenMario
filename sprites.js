@@ -295,7 +295,7 @@ function findSpriteInLibrary(thing, current, classes) {
         nogood = false;
         switch(check.constructor.name) {
           // If it's a sprite array, you've found it.
-          case Uint8ArrayName:  case "SpriteMultiple":
+          case Uint8ArrayName: case "SpriteMultiple":
             return check;
           // If it's an object, recurse normally
           case "Object": 
