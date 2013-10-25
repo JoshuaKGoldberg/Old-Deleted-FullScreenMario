@@ -1125,7 +1125,7 @@ function World11(map) {
       greeter += "<p id='explanation' style='text-align:center;<!--/*text-shadow:2px 2px 1px black;*/-->margin-left:7px;'>";
       greeter += "  Move: Arrows/WASD";
       greeter += "  <br>";
-      greeter += "  Fire/Sprint: Shift/CTRL";
+      greeter += "  Fire/Sprint: S<small>hift</small>/C<small>TRL</small>";
       greeter += "  <br>";
       greeter += "  Pause/Mute: P/M ";
       // greeter += "  <br>";
