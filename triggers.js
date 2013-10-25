@@ -4,16 +4,23 @@
 function resetTriggers() {
   // Make the controls object
   window.controls = new Controls({
-    left: [37, 65],       // a,     left
-    right: [39, 68],      // d,     right
-    up: [38, 87, 32],     // w,     up
-    down: [40, 83],       // s,     down
-    sprint: [16, 17],     // shift, ctrl
-    pause: [80],          // p
-    mute: [77],           // m
-    qcount: [81]          // q
+    left: [37, 65, "AXIS_LEFT", "DPAD_LEFT"],       // a,     left
+    right: [39, 68, "AXIS_RIGHT", "DPAD_RIGHT"],    // d,     right
+    up: [38, 87, 32, "FACE_2"],                     // w,     up
+    down: [40, 83, "AXIS_DOWN", "DPAD_DOWN"],       // s,     down
+    sprint: [16, 17, "FACE_1"],                     // shift, ctrl
+    pause: [80, "START_FORWARD"],                   // p
+    mute: [77],                                     // m
+    qcount: [81]                                    // q
   });
-  
+
+  // Gamepad support via gamepad.js
+  // https://github.com/kallaspriit/HTML5-JavaScript-Gamepad-Controller-Library
+  window.gamepad = new Gamepad();
+  gamepad.bind(Gamepad.Event.BUTTON_DOWN, ControlsPipe("keydown", true));
+  gamepad.bind(Gamepad.Event.BUTTON_UP, ControlsPipe("keyup", false));
+  gamepad.init();
+
   // Set the key events on the body
   proliferate(body, {
       onkeydown: ControlsPipe("keydown", true),
@@ -24,10 +31,10 @@ function resetTriggers() {
 }
 
 // Hash table for onkeydown and onkeyup
-function Controls(pipes) {
+function Controls(pipes, gamepadPipes) {
   // Pipes is a listing of which actions are piped to by which character codes
   this.pipes = pipes;
-  
+
   // Actions are piped to the corresponding keydown or keyup via the corresponding ControlsPipe
   var keydown = this.keydown = {
     // Left
@@ -113,12 +120,12 @@ function Controls(pipes) {
       unpause(true);
     },
   }
-  
+
   var tag, codes, code, i;
   // Map each character code in pipes to the corresponding key event
   // For each tag ("up", "down"...)
   for(tag in pipes) {
-    // For each array of character codes, like 38 (up) or 40 (down) 
+    // For each array of character codes, like 38 (up) or 40 (down)
     codes = pipes[tag];
     for(i in codes) {
       code = codes[i];
@@ -135,17 +142,17 @@ function ControlsPipe(name, strict) {
   var responses = controls[name];
   return function(event) {
     if((strict && ((mario && mario.dead) || window.paused)) || window.nokeys) return;
-    
+
     // Allow this to be used as keyup(37) or keyup({which: 37})
-    if(typeof(event) != "number" || event.which)
-      event = event.which;
-    
+    if(typeof(event) != "number" || event.which || event.control)
+      event = event.which || event.control;
+
     // If there is a known response to this character code, do it
     if(responses[event])
       responses[event](mario.keys);
     // Otherwise only complain if verbosity[name] is true
     else mlog(name, "Could not", name,  event);
-    
+
     // Record this in the history
     window.gamehistory[gamecount] = [keydown, event];
   }
@@ -153,21 +160,21 @@ function ControlsPipe(name, strict) {
 
 function keydown(event) {
   if((mario && mario.dead) || window.paused || window.nokeys) return;
-  
+
   // Allow this to be used as keyup(37) or keyup({which: 37})
   if(typeof(event) != "number" || event.which)
     event = event.which;
-  
+
   window.gamehistory[gamecount] = [keydown, event];
 }
 
 function keyup(event) {
   if(window.nokeys) return;
-  
+
   // Allow this to be used as keyup(37) or keyup({which: 37})
   if(typeof(event) != "number" || event.which)
     event = event.which;
-  
+
   window.gamehistory[gamecount] = [keyup, event];
 }
 
