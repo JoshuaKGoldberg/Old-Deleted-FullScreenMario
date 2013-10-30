@@ -1106,8 +1106,22 @@ function World11(map) {
     new Location(1)
   ];
   map.areas = [
-    new Area("Overworld", function() {
+    new Area("Castle Night Alt2", function() {
       setLocationGeneration(0);
+      
+      addEventInterval(function() {
+        var boo = document.getElementById("boo");
+        if(!boo) return true;
+        console.log("durp");
+        if(boo.boo_on) {
+          boo.innerHTML = "&copy;1985 NINTENDO";
+          boo.boo_on = false;
+        }
+        else {
+          boo.innerHTML = "&copy;1985 LAWYERS";
+          boo.boo_on = true;
+        }
+      }, 140, Infinity);
       
       var greeter = "";
       greeter += "<div style='width:350px;max-height:189px;background-color:#d64d00;border-radius:7px;box-shadow:3px 3px #efb28b inset, -3px -3px black inset;";
@@ -1116,16 +1130,16 @@ function World11(map) {
       greeter += "background-position: 7px 7px, 336px 7px, 7px 168px, 336px 168px";
       greeter += "'>";
       greeter += "  <p style='text-align:left;padding:7px 0 11px 11px;color:#ffcccc;font-family: Super Plumber Bros;font-size:77px;text-shadow:3px 8px black'>";
-      greeter += "    <span style='font-size:84px'>super</span>";
+      greeter += "    <span style='font-size:84px'>scary</span>";
       greeter += "    <br><br>"; // To do: make this not so font dependant
       greeter += "    <span style='font-size:81px;line-height:96px'>MARIO BROS.</span>";
       greeter += "  </p>";
       greeter += "</div>";
-      greeter += "<div style='text-align:right;color:#ffcccc;margin-top:-7px'>&copy;1985 NINTENDO</div>";
+      greeter += "<div id='boo' style='text-align:right;color:#ffcccc;margin-top:-7px;width:350px;height:35px;'>&copy;1985 NINTENDO</div>";
       greeter += "<p id='explanation' style='text-align:center;<!--/*text-shadow:2px 2px 1px black;*/-->margin-left:7px;'>";
       greeter += "  Move: Arrows/WASD";
       greeter += "  <br>";
-      greeter += "  Fire/Sprint: S<small>hift</small>/C<small>TRL</small>";
+      greeter += "  Fire/Sprint: Shift/CTRL";
       greeter += "  <br>";
       greeter += "  Pause/Mute: P/M ";
       // greeter += "  <br>";
