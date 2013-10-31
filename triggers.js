@@ -6,10 +6,10 @@ function resetTriggers() {
   window.controls = new Controls({
     left: [37, 65, "AXIS_LEFT", "DPAD_LEFT"],       // a,     left
     right: [39, 68, "AXIS_RIGHT", "DPAD_RIGHT"],      // d,     right
-    up: [38, 87, 32, "FACE_2"],     // w,     up
+    up: [38, 87, 32, "FACE_1", "DPAD_UP", "LEFT_BOTTOM_SHOULDER"],     // w,     up
     down: [40, 83, "AXIS_DOWN", "DPAD_DOWN"],       // s,     down
-    sprint: [16, 17, "FACE_1"],     // shift, ctrl
-    pause: [80, "START_FORWARD"],          // p
+    sprint: [16, 17, "FACE_3", "RIGHT_BOTTOM_SHOULDER"],     // shift, ctrl
+    pause: [80, "START_FORWARD", "SELECT_BACK"],          // p
     mute: [77],           // m
     qcount: [81]          // q
   });
@@ -17,6 +17,40 @@ function resetTriggers() {
 window.gamepad = new Gamepad();
 gamepad.bind(Gamepad.Event.BUTTON_DOWN, ControlsPipe("keydown", true));
 gamepad.bind(Gamepad.Event.BUTTON_UP, ControlsPipe("keyup", false));
+gamepad.bind(Gamepad.Event.AXIS_CHANGED, function(e)
+{
+  if (Math.abs(e.value) < 0.1) return;
+  if (e.axis === "LEFT_STICK_Y")
+  {
+    if (Math.abs(e.value) > 0.5)
+    {
+      if (e.value > 0)
+      {
+        keydown("DPAD_DOWN");
+      } else {
+        keydown("DPAD_UP");
+      }
+    } else {
+      keyup("DPAD_UP");
+      keyup("DPAD_DOWN");
+    }
+  } else if (e.axis === "LEFT_STICK_X")
+  {
+    if (Math.abs(e.value) > 0.5)
+    {
+      if (e.value > 0)
+      {
+        keydown("DPAD_LEFT");
+      } else {
+        keydown("DPAD_RIGHT");
+      }
+    } else {
+      keyup("DPAD_LEFT");
+      keyup("DPAD_RIGHT");
+    }
+  }
+});
+
 gamepad.init();
 
   // Set the key events on the body
@@ -153,25 +187,29 @@ function ControlsPipe(name, strict) {
 
     // Record this in the history
     window.gamehistory[gamecount] = [keydown, event];
-  }
+  };
 }
 
 function keydown(event) {
   if((mario && mario.dead) || window.paused || window.nokeys) return;
-
+  var responses = controls["keydown"];
   // Allow this to be used as keyup(37) or keyup({which: 37})
-  if(typeof(event) != "number" || event.which)
+  if(typeof(event) === "object" || event.which)
     event = event.which;
+  if(responses[event])
+      responses[event](mario.keys);
 
   window.gamehistory[gamecount] = [keydown, event];
 }
 
 function keyup(event) {
   if(window.nokeys) return;
-
+  var responses = controls["keyup"];
   // Allow this to be used as keyup(37) or keyup({which: 37})
-  if(typeof(event) != "number" || event.which)
+  if(typeof(event) === "object" || event.which)
     event = event.which;
+  if(responses[event])
+      responses[event](mario.keys);
 
   window.gamehistory[gamecount] = [keyup, event];
 }
