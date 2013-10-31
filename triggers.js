@@ -4,14 +4,14 @@
 function resetTriggers() {
   // Make the controls object
   window.controls = new Controls({
-    left: [37, 65, "AXIS_LEFT", "DPAD_LEFT"],       // a,     left
-    right: [39, 68, "AXIS_RIGHT", "DPAD_RIGHT"],    // d,     right
-    up: [38, 87, 32, "FACE_2"],                     // w,     up
-    down: [40, 83, "AXIS_DOWN", "DPAD_DOWN"],       // s,     down
+    left:   [37, 65, "AXIS_LEFT", "DPAD_LEFT"],     // a,     left
+    right:  [39, 68, "AXIS_RIGHT", "DPAD_RIGHT"],   // d,     right
+    up:     [38, 87, 32, "FACE_2"],                 // w,     up,    space
+    down:   [40, 83, "AXIS_DOWN", "DPAD_DOWN"],     // s,     down
     sprint: [16, 17, "FACE_1"],                     // shift, ctrl
-    pause: [80, "START_FORWARD"],                   // p
-    mute: [77],                                     // m
-    qcount: [81]                                    // q
+    pause:  [80, "START_FORWARD"],                  // p
+    mute:   [77],                                   // m
+    q:      [81]                                    // q
   });
 
   // Gamepad support via gamepad.js
