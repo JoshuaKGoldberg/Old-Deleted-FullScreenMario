@@ -8,8 +8,8 @@ function resetTriggers() {
     right: [39, 68, "AXIS_RIGHT", "DPAD_RIGHT"],      // d,     right
     up: [38, 87, 32, "FACE_1", "DPAD_UP", "LEFT_BOTTOM_SHOULDER"],     // w,     up
     down: [40, 83, "AXIS_DOWN", "DPAD_DOWN"],       // s,     down
-    sprint: [16, 17, "FACE_3", "RIGHT_BOTTOM_SHOULDER"],     // shift, ctrl
-    pause: [80, "START_FORWARD", "SELECT_BACK"],          // p
+    sprint: [16, 17, "FACE_1"],     // shift, ctrl
+    pause: [80, "START_FORWARD"],          // p
     mute: [77],           // m
     qcount: [81]          // q
   });
