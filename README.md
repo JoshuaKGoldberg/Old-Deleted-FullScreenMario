@@ -115,7 +115,26 @@ Map Shifting
   
 </table>
 
-Developers
-----------
+
+Level Editor
+------------
+
+<table>
+  
+  <tr>
+    <td>
+      <code>loadEditor()</code>
+    </td>
+    <td>
+      Starts the in-game level editor.
+    </td>
+  </tr>
+  
+</table>
+
+Developers & Legal
+------------------
 
 This is released under the <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Attribution Non-Commercial Share-Alike</a> license. Full Screen Mario is meant to be both a proof of concept and an entertaining pasttime, not a source of income</a>.
+
+The whole project was originally hosted under www.fullscreenmario.com, but that site was taken down by Nintendo for copyright infringement.

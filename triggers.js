@@ -29,7 +29,7 @@ function resetTriggers() {
   switch(event.axis) {
     // Left stick, vertical
     case "LEFT_STICK_Y":
-    // case "RIGHT_STICK_Y":
+    case "RIGHT_STICK_Y":
       // If it actually has a direction, either go up or down
       if(value_abs > 0.5) {
         keydown(value > 0 ? "DPAD_DOWN" : "DPAD_UP");
@@ -42,10 +42,10 @@ function resetTriggers() {
     break;
     // Left stick, horizontal
     case "LEFT_STICK_X":
-    // case "RIGHT_STICK_X":
+    case "RIGHT_STICK_X":
       // If it actually has a direction, either go left or right
       if(value_abs > 0.5) {
-        keydown(value > 0 ? "DPAD_LEFT" : "DPAD_RIGHT");
+        keydown(value < 0 ? "DPAD_LEFT" : "DPAD_RIGHT");
       }
       // It doesn't have a direction, so they're both unpressed
       else {
