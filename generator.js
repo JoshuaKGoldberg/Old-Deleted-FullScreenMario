@@ -254,7 +254,7 @@ function pushRandomSectionPreCastle(xloc, num) {
   pushPreFloor(xloc + bwidth * 8, 0, i + 3 - bwidth);
   
   var next = 4 + randTrue(3);
-  if(num >= (4 + randTrue(3))) endCastleOutsideRandom(xloc + (bwidth + next + 1) * 8, true);
+  if(num >= 3) endCastleOutsideRandom(xloc + (bwidth + next + 1) * 8, true);
   else pushRandomSectionPreCastle(xloc + (bwidth + next) * 8, num + 1);
   
   spawnMap();
@@ -293,7 +293,7 @@ function endCastleOutsideRandom(xloc) {
   }
   
   pushPreFloor(xloc + (leadwidth + 2) * 8, 0, round(gamescreen.width / 8));
-  endCastleOutside(xloc + (leadwidth + nextwidth) * 8 + 4, 0, 0, round(gamescreen.width / 8));
+  endCastleOutside(xloc + (leadwidth + nextwidth) * 8 + 4, 0, true, round(gamescreen.width / 8));
 }
 
 function startRandomSectionCastle(xloc) {
@@ -967,7 +967,9 @@ function prepareNextGeneratorStandard(xloc, bwidth, func, allow_platforms, no_un
   // }
   // else map.needs_floor = false;
   
-  if(func == pushRandomSectionOverworld && map.num_random_sections > 14) func = pushRandomSectionPreCastle;
+  if(func == pushRandomSectionOverworld && (map.num_random_sections >= 3 || randTrue(7)))
+    func = pushRandomSectionPreCastle;
+  
   if(!no_unusuals && ++map.sincechange > 3) {
     func = getRandomNextSection();
     map.sincechange = 0;

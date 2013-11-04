@@ -1437,7 +1437,7 @@ function marioGetsSmall(me) {
   addEvent(function(mario) {
     removeClass(mario, "large");
     setMarioSizeSmall(mario);
-    setBottom(mario, bottom - unitsized2);
+    setBottom(mario, bottom - unitsize);
   }, 21, mario);
   // Step three (t+42)
   addEvent(function(mario) {

@@ -792,7 +792,7 @@ function emergeUp(me, solid) {
 }
 
 function flicker(me, cleartime, interval) {
-  var cleartime = round(cleartime) || 21,
+  var cleartime = round(cleartime) || 49,
       interval = round(interval) || 3;
   me.flickering = true;
   addEventInterval(function(me) { me.hidden = !me.hidden; }, interval, cleartime, me);
