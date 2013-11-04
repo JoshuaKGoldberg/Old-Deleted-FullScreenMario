@@ -18,7 +18,6 @@ function resetTriggers() {
   window.gamepad = new Gamepad();
   gamepad.bind(Gamepad.Event.BUTTON_DOWN, ControlsPipe("keydown", true));
   gamepad.bind(Gamepad.Event.BUTTON_UP, ControlsPipe("keyup", false));
-  // Thanks to Allen Cook for this function!
   gamepad.bind(Gamepad.Event.AXIS_CHANGED, function(event) {
   var value = event.value,
       value_abs = abs(value);

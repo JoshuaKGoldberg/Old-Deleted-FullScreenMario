@@ -10,7 +10,8 @@ map.areas = [
     setLocationGeneration(0);
     
     pushPreCastle();
-    pushPreScenery("Castle", -1 * unitsizet4, castlev);
+    // pushPreScenery("Castle", -1 * unitsizet4, castlev);
+    pushPreCastle(0, 0);
     pushPrePattern("backfence", -384, 0, 4);
     pushPrePattern("backfence", 1152, 0, 2);
     pushPreFloor(0, 0, 26);
