@@ -188,6 +188,7 @@ function Mushroom(me, type) {
   me.collide = collideFriendly;
   me.jump = mushroomJump;
   me.death = killNormal;
+  me.nofire = true;
   
   var name = "mushroom";
   switch(type) {
