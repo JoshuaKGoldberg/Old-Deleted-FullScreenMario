@@ -967,7 +967,7 @@ function prepareNextGeneratorStandard(xloc, bwidth, func, allow_platforms, no_un
   // }
   // else map.needs_floor = false;
   
-  if(func == pushRandomSectionOverworld && (map.num_random_sections >= 3 || randTrue(7)))
+  if(func == pushRandomSectionOverworld && (map.num_random_sections >= 3 + randTrue(7)))
     func = pushRandomSectionPreCastle;
   
   if(!no_unusuals && ++map.sincechange > 3) {

@@ -3302,7 +3302,7 @@ function World62(map) {
       setLocationGeneration(0);
       
       pushPreCastle();
-      pushPrePattern("backreg", 0, 0, 4);
+      pushPrePattern("backreg", 0, 0, 5);
       pushPreFloor(0, 0, 123);
       fillPreThing(Brick, 80, jumplev1, 3, 1, 8);
       pushPrePipe(152, 0, 32, true, 5); // enter first underworld

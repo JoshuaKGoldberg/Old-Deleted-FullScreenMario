@@ -1,62 +1,63 @@
 /* Triggers.js */
-// Keeps track of triggers, which mainly consist of key presses
+// Keeps track of triggers, which mainly consist of key presses,
+// and messages, which would be from an index.html UI
 
 function resetTriggers() {
   // Make the controls object
   window.controls = new Controls({
-    left:   [37, 65, "AXIS_LEFT", "DPAD_LEFT"],                         // a,     left
-    right:  [39, 68, "AXIS_RIGHT", "DPAD_RIGHT"],                       // d,     right
-    up:     [38, 87, 32, "FACE_1", "DPAD_UP", "LEFT_BOTTOM_SHOULDER"],  // w,     up
-    down:   [40, 83, "AXIS_DOWN", "DPAD_DOWN"],                         // s,     down
-    sprint: [16, 17, "FACE_1"],                                         // shift, ctrl
-    pause:  [80, "START_FORWARD"],                                      // p
-    mute:   [77],                                                       // m
-    q:      [81]                                                        // q
+    left:   [37, 65,      "AXIS_LEFT", "DPAD_LEFT"],                     // a,     left
+    right:  [39, 68,      "AXIS_RIGHT", "DPAD_RIGHT"],                   // d,     right
+    up:     [38, 87, 32,  "FACE_1", "DPAD_UP", "LEFT_BOTTOM_SHOULDER"],  // w,     up
+    down:   [40, 83,      "AXIS_DOWN", "DPAD_DOWN"],                     // s,     down
+    sprint: [16, 17,      "FACE_1"],                                     // shift, ctrl
+    pause:  [80,          "START_FORWARD"],                              // p
+    mute:   [77],                                                        // m
+    q:      [81]                                                         // q
   });
-
   
+  // Gamepad.js support for joysticks and controllers
   window.gamepad = new Gamepad();
   gamepad.bind(Gamepad.Event.BUTTON_DOWN, ControlsPipe("keydown", true));
   gamepad.bind(Gamepad.Event.BUTTON_UP, ControlsPipe("keyup", false));
   gamepad.bind(Gamepad.Event.AXIS_CHANGED, function(event) {
-  var value = event.value,
-      value_abs = abs(value);
-  
-  // Don't allow tremors
-  if(value_abs < 0.1) return;
-  
-  // Depending on the axis used...
-  switch(event.axis) {
-    // Left stick, vertical
-    case "LEFT_STICK_Y":
-    case "RIGHT_STICK_Y":
-      // If it actually has a direction, either go up or down
-      if(value_abs > 0.5) {
-        keydown(value > 0 ? "DPAD_DOWN" : "DPAD_UP");
-      }
-      // It doesn't have a direction, so they're both unpressed
-      else {
-        keyup("DPAD_UP");
-        keyup("DPAD_DOWN");
-      }
-    break;
-    // Left stick, horizontal
-    case "LEFT_STICK_X":
-    case "RIGHT_STICK_X":
-      // If it actually has a direction, either go left or right
-      if(value_abs > 0.5) {
-        keydown(value < 0 ? "DPAD_LEFT" : "DPAD_RIGHT");
-      }
-      // It doesn't have a direction, so they're both unpressed
-      else {
-        keyup("DPAD_UP");
-        keyup("DPAD_DOWN");
-      }
-    break;
-  }
-});
+    var value = event.value,
+        value_abs = abs(value);
+    
+    // Don't allow tremors
+    if(value_abs < 0.1) return;
+    
+    // Depending on the axis used...
+    switch(event.axis) {
+      // Left stick, vertical
+      case "LEFT_STICK_Y":
+      case "RIGHT_STICK_Y":
+        // If it actually has a direction, either go up or down
+        if(value_abs > 0.5) {
+          keydown(value > 0 ? "DPAD_DOWN" : "DPAD_UP");
+        }
+        // It doesn't have a direction, so they're both unpressed
+        else {
+          keyup("DPAD_UP");
+          keyup("DPAD_DOWN");
+        }
+      break;
+      // Left stick, horizontal
+      case "LEFT_STICK_X":
+      case "RIGHT_STICK_X":
+        // If it actually has a direction, either go left or right
+        if(value_abs > 0.5) {
+          keydown(value < 0 ? "DPAD_LEFT" : "DPAD_RIGHT");
+        }
+        // It doesn't have a direction, so they're both unpressed
+        else {
+          keyup("DPAD_UP");
+          keyup("DPAD_DOWN");
+        }
+      break;
+    }
+  });
 
-gamepad.init();
+  gamepad.init();
 
   // Set the key events on the body
   proliferate(body, {
@@ -65,6 +66,9 @@ gamepad.init();
       oncontextmenu: contextmenu,
       onmousedown: mousedown
     });
+  
+  // Set UI triggers
+  setMessageTriggers();
 }
 
 // Hash table for onkeydown and onkeyup
@@ -269,4 +273,36 @@ function maxlulz() {
   addEventInterval(function(arr) {
       setAreaSetting(arr[randInt(arr.length)]);
     }, 7, Infinity, ["Overworld", "Underworld", "Underwater", "Sky", "Castle"]);
+}
+
+
+
+/* Triggers (from a UI)
+*/
+function setMessageTriggers() {
+  // Commands will be sent in by these codes
+  var command_codes = {
+    setMap: triggerSetMap,
+    startEditor: function() { loadEditor(); }
+  };
+  
+  // When a message is received, send it to the appropriate command code
+  window.addEventListener("message", function(event) {
+    var data = event.data,
+        type = data.type;
+    // If the type is known, do it
+    if(command_codes[type])
+      command_codes[type](data);
+    // Otherwise complain
+    else {
+      console.log("Unknown event type received:", type, ".\n", data);
+    }
+  });
+}
+
+// The UI has requested a map change
+function triggerSetMap(data) {
+  clearMarioStats();
+  setMap.apply(this, data.map || []);
+  setLives(3);
 }
