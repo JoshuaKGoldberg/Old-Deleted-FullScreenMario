@@ -2290,6 +2290,8 @@ function CastleAxeFalls(me, collider) {
   killOtherCharacters();
   addEvent(killNormal, 7, axe.chain);
   addEvent(CastleAxeKillsBridge, 14, axe.bridge, axe);
+  pauseTheme();
+  playTheme("World Clear", false, false);
 }
 // Step 2 of getting to that jerkface Toad
 function CastleAxeKillsBridge(bridge, axe) {
