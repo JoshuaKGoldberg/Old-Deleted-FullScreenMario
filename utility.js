@@ -726,7 +726,7 @@ function killNormal(me) {
   if(!me) return;
   me.hidden = me.dead = true;
   me.alive = me.resting = me.movement = false;
-  clearAllCycles(me);
+  EventHandler.clearAllCycles(me);
 }
 function killFlip(me, extra) {
   flipVert(me);
@@ -734,7 +734,7 @@ function killFlip(me, extra) {
   me.nocollide = me.dead = true;
   me.resting = me.movement = me.speed = me.xvel = me.nofall = false;
   me.yvel = -unitsize;
-  addEvent(function(me) { killNormal(me); }, 70 + (extra || 0));
+  EventHandler.addEvent(function(me) { killNormal(me); }, 70 + (extra || 0));
 }
 
 // To do: phase this out in favor of an addEvent-based one
@@ -780,9 +780,9 @@ function emergeUp(me, solid) {
             me.movementsave = me.movement;
             me.movement = moveSimple;
             // Wait until it's off the solid
-            me.moving = addEventInterval(function(me, solid) {
+            me.moving = EventHandler.addEventInterval(function(me, solid) {
               if(me.resting != solid) {
-                addEvent(function(me) { me.movement = me.movementsave; }, 1, me);
+                EventHandler.addEvent(function(me) { me.movement = me.movementsave; }, 1, me);
                 return true;
               }
             }, 1, Infinity, me, solid);
@@ -795,8 +795,8 @@ function flicker(me, cleartime, interval) {
   var cleartime = round(cleartime) || 49,
       interval = round(interval) || 3;
   me.flickering = true;
-  addEventInterval(function(me) { me.hidden = !me.hidden; }, interval, cleartime, me);
-  addEvent(function(me) { me.flickering = me.hidden = false; }, cleartime * interval + 1, me);
+  EventHandler.addEventInterval(function(me) { me.hidden = !me.hidden; }, interval, cleartime, me);
+  EventHandler.addEvent(function(me) { me.flickering = me.hidden = false; }, cleartime * interval + 1, me);
 }
 
 // Kills all characters other than mario
@@ -804,14 +804,18 @@ function flicker(me, cleartime, interval) {
 // Also kills all moving solids
 function killOtherCharacters() {
   var thing, i;
-  for(i = characters.length - 1; i >= 0; --i) {
-    thing = characters[i];
-    if(!thing.nokillend) deleteThing(thing, characters, i);
-    else if(thing.killonend) thing.killonend(thing);
+  if(window.characters) {
+    for(i = characters.length - 1; i >= 0; --i) {
+      thing = characters[i];
+      if(!thing.nokillend) deleteThing(thing, characters, i);
+      else if(thing.killonend) thing.killonend(thing);
+    }
   }
-  for(i = solids.length - 1; i >= 0; --i)
-    if(solids[i].killonend)
-      deleteThing(solids[i], solids, i);
+  if(window.solids) {
+    for(i = solids.length - 1; i >= 0; --i)
+      if(solids[i].killonend)
+        deleteThing(solids[i], solids, i);
+  }
 }
 
 function lookTowardMario(me, big) {

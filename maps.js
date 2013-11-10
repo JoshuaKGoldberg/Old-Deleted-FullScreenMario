@@ -217,15 +217,16 @@ function shiftToLocation(loc) {
   // Typically this will do nothing or be from a pipe
   loc.entry(mario, loc.entrything);
   // Don't forget the least annoying part of programming this!
-  addEvent(playTheme, 2);
+  EventHandler.addEvent(playTheme, 2);
   
   // Texts are bound-check checked periodically for peformance reasons
-  addEventInterval(checkTexts, 117, Infinity);
+  EventHandler.addEventInterval(checkTexts, 117, Infinity);
 }
 // To do: add in other stuff
 function setAreaPreCreation(area) {
   // Clear the containers
   window.events = [];
+  EventHandler.clearAllEvents();
   window.characters = [];
   window.solids = [];
   window.scenery = [];
@@ -263,7 +264,7 @@ function setAreaPostCreation() {
   map.underwater = map.area.underwater;
   map.jumpmod = 1.056 + 3.5 * map.underwater;
   map.has_lakitu = false;
-  addEvent(setMapGravity, 1);
+  EventHandler.addEvent(setMapGravity, 1);
   
   // If it's underwater, give it the waves on top and mario's bubble event
   if(area.underwater) {
@@ -430,7 +431,7 @@ function entryRandom(me) {
     case "Vine":
       // Do that vine stuff
       locMovePreparations(mario);
-      addEvent(function() { enterCloudWorld(mario, true); }, 1);
+      EventHandler.addEvent(function() { enterCloudWorld(mario, true); }, 1);
       mario.nofall = true;
       spawnMap();
     break;
@@ -443,23 +444,22 @@ function entryRandom(me) {
     break;
   }
 }
-function enterCloudWorld(me, nopause) {
+function enterCloudWorld(me) {
   // There are four cloud blocks to the left
   // The vine goes up until it has four blocks above the clouds, then waits 2 seconds
   // Mario climbs up the left until two blocks from the top, then switches & jumps
-  /*if(!nopause) pause();
-  else */unpause();
+  // if(paused) unpause();
   
   if(map.random) map.exitloc = getAfterSkyTransport();
   
   var screenbottom = 140 * unitsize,
       screentop = 72 * unitsize;
+  me.placed = me.nofall = true;
   setTop(me, screenbottom);
   setLeft(me, unitsize * 30);
   removeClass(me, "jumping");
   addClasses(me, ["climbing", "animated"]);
-  me.climbing = addSpriteCycleManual(me, ["one", "two"], "climbing");
-  me.nofall = true;
+  me.climbing = EventHandler.addSpriteCycle(me, ["one", "two"], "climbing");
   
   me.attached = new Thing(Vine, -1);
   addThing(me.attached, unitsizet32, screenbottom - unitsizet8);
@@ -486,9 +486,9 @@ function enterCloudWorld(me, nopause) {
             addClass(me, "flipped");
             setTimeout(function() {
               // Mario hops off
-              // unattachMario(me);
-              marioHopsOff(me, me.attached);
-              mario.cycles.climbing.push("three"); // emulates running
+              marioHopsOff(me, me.attached, true);
+              EventHandler.clearClassCycle(me, "climbing");
+              me.running = EventHandler.addSpriteCycle(me, ["one", "two", "three", "two"], "running", setMarioRunningCycler);
             }, timer * 28);
           }, timer * 14);
         }
@@ -750,8 +750,8 @@ function goUnderWater() {
       map.area.underwater = true;
     }
     setMapGravity();
-    clearEventInterval(map.bubbling);
-    map.bubbling = addEventInterval(marioBubbles, 96, Infinity);
+    EventHandler.clearEvent(map.bubbling);
+    map.bubbling = EventHandler.addEventInterval(marioBubbles, 96, Infinity);
     map.underwater = true;
   }
 }
@@ -763,7 +763,7 @@ function goOntoLand() {
       map.area.underwater = false;
     }
     setMapGravity();
-    clearEventInterval(map.bubbling);
+    EventHandler.clearEvent(map.bubbling);
     map.underwater = false;
   }
 }
@@ -2174,7 +2174,7 @@ function World31(map) {
       setLocationGeneration(4);
       pushPreThing(Stone, 0, 0, 4);
       pushPreThing(Stone, 40, 0, 78);
-      pushPreThing(PlatformTransport, 128, 24, 6, "cloud");
+      pushPreThing(Platform, 128, 24, 6, collideTransport);
       fillPreThing(Coin, 121, 55, 16, 1, 8);
       pushPreThing(Stone, 256, 40);
       fillPreThing(Coin, 273, 55, 16, 1, 8);
@@ -3057,7 +3057,7 @@ function World52(map) {
 
       pushPreThing(Clouds, 0, 0, 4);
       pushPreThing(Clouds, 40, 0, 72);
-      pushPreThing(PlatformTransport, 120, 32, 8, "cloud");
+      pushPreThing(Platform, 120, 32, 8, collideTransport);
       fillPreThing(Coin, 120, 64, 16, 1, 8);
       fillPreThing(Coin, 256, 80, 3, 1, 8);
       fillPreThing(Coin, 288, 72, 16, 1, 8);
@@ -3451,7 +3451,7 @@ function World62(map) {
       
       pushPreThing(Stone, 0, 0, 4);
       pushPreThing(Stone, 40, 0, 78);
-      pushPreThing(PlatformTransport, 128, 24, 6, "cloud");
+      pushPreThing(Platform, 128, 24, 6, collideTransport);
       fillPreThing(Coin, 121, 55, 16, 1, 8);
       pushPreThing(Stone, 256, 40);
       fillPreThing(Coin, 273, 55, 16, 1, 8);

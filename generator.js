@@ -843,7 +843,7 @@ function pushRandomSectionUnderwater(xloc) {
     if(randTrue(3)) ++map.countBlooper;
   }
   
-  if(++map.sincechange < 7) {
+  if(++map.sincechange < 3) {
     var tonext = prepareNextGeneratorStandard(xloc, bwidth, pushRandomSectionUnderwater, false, true);
     pushPreScenery("Water", xloc + bwidth * 8, ceilmax - 21, (tonext + 1) * 8 / 3, 1)
     pushPreThing(WaterBlock, xloc + bwidth * 8, ceilmax, (tonext + 1) * 8);
@@ -1167,7 +1167,7 @@ function addDistanceCounter() {
               innerText: data.traveledold + " blocks traveled"
             });
   body.appendChild(counter);
-  addEventInterval(function(counter) {
+  EventHandler.addEventInterval(function(counter) {
     data.traveled = max(0,Math.round((mario.right + gamescreen.left) / unitsizet8) - 3);
     counter.innerText = (data.traveledold + data.traveled) + " blocks traveled";
   }, 3, Infinity, counter);

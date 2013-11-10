@@ -19,18 +19,6 @@ function FullScreenMario() {
                       Sounds: false,
                       };
   
-  // Oh, HTML5.
-  // http://matt.scharley.me/2012/03/09/monkey-patch-name-ie.html
-  if(Function.prototype.name === undefined && Object.defineProperty !== undefined) {
-    Object.defineProperty(Function.prototype, 'name', {
-        get: function() {
-            var funcNameRegex = /function\s([^(]{1,})\(/,
-                results = (funcNameRegex).exec((this).toString());
-            return (results && results.length > 1) ? results[1].trim() : "";
-        },
-        set: function(value) {}
-    });
-  }
   window.requestAnimationFrame = window.requestAnimationFrame
                            || window.mozRequestAnimationFrame
                            || window.webkitRequestAnimationFrame
@@ -46,12 +34,11 @@ function FullScreenMario() {
   window.Uint8ClampedArray = window.Uint8ClampedArray
                           || window.Uint8Array
                           || Array;
-  // Because the shiv will mess this up for sprites.js detection                          
-  window.Uint8ArrayName = Uint8ClampedArray.name || "Uint8Array"; // ie
 
   // Resetting everything may take a while
   resetMeasurements();
-  resetLibrary(); // A good 300+ ms right here
+  resetLibrary();
+  resetEvents();
   resetCanvas();
   resetMaps();
   resetScenery();
@@ -151,6 +138,17 @@ function resetGameScreenPosition(me) {
   me.width = innerWidth / unitsize;
   me.unitheight = innerHeight;
   me.unitwidth = innerWidth;
+}
+
+// Events are done with EventHandlr.js
+// This helps make timing obey pauses, and makes class cycles much easier
+function resetEvents() {
+  window.EventHandler = new EventHandlr({
+    onSpriteCycleStart: "onadding",
+    doSpriteCycleStart: "placed",
+    cycleCheckValidity: "alive",
+    timingDefault: 9
+  });
 }
 
 // Variables regarding the state of the game

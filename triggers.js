@@ -242,8 +242,8 @@ function scriptKeys(oldhistory) {
   var i, entry;
   for(i in oldhistory) {
     entry = oldhistory[i];
-    addEvent(entry[0], i, entry[1]);
-    addEvent(function() { alert(entry[0].name + ", " + entry[1]) }, i);
+    EventHandler.addEvent(entry[0], i, entry[1]);
+    EventHandler.addEvent(function() { alert(entry[0].name + ", " + entry[1]) }, i);
   }
 }
 
@@ -252,7 +252,7 @@ function lulz(options, timer) {
   mario.star = true;
   options = options || [Goomba];
   timer = timer || 7;
-  addEventInterval(function() {
+  EventHandler.addEvent(function() {
     if(characters.length > 210) return;
     var lul = new Thing(options[randInt(options.length)], randBoolJS(), randBoolJS());
     lul.yvel = random() * -unitsizet4;
@@ -270,7 +270,7 @@ function maxlulz() {
   // Sigh....
   // window.palette = arrayShuffle(window.palette, 1);
   // clearAllSprites(true);
-  addEventInterval(function(arr) {
+  EventHandler.addEvent(function(arr) {
       setAreaSetting(arr[randInt(arr.length)]);
     }, 7, Infinity, ["Overworld", "Underworld", "Underwater", "Sky", "Castle"]);
 }

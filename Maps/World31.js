@@ -130,7 +130,7 @@ map.areas = [
     setLocationGeneration(4);
     pushPreThing(Stone, 0, 0, 4);
     pushPreThing(Stone, 40, 0, 78);
-    pushPreThing(PlatformTransport, 128, 24, 6, "cloud");
+    pushPreThing(Platform, 128, 24, 6, collideTransport);
     fillPreThing(Coin, 121, 55, 16, 1, 8);
     pushPreThing(Stone, 256, 40);
     fillPreThing(Coin, 273, 55, 16, 1, 8);

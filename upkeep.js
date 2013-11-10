@@ -25,7 +25,8 @@ function upkeep() {
   if(texts.length) maintainTexts();
   
   // Events upkeep
-  handleEvents();
+  EventHandler.handleEvents();
+  // handleEvents();
   
   refillCanvas();
 }
