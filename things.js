@@ -1101,7 +1101,7 @@ function moveLakituInit(me) {
   EventHandler.addEventInterval(function(me) {
     if(me.alive) throwSpiny(me);
     else return true;
-  }, 140, -1, me);
+  }, 140, Infinity, me);
   me.movement = moveLakituInit2;
   moveLakituInit2(me);
   map.has_lakitu = me;
@@ -2300,6 +2300,8 @@ function CastleAxeFalls(me, collider) {
   killOtherCharacters();
   EventHandler.addEvent(killNormal, 7, axe.chain);
   EventHandler.addEvent(CastleAxeKillsBridge, 14, axe.bridge, axe);
+  pauseTheme();
+  playTheme("World Clear", false, false);
 }
 // Step 2 of getting to that jerkface Toad
 function CastleAxeKillsBridge(bridge, axe) {

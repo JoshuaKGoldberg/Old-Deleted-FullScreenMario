@@ -61,7 +61,10 @@ function playLocal(name, xloc, main) {
 
 // Plays a theme as sounds.theme via play()
 // If no theme is provided, it plays the area's theme
-function playTheme(name_raw, resume) {
+function playTheme(name_raw, resume, loop) {
+  // set loop default to true
+  loop = typeof loop !== 'undefined' ? loop : true;
+
   // First make sure there isn't already a theme playing
   if(sound = sounds.theme) {
     soundStop(sound);
@@ -74,7 +77,12 @@ function playTheme(name_raw, resume) {
   
   // This creates the sound.
   var sound = sounds.theme = play(name_raw);
-  sound.loop = true;
+
+  if (loop) {
+    sound.loop = true;
+  } else {
+    sound.loop = false;
+  } 
   
   // If it's only used once, add the event listener to resume theme
   if(sound.used == 1) sound.addEventListener("ended", playTheme);
