@@ -85,6 +85,10 @@ function playTheme(name_raw, resume, loop) {
   } 
   
   // If it's only used once, add the event listener to resume theme
+  if(!resume) {
+    sound.used = false;
+  }
+
   if(sound.used == 1) sound.addEventListener("ended", playTheme);
   
   return sound;
