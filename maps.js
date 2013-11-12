@@ -217,16 +217,16 @@ function shiftToLocation(loc) {
   // Typically this will do nothing or be from a pipe
   loc.entry(mario, loc.entrything);
   // Don't forget the least annoying part of programming this!
-  EventHandler.addEvent(playTheme, 2);
+  TimeHandler.addEvent(playTheme, 2);
   
   // Texts are bound-check checked periodically for peformance reasons
-  EventHandler.addEventInterval(checkTexts, 117, Infinity);
+  TimeHandler.addEventInterval(checkTexts, 117, Infinity);
 }
 // To do: add in other stuff
 function setAreaPreCreation(area) {
   // Clear the containers
   window.events = [];
-  EventHandler.clearAllEvents();
+  TimeHandler.clearAllEvents();
   window.characters = [];
   window.solids = [];
   window.scenery = [];
@@ -264,7 +264,7 @@ function setAreaPostCreation() {
   map.underwater = map.area.underwater;
   map.jumpmod = 1.056 + 3.5 * map.underwater;
   map.has_lakitu = false;
-  EventHandler.addEvent(setMapGravity, 1);
+  TimeHandler.addEvent(setMapGravity, 1);
   
   // If it's underwater, give it the waves on top and mario's bubble event
   if(area.underwater) {
@@ -431,7 +431,7 @@ function entryRandom(me) {
     case "Vine":
       // Do that vine stuff
       locMovePreparations(mario);
-      EventHandler.addEvent(function() { enterCloudWorld(mario, true); }, 1);
+      TimeHandler.addEvent(function() { enterCloudWorld(mario, true); }, 1);
       mario.nofall = true;
       spawnMap();
     break;
@@ -459,7 +459,7 @@ function enterCloudWorld(me) {
   setLeft(me, unitsize * 30);
   removeClass(me, "jumping");
   addClasses(me, ["climbing", "animated"]);
-  me.climbing = EventHandler.addSpriteCycle(me, ["one", "two"], "climbing");
+  me.climbing = TimeHandler.addSpriteCycle(me, ["one", "two"], "climbing");
   
   me.attached = new Thing(Vine, -1);
   addThing(me.attached, unitsizet32, screenbottom - unitsizet8);
@@ -487,8 +487,8 @@ function enterCloudWorld(me) {
             setTimeout(function() {
               // Mario hops off
               marioHopsOff(me, me.attached, true);
-              EventHandler.clearClassCycle(me, "climbing");
-              me.running = EventHandler.addSpriteCycle(me, ["one", "two", "three", "two"], "running", setMarioRunningCycler);
+              TimeHandler.clearClassCycle(me, "climbing");
+              me.running = TimeHandler.addSpriteCycle(me, ["one", "two", "three", "two"], "running", setMarioRunningCycler);
             }, timer * 28);
           }, timer * 14);
         }
@@ -535,6 +535,9 @@ function intoPipeVert(me, pipe, transport) {
   }, timer);
 }
 function intoPipeHoriz(me, pipe, transport) {
+  // If Mario isn't resting or swimming, he shouldn't be allowed to pipe
+  if(!me.resting || !map.underwater) return;
+  
   pipePreparations(me);
   switchContainers(me, characters, scenery);
   unpause();
@@ -745,8 +748,8 @@ function goUnderWater() {
       map.area.underwater = true;
     }
     setMapGravity();
-    EventHandler.clearEvent(map.bubbling);
-    map.bubbling = EventHandler.addEventInterval(marioBubbles, 96, Infinity);
+    TimeHandler.clearEvent(map.bubbling);
+    map.bubbling = TimeHandler.addEventInterval(marioBubbles, 96, Infinity);
     map.underwater = true;
   }
 }
@@ -758,7 +761,7 @@ function goOntoLand() {
       map.area.underwater = false;
     }
     setMapGravity();
-    EventHandler.clearEvent(map.bubbling);
+    TimeHandler.clearEvent(map.bubbling);
     map.underwater = false;
   }
 }

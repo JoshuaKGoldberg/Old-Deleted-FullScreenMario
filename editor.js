@@ -32,7 +32,7 @@ function loadEditor(noreset) {
   // Visually update
   classAdd(body, "editor");
   classAdd(editor.sidebar, "expanded");
-  EventHandler.addEvent(classRemove, 35, editor.sidebar, "expanded");
+  TimeHandler.addEvent(classRemove, 35, editor.sidebar, "expanded");
   
   // Let the rest of the game know what's going on
   map.shifting = false;
@@ -148,7 +148,7 @@ function setEditorLibrary() {
           else output.push(window[pairs.contents]);
           
           if(pairs.hidden == "True") {
-            EventHandler.addEvent(function() { editor.follower.hidden = true; });
+            TimeHandler.addEvent(function() { editor.follower.hidden = true; });
             output.push(1);
           }
           return output;
@@ -448,12 +448,12 @@ function editorScrollingStart(event) {
   var scroller = event.target,
       dx = scroller.dx;
   editorPreventClicks();
-  editor.scrolling = EventHandler.addEventInterval(editorScrolling, 1, Infinity, -dx);
+  editor.scrolling = TimeHandler.addEventInterval(editorScrolling, 1, Infinity, -dx);
   classRemove(editor.scrollers["left"], "off");
 }
 function editorScrollingStop() {
-  EventHandler.addEvent(editorClickOff, 3);
-  EventHandler.clearEvent(editor.scrolling);
+  TimeHandler.addEvent(editorClickOff, 3);
+  TimeHandler.clearEvent(editor.scrolling);
 }
 function editorScrolling(dx) {
   scrollEditor(dx);
@@ -937,7 +937,7 @@ function editorFollowerUpdateStandard(reference, pairs) {
   // Hidden is a necessary check
   if(pairs.hidden == "True") {
     // This is an event because these are set before the new follower is made
-    EventHandler.addEvent(function() { editor.follower.hidden = true; });
+    TimeHandler.addEvent(function() { editor.follower.hidden = true; });
   }
   
   // More importantly, check for width and height
@@ -963,7 +963,7 @@ function editorClickControl(event) {
 }
 function editorPreventClicks() {
   editor.clicking = true;
-  EventHandler.addEvent(editorClickOff, 3);
+  TimeHandler.addEvent(editorClickOff, 3);
 }
 function editorClickOff() {
   if(window.editor) editor.clicking = false;
@@ -985,7 +985,7 @@ function editorControlReset() {
       len = placed.length,
       timer = roundDigit(35 / len, 21);
   
-  EventHandler.addEventInterval(editorControlUndo, timer, len);
+  TimeHandler.addEventInterval(editorControlUndo, timer, len);
 }
 
 // Creates the function and displays the submission window to the user

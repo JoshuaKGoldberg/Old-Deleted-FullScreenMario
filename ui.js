@@ -122,6 +122,7 @@ function setCheats() {
   console.log("Hi, thanks for playing Full Screen Mario! I see you're using the console.");
   console.log("There's not really any way to stop you from messing around so if you'd like to know the common cheats, enter \"displayCheats()\" here.");
   console.log("If you'd like, go ahead and look around the source code. There are a few surprises you might have fun with... ;)");
+  console.log("http://www.github.com/DiogenesTheCynic/FullScreenMario");
   window.cheats = {
     Change_Map: "game.setMap([#,#] or #,#);",
     Change_Map_Location: "game.shiftToLocation(#);",

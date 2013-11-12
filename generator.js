@@ -1167,7 +1167,7 @@ function addDistanceCounter() {
               innerText: data.traveledold + " blocks traveled"
             });
   body.appendChild(counter);
-  EventHandler.addEventInterval(function(counter) {
+  TimeHandler.addEventInterval(function(counter) {
     data.traveled = max(0,Math.round((mario.right + gamescreen.left) / unitsizet8) - 3);
     counter.innerText = (data.traveledold + data.traveled) + " blocks traveled";
   }, 3, Infinity, counter);

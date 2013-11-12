@@ -140,10 +140,10 @@ function resetGameScreenPosition(me) {
   me.unitwidth = innerWidth;
 }
 
-// Events are done with EventHandlr.js
+// Events are done with TimeHandlr.js
 // This helps make timing obey pauses, and makes class cycles much easier
 function resetEvents() {
-  window.EventHandler = new EventHandlr({
+  window.TimeHandler = new TimeHandlr({
     onSpriteCycleStart: "onadding",
     doSpriteCycleStart: "placed",
     cycleCheckValidity: "alive",

@@ -62,7 +62,7 @@ function clearDataDisplay() {
 // Starts the interval of updating data time
 // 1 game second is about 25*16.667=416.675ms
 function startDataTime() {
-  EventHandler.addEventInterval(updateDataTime, 25, Infinity, data.time);
+  TimeHandler.addEventInterval(updateDataTime, 25, Infinity, data.time);
 }
 function updateDataTime(me) {
   // If the time direction isn't up (random map), check for timing
@@ -97,7 +97,7 @@ function score(me, amount, appears) {
   if(appears) {
     var text = addText(amount, me.left, me.top);
     text.yvel = -unitsized4;
-    EventHandler.addEvent(killScore, 49, text);
+    TimeHandler.addEvent(killScore, 49, text);
   }
   while(data.score > 10000) { // you never know...
     gainLife();
