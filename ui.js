@@ -60,6 +60,22 @@ function setMapSelector(timed) {
   
   // Add that HTML to #in_mapselect, along with a big one for random maps
   elemSelect.innerHTML += innerHTML + createAdderBigMap("Map Generator!", "setGameMapRandom");
+  
+  // If this isn't local, actually responding to the game loading maps is doable
+  // See load.js
+  if(!isLocal) {
+    // This will allow for onMapLoad
+    game.parentwindow = window;
+    
+    // If the game already has a map, set the class to be loaded
+    var elem;
+    for(i = 1; i <= 8; ++i)
+      for(j = 1; j <= 4; ++j) {
+        console.log("World" + i + String(j), game["World" + i + String(j)]);
+        if(game["World" + i + String(j)] && (elem = document.getElementById("maprect" + i + "," + j)))
+          elem.className = "maprect";
+      }
+  }
 }
 
 function createAdderMap(i, j) {
@@ -92,6 +108,13 @@ function setGameMap(one, two) {
     map: [one, two]
   }, "*");
   game.focus();
+}
+
+// See load.js
+function onMapLoad(one, two) {
+  var elem = document.getElementById("maprect" + one + "," + two);
+  if(elem)
+    elem.className = "maprect";
 }
 
 function setGameMapRandom() {
