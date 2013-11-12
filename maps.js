@@ -503,12 +503,8 @@ function walkToPipe() {
 
   var hasPipingStarted = false;
   var move = setInterval(function() {
-    if(mario.piping && !hasPipingStarted) {
+    if(mario.piping) {
       // We have started piping
-      hasPipingStarted = true;
-    }
-    else if ( !mario.piping && hasPipingStarted ) {
-      // piping has finished
       if(sounds[0]) sounds[0].pause();
       nokeys = mario.keys.run = notime = false;
       clearInterval(move);
@@ -539,7 +535,6 @@ function intoPipeVert(me, pipe, transport) {
   }, timer);
 }
 function intoPipeHoriz(me, pipe, transport) {
-  if(!me.keys.run || !(me.resting || map.underwater)) return;
   pipePreparations(me);
   switchContainers(me, characters, scenery);
   unpause();
