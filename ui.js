@@ -71,7 +71,6 @@ function setMapSelector(timed) {
     var elem;
     for(i = 1; i <= 8; ++i)
       for(j = 1; j <= 4; ++j) {
-        console.log("World" + i + String(j), game["World" + i + String(j)]);
         if(game["World" + i + String(j)] && (elem = document.getElementById("maprect" + i + "," + j)))
           elem.className = "maprect";
       }
