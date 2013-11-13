@@ -536,7 +536,8 @@ function intoPipeVert(me, pipe, transport) {
 }
 function intoPipeHoriz(me, pipe, transport) {
   // If Mario isn't resting or swimming, he shouldn't be allowed to pipe
-  if(!me.resting || !map.underwater) return;
+  // (resting may have been cleared at this point, so yvel is how it checks)
+  if(!me.yvel || !map.underwater) return;
   
   pipePreparations(me);
   switchContainers(me, characters, scenery);
