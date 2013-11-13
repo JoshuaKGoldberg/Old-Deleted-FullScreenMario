@@ -2,39 +2,56 @@ FullScreenMario
 ===============
 
 An HTML5 remake of the original Super Mario Brothers - expanded for modern browsing.
+
 ------------------------------------------------------------------------------------
+
+## How to Play
+
+Because of the legal issues this can't be hosted anymore on www.fullscreenmario.com, but
+with these steps you can run it inside a cloud IDE in your browser without having to download
+anything.
+
+[![IDE](https://codio-public.s3.amazonaws.com/sharing/demo-in-ide.png)](https://codio.com/p/create/?from_github=Diogenesthecynic/FullScreenMario)
+
+* Select `Preview > Project Index`.
+* Select `Preview > New Browser Tab`.
+* Click `Preview` and then click inside the game area.
+* Enjoy
+
+
+## Cheat Codes
 
 Here's a quick set of cheat codes you can use during the game. If you're using this through the <a href="http://www.fullscreenmario.com">fullscreenmario.com</a> UI, you'll have to reference everything as a member of 'game' (which is a link to the frame containing FSM).
 
-Game Powerups
--------------
+### Game Powerups
+
 <table>
 
   <tr>
     <th>Command</th>
     <th>Result</th>
   </tr>
-  
+
   <tr>
     <td><code>marioShroom(mario)</code></td>
     <td>The equivalent of Mario touching a Mushroom or FireFlower item.</td>
   </tr>
-  
+
   <tr>
     <td><code>marioStar(mario)</code></td>
     <td>The equivalent of Mario touching a Star item. Note that if you want Mario to be invincible for the rest of the current map, use <code>++mario.star</code>.</td>
   </tr>
-  
+
   <tr>
     <td><code>scrollMario(X)</code></td>
     <td>Scrolls the window horizontally by X, keeping Mario in the same spot relative to the screen.</td>
   </tr>
-  
+
   <tr>
     <td><code>scrollTime(T)</code></td>
     <td>Floats Mario through the rest of the level (beware, this is best used on the Random worlds!).</td>
   </tr>
-  
+
   <tr>
     <td><code>fastforward(T)</code></td>
     <td>Sets the game speed to <code>1+T</code>. T=1 results in double the speed, and T=0 is normal speed.</td>
@@ -43,15 +60,15 @@ Game Powerups
 </table>
 
 
-Adding Things
--------------
+### Adding Things
+
 <table>
 
   <tr>
     <th>Command</th>
     <th>Result</th>
   </tr>
-  
+
   <tr>
     <td>
       <code>addThing(ThingFunction, xloc, yloc)</code>
@@ -60,16 +77,15 @@ Adding Things
     </td>
     <td>Creates a new instance of a Thing, such as <code>Goomba</code> or <code>Koopa</code>, at the specified location. Thing functions are located as separate in things.js; in the future they will be stored as JSON objects.</td>
   </tr>
-  
+
   <tr>
     <td><code>killNormal(MyThing)</code></td>
     <td>Kills a specified Thing. You may find them listed under <code>window.characters</code>, <code>window.solids</code>, and <code>window.scenery</code>.</td>
   </tr>
-  
+
 </table>
 
-Map Shifting
-------------
+### Map Shifting
 
 <table>
 
@@ -86,7 +102,7 @@ Map Shifting
     </td>
     <td>Starts the World A-B map immediately. If it doesn't exist (such as when maps aren't loaded via AJAX yet), it will log a complaint gracefully.</td>
   </tr>
-  
+
   <tr>
     <td>
       <code>setMapRandom()</code>
@@ -103,7 +119,7 @@ Map Shifting
       </ul>
     </td>
   </tr>
-  
+
   <tr>
     <td>
       <code>shiftToLocation(N)</td>
@@ -112,15 +128,14 @@ Map Shifting
       Shifts to the Nth location in the current map. For example, <code>setMap(1,1); shiftToLocation(2);</code> brings the user to the Underworld section of World 1-1. Note that maps are stored under Maps/WorldAB.js as function bodies.
     </td>
   </tr>
-  
+
 </table>
 
 
-Level Editor
-------------
+## Level Editor
 
 <table>
-  
+
   <tr>
     <td>
       <code>loadEditor()</code>
@@ -129,11 +144,10 @@ Level Editor
       Starts the in-game level editor.
     </td>
   </tr>
-  
+
 </table>
 
-Developers & Legal
-------------------
+## Developers & Legal
 
 This is released under the <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Attribution Non-Commercial Share-Alike</a> license. Full Screen Mario is meant to be both a proof of concept and an entertaining pasttime, not a source of income</a>.
 
