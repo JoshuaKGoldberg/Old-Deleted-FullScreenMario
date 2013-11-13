@@ -44,7 +44,6 @@ Here's a quick set of cheat codes you can use during the game. If you're using t
 
 ### Game Powerups
 
-<html>
   
   <table>
 
@@ -80,11 +79,9 @@ Here's a quick set of cheat codes you can use during the game. If you're using t
 
   </table>
   
-</html>
 
 ### Adding Things
 
-<html>
   
   <table>
 
@@ -109,11 +106,9 @@ Here's a quick set of cheat codes you can use during the game. If you're using t
 
   </table>
   
-</html>
 
 ### Map Shifting
 
-<html>
 
   <table>
 
@@ -159,11 +154,9 @@ Here's a quick set of cheat codes you can use during the game. If you're using t
 
   </table>
   
-</html>
 
 ## Level Editor
 
-<html>
 
   <table>
 
@@ -178,7 +171,6 @@ Here's a quick set of cheat codes you can use during the game. If you're using t
 
   </table>
   
-</html>
 
 ## Developers & Legal
 
