@@ -1329,6 +1329,8 @@ function coinEmergeMoveParent(me) {
 function placeMario(xloc, yloc) {
   clearOldMario();
   window.mario = new Thing(Mario);
+  if (window.luigi) window.mario.title = "Luigi";
+
   var adder = addThing(mario, xloc || unitsizet16, yloc || (map.floor - mario.height) * unitsize);
   if(data.mariopower >= 2) {
     marioGetsBig(mario, true);

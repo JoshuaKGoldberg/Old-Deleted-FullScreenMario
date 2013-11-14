@@ -59,6 +59,12 @@ function clearDataDisplay() {
   body.removeChild(data_display);
 }
 
+function toggleLuigi() {
+  window.luigi = !window.luigi;
+  localStorage.luigi = window.luigi;
+  this.mario.title = (window.luigi) ? "Luigi" : "Mario";
+}
+
 // Starts the interval of updating data time
 // 1 game second is about 25*16.667=416.675ms
 function startDataTime() {

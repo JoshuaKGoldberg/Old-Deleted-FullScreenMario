@@ -155,7 +155,7 @@ function setCheats() {
     Random_Map: "game.setMapRandom();",
     Shroom: "game.marioShroom(game.mario)",
     Star_Power: "game.marioStar(game.mario)",
-    Unlimited_Time: "game.data.time.amount = Infinity;"
+    Unlimited_Time: "game.data.time.amount = Infinity;",
   }
   cheatsize = 0;
   for(var i in cheats)
