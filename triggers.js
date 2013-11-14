@@ -132,7 +132,6 @@ function Controls(pipes, gamepadPipes) {
       }
     },
     l: function(keys) {
-      console.log("hello");
       toggleLuigi();
     }
   };

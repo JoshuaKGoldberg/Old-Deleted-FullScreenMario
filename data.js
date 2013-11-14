@@ -62,7 +62,7 @@ function clearDataDisplay() {
 function toggleLuigi() {
   window.luigi = !window.luigi;
   localStorage.luigi = window.luigi;
-  gameRestart();
+  this.mario.title = (window.luigi) ? "Luigi" : "Mario";
 }
 
 // Starts the interval of updating data time
