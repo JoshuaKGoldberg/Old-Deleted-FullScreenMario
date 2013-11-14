@@ -1326,9 +1326,38 @@ function coinEmergeMoveParent(me) {
   }  
 }
 
+
+/*
+ * Luigi
+ */
+ function Luigi(me) {
+  setMarioSizeSmall(me);
+  me.walkspeed = unitsized2;
+  me.canjump = me.nofiredeath = me.nofire = me.mario = me.nokillend = 1;
+  me.numballs = me.moveleft = me.skidding = me.star = me.dying = me.nofall = me.maxvel = me.paddling = me.jumpers = me.landing = 0;
+  me.running = ''; // Evalues to false for cycle checker
+  me.power = data.mariopower; // 1 for normal, 2 for big, 3 for fiery
+  me.maxspeed = me.maxspeedsave = unitsize * 1.35; // Really only used for timed animations
+  me.scrollspeed = unitsize * 1.75;
+  me.keys = new Keys();
+  me.fire = marioFires;
+  me.movement = moveMario;
+  me.death = killMario;
+  setCharacter(me, "mario normal small still");
+  me.tolx = unitsizet2;
+  me.toly = 0;
+  me.gravity = map.gravity;
+  if(map.underwater) {
+    me.swimming = true;
+    TimeHandler.addSpriteCycle(me, ["swim1", "swim2"], "swimming", 5);
+  }  
+}
+
 function placeMario(xloc, yloc) {
   clearOldMario();
-  window.mario = new Thing(Mario);
+  if (window.luigi) window.mario = new Thing(Luigi);
+  else              window.mario = new Thing(Mario);
+
   var adder = addThing(mario, xloc || unitsizet16, yloc || (map.floor - mario.height) * unitsize);
   if(data.mariopower >= 2) {
     marioGetsBig(mario, true);
