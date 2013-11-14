@@ -14,7 +14,7 @@ However, you may run or host your own copies of the game on your computer, a clo
 
 You may run the game through the helper UI via index.html, or directly via mario.html.
 This will run an entirely local copy of the game (note that via index.html, for security reasons, Chrome may not 
-allow you to access the game through the Javavascript console).
+allow you to access the game through the Javascript console).
 
 ### Your Computer (Virtual Host)
 
@@ -40,7 +40,7 @@ Follow the same steps as running on your computer (virtual host).
 
 ## Cheat Codes
 
-Here's a quick set of cheat codes you can use during the game. If you're using this through the <a href="http://www.fullscreenmario.com">fullscreenmario.com</a> UI, you'll have to reference everything as a member of 'game' (which is a link to the frame containing FSM).
+Here's a quick set of cheat codes you can use during the game. If you're using this through the helper UI, you'll have to reference everything as a member of 'game' (which is a link to the frame containing FSM).
 
 ### Game Powerups
 

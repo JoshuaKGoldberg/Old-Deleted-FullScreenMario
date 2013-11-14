@@ -1687,7 +1687,6 @@ function marioHopsOff(me, solid, addrun) {
   removeClasses(me, "climbing running");
   addClass(me, "jumping");
   
-  console
   me.piping = me.nocollide = me.nofall = me.climbing = false;
   me.gravity = gravity / 4;
   me.xvel = 3.5;
@@ -2578,9 +2577,8 @@ function endLevelPoints(me, detector) {
   killNormal(me);
   
   // Determine the number of fireballs (1, 3, and 6 become not 0)
-  var numfire = getLast(String(data.time.amount));
+  var numfire = parseInt(getLast(String(data.time.amount)));
   if(!(numfire == 1 || numfire == 3 || numfire == 6)) numfire = 0;
-
   // Count down the points (x50)
   var points = setInterval(function() {
     // 50 for each
