@@ -156,7 +156,6 @@ function setCheats() {
     Shroom: "game.marioShroom(game.mario)",
     Star_Power: "game.marioStar(game.mario)",
     Unlimited_Time: "game.data.time.amount = Infinity;",
-    Luigi: "game.data.toggleLuigi();"
   }
   cheatsize = 0;
   for(var i in cheats)

@@ -12,7 +12,8 @@ function resetTriggers() {
     sprint: [16, 17,      "FACE_1"],                                     // shift, ctrl
     pause:  [80,          "START_FORWARD"],                              // p
     mute:   [77],                                                        // m
-    q:      [81]                                                         // q
+    q:      [81],                                                        // q
+    l:      [76],                                                        // l
   });
   
   // Gamepad.js support for joysticks and controllers
@@ -129,6 +130,10 @@ function Controls(pipes, gamepadPipes) {
         case 14: superlulz(); break;
         case 21: hyperlulz(); break;
       }
+    },
+    l: function(keys) {
+      console.log("hello");
+      toggleLuigi();
     }
   };
   var keyup = this.keyup = {
