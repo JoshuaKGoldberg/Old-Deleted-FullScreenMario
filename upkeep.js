@@ -124,27 +124,27 @@ function maintainCharacters(update) {
 }
 
 function maintainMario(update) {
-  if(!mario.alive) return;
+  if(!player.alive) return;
   
   // Mario is falling
-  if(mario.yvel > 0) {
-    if(!map.underwater) mario.keys.jump = 0;
+  if(player.yvel > 0) {
+    if(!map.underwater) player.keys.jump = 0;
     // Jumping?
-    if(!mario.jumping) {
+    if(!player.jumping) {
       // Paddling? (from falling off a solid)
       if(map.underwater) {
-        if(!mario.paddling) {
+        if(!player.paddling) {
           switchClass(mario, "paddling", "paddling");
-          mario.padding = true;
+          player.padding = true;
         }
       }
       else {
         addClass(mario, "jumping");
-        mario.jumping = true;
+        player.jumping = true;
       }
     }
     // Mario has fallen too far
-    if(!mario.piping && !mario.dying && mario.top > gamescreen.deathheight) {
+    if(!player.piping && !player.dying && player.top > gamescreen.deathheight) {
       // If the map has an exit loc (cloud world), transport there
       if(map.exitloc) {
         // Random maps will pretend he died
@@ -163,27 +163,27 @@ function maintainMario(update) {
   }
   
   // Mario is moving to the right
-  if(mario.xvel > 0) {
-    if(mario.right > gamescreen.middlex) {
+  if(player.xvel > 0) {
+    if(player.right > gamescreen.middlex) {
       // If Mario is to the right of the gamescreen's middle, move the gamescreen
-      if(mario.right > gamescreen.right - gamescreen.left)
-        mario.xvel = min(0, mario.xvel);
+      if(player.right > gamescreen.right - gamescreen.left)
+        player.xvel = min(0, player.xvel);
     }
   }
   // Mario is moving to the left
-  else if(mario.left < 0) {
+  else if(player.left < 0) {
     // Stop Mario from going to the left.
-    mario.xvel = max(0, mario.xvel);
+    player.xvel = max(0, player.xvel);
   }
   
   // Mario is hitting something (stop jumping)
-  if(mario.under) mario.jumpcount = 0;
+  if(player.under) player.jumpcount = 0;
   
   // Scrolloffset is how far over the middle mario's right is
   // It's multiplied by 0 or 1 for map.canscroll
-  window.scrolloffset = (map.canscroll/* || (map.random && !map.noscroll)*/) * (mario.right - gamescreen.middlex);
+  window.scrolloffset = (map.canscroll/* || (map.random && !map.noscroll)*/) * (player.right - gamescreen.middlex);
   if(scrolloffset > 0 && !map.shifting) {
-    scrollWindow(lastscroll = round(min(mario.scrollspeed, scrolloffset)));
+    scrollWindow(lastscroll = round(min(player.scrollspeed, scrolloffset)));
   }
   else lastscroll = 0;
 }

@@ -266,7 +266,7 @@ function determineThingCollisions(me) {
       
       // The .hidden check is required. Try the beginning of 2-1 without it.
       // visual_scenery is also necessary because of Pirhanas (nothing else uses that)
-      if(objectsTouch(me, other) && (me.mario || (!other.hidden || !(other.visual_scenery && other.visual_scenery.hidden)) || solidOnCharacter(other, me))) {
+      if(objectsTouch(me, other) && (me.player || (!other.hidden || !(other.visual_scenery && other.visual_scenery.hidden)) || solidOnCharacter(other, me))) {
         // Collisions for characters are simple
         if(other.character)
           // if(charactersTouch(me, other))
@@ -359,7 +359,7 @@ function objectsCollided(one, two) {
   if(two.up && one != two.up) return characterTouchesUp(one, two);
   
   // Otherwise, regular collisions
-  if(two.solid || one.mario)
+  if(two.solid || one.player)
     two.collide(one, two);
   else one.collide(two, one);
 }
@@ -374,7 +374,7 @@ function objectToLeft(one, two) {
 function objectOnTop(one, two) {
   if(one.type == "solid" && two.yvel > 0) return false;
   if(one.yvel < two.yvel && two.type != "solid") return false;
-  if(one.mario && one.bottom < two.bottom && two.group == "enemy") return true;
+  if(one.player && one.bottom < two.bottom && two.group == "enemy") return true;
   return(  (one.left + unitsize < two.right && one.right - unitsize > two.left) && 
   (one.bottom - two.yvel <= two.top + two.toly || one.bottom <= two.top + two.toly + abs(one.yvel - two.yvel)));
 }
@@ -416,7 +416,7 @@ function characterTouchedSolid(me, solid) {
     if(solid.hidden) return;
     me.resting = solid;
     // Meh.
-    if(me.mario && map.underwater) removeClass(me, "paddling");
+    if(me.player && map.underwater) removeClass(me, "paddling");
   }
   
   // Solid on top of me
@@ -427,11 +427,11 @@ function characterTouchedSolid(me, solid) {
     if(!me.under) me.under = [solid];
     else me.under.push(solid);
     // To do: make this not so obviously hardcoded
-    if(me.mario) {
+    if(me.player) {
       setTop(me, solid.bottom - me.toly + solid.yvel, true);
     }
     me.yvel = solid.yvel;
-    if(me.mario) me.keys.jump = 0;
+    if(me.player) me.keys.jump = 0;
   }
   
   if(solid.hidden) return;
@@ -448,7 +448,7 @@ function characterTouchedSolid(me, solid) {
     }
     
     // Non-Marios are instructed to flip
-    if(!me.mario) {
+    if(!me.player) {
       me.moveleft = !me.moveleft;
       if(me.group == "item") me.collide(solid, me);
     }
@@ -493,7 +493,7 @@ function characterIsAlive(me) {
  */
 function scoreMarioShell(mario, shell) {
   // Star Mario gets 200
-  if(mario.star) return score(shell, 200, true);
+  if(player.star) return score(shell, 200, true);
   // Shells in the air cause 8000 points, oh lawdy
   if(!shell.resting) return score(shell, 8000, true);
   // Peeking shells are also more
@@ -635,7 +635,7 @@ function collideTransport(me, solid) {
 // To do: make me.collide and stages w/functions
 // To do: split this into .partner and whatnot
 function moveFalling(me) {
-  if(me != mario.resting) return me.yvel = 0;
+  if(me != player.resting) return me.yvel = 0;
   
   // Since Mario is on me, fall
   shiftVert(me, me.yvel += unitsized8);
@@ -649,7 +649,7 @@ function moveFalling(me) {
 }
 function moveFallingScale(me) {
   // If Mario is resting on me, fall
-  if(mario.resting == me) {
+  if(player.resting == me) {
     shiftScaleStringVert(me, me.string, me.yvel += unitsized16);
     shiftScaleStringVert(me.partner, me.partner.string, -me.yvel);
     me.tension += me.yvel;
@@ -824,7 +824,7 @@ function killOtherCharacters() {
 
 function lookTowardMario(me, big) {
   // Mario is to the left
-  if(mario.right <= me.left) {
+  if(player.right <= me.left) {
     if(!me.lookleft || big) {
       me.lookleft = true;
       me.moveleft = false;
@@ -832,7 +832,7 @@ function lookTowardMario(me, big) {
     }
   }
   // Mario is to the right
-  else if(mario.left >= me.right) {
+  else if(player.left >= me.right) {
     if(me.lookleft || big) {
       me.lookleft = false;
       me.moveleft = true;

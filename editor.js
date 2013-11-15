@@ -974,7 +974,7 @@ function editorControlUndo() {
   var placed = editor.placed,
       last = placed.pop();
   
-  if(last && !last.mario) {
+  if(last && !last.player) {
     killNormal(last);
   }  
 }
@@ -1149,7 +1149,7 @@ function eraserErases(me) {
   // If this touches anything in placed
   for(i = arr.length - 1; i >= 0; --i) {
     other = arr[i];
-    if(other.mario || other == editor.follower) continue;
+    if(other.player || other == editor.follower) continue;
     // These ones touch:
     if(objectsTouch(me, other)) {
       // Kill the other

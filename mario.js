@@ -204,8 +204,8 @@ function shiftElements(stuff, x, y) {
 
 // Similar to scrollWindow, but saves mario's x-loc
 function scrollMario(x, y, see) {
-  var saveleft = mario.left,
-      savetop = mario.top;
+  var saveleft = player.left,
+      savetop = player.top;
   y = y || 0;
   scrollWindow(x,y);
   setLeft(mario, saveleft, see);

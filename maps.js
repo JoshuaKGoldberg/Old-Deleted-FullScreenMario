@@ -150,7 +150,7 @@ function setMap(one, two) {
   window.area = newmap.area = newmap.areas[0];
   
   // Save the score if need be
-  if(window.mario && mario.power) storeMarioStats();
+  if(window.player && player.power) storeMarioStats();
   if(window.data) data.scoreold = data.score.amount;
   
   // Actual resetting is done in shiftToLocation
@@ -432,7 +432,7 @@ function entryRandom(me) {
       // Do that vine stuff
       locMovePreparations(mario);
       TimeHandler.addEvent(function() { enterCloudWorld(mario, true); }, 1);
-      mario.nofall = true;
+      player.nofall = true;
       spawnMap();
     break;
     case "Castle":
@@ -503,12 +503,12 @@ function walkToPipe() {
 
   var hasPipingStarted = false;
   var move = setInterval(function() {
-    if(mario.piping) {
+    if(player.piping) {
       // We have started piping
       if(sounds[0]) sounds[0].pause();
-      nokeys = mario.keys.run = notime = false;
+      nokeys = player.keys.run = notime = false;
       clearInterval(move);
-      mario.maxspeed = mario.maxspeedsave;
+      player.maxspeed = player.maxspeedsave;
     }
   }, timer);
   unpause();
@@ -569,7 +569,7 @@ function locMovePreparations(me) {
   removeClass(me, "flipped");
 }
 function startCastle(me) {
-  me = me || window.mario;
+  me = me || window.player;
   if(!me) return;
   setBottom(me, unitsize * 56);
   setLeft(me, unitsizet2);
@@ -744,7 +744,7 @@ function pushPreWarpWorld(xloc, yloc, worlds, offset, block) {
 function goUnderWater() {
   if(window.map) {
     if(map.area) {
-      if(window.mario && !map.shifting)
+      if(window.player && !map.shifting)
         setAreaSetting(String(map.area.setting || "") + " Underwater");
       map.area.underwater = true;
     }
@@ -757,7 +757,7 @@ function goUnderWater() {
 function goOntoLand() {
   if(map) {
     if(map.area) {
-      if(window.mario && !map.shifting)
+      if(window.player && !map.shifting)
         setAreaSetting(map.area.setting.replace("Underwater", "") || "Overworld");
       map.area.underwater = false;
     }
@@ -767,9 +767,9 @@ function goOntoLand() {
   }
 }
 function setMapGravity() {
-  if(window.mario) {
-    if(map.underwater) mario.gravity = gravity / 2.8;
-    else mario.gravity = gravity;
+  if(window.player) {
+    if(map.underwater) player.gravity = gravity / 2.8;
+    else player.gravity = gravity;
   }
 }
 
@@ -1055,11 +1055,11 @@ function zoneDisableLakitu() {
 function zoneStartCheeps(xloc) { pushPreFuncCollider(xloc, zoneEnableCheeps); }
 function zoneStopCheeps(xloc) { pushPreFuncCollider(xloc, zoneDisableCheeps); }
 function zoneEnableCheeps(me) {
-  if(map.zone_cheeps || !me.mario) return;
+  if(map.zone_cheeps || !me.player) return;
   startCheepSpawn();
 }
 function zoneDisableCheeps(me) {
-  if(!me.mario) return;
+  if(!me.player) return;
   map.zone_cheeps = false;
 }
 

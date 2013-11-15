@@ -16,7 +16,7 @@ function resetData() {
 }
 // Keeps information displayed on the screen
 function Data() {
-  this.mariopower = 1;
+  this.playerpower = 1;
   this.traveled = this.traveledold = 0; // only used for random
   this.scorelevs = [100, 200, 400, 500, 800, 1000, 2000, 4000, 5000, 8000];
   this.score = new DataObject(0, 6, "SCORE");
@@ -62,8 +62,8 @@ function clearDataDisplay() {
 function toggleLuigi() {
   window.luigi = !window.luigi;
   localStorage.luigi = window.luigi;
-  window.mario.title = (window.luigi) ? "Luigi" : "Mario";
-  setThingSprite(window.mario);
+  window.player.title = (window.luigi) ? "Luigi" : "Mario";
+  setThingSprite(window.player);
 }
 
 // Starts the interval of updating data time
@@ -137,8 +137,8 @@ function setLives(num) {
 }
 
 function storeMarioStats() {
-  data.mariopower = mario.power;
+  data.playerpower = player.power;
 }
 function clearMarioStats() {
-  data.mariopower = mario.power = 1;
+  data.playerpower = player.power = 1;
 }

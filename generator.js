@@ -1168,7 +1168,7 @@ function addDistanceCounter() {
             });
   body.appendChild(counter);
   TimeHandler.addEventInterval(function(counter) {
-    data.traveled = max(0,Math.round((mario.right + gamescreen.left) / unitsizet8) - 3);
+    data.traveled = max(0,Math.round((player.right + gamescreen.left) / unitsizet8) - 3);
     counter.innerText = (data.traveledold + data.traveled) + " blocks traveled";
   }, 3, Infinity, counter);
 }
