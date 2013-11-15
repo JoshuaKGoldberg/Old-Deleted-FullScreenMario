@@ -48,14 +48,18 @@ function step(num) {
 }
 
 function fastforward(num) {
-  pause();
-  function resume() {
-    for(i = speed = (num || 1) - 1; i > 0; --i)
-      step();
-    unpause();
+  window.speed = max(0, parseInt(num || 0)) + 1;
+}
+
+function toggleFastFWD(num) {
+  if(!window.fastforwarding) {
+    fastforward(2);
+    window.fastforwarding = true;
   }
-  
-  requestAnimationFrame(resume);
+  else {
+    fastforward(0);
+    window.fastforwarding = false;
+  }
 }
 
 function specifyTimer(timerin) {

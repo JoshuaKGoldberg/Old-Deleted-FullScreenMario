@@ -43,13 +43,11 @@ iframe {
   text-align: center;
 }
 
-#out_editor {
-  float: left;
-}
+#out_editor { float: left; }
 
-#out_mapselect {
-  float: right;
-}
+#out_mapselect { float: right; }
+
+#out_options { margin: 7px auto; }
 
 .expander {
   margin-top: -24px;
@@ -97,6 +95,7 @@ iframe {
 }
 
 .maprect.big { width: 231px; }
+.maprect.larger { margin: 14px 0; }
 .maprect.giant { 
   padding: 28px 0 70px 0;
   font-size: 17px;

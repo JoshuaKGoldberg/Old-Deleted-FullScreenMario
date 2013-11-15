@@ -6,29 +6,34 @@ function upkeep() {
   // window.nextupk = requestAnimationFrame(upkeep);
   window.nextupk = setTimeout(upkeep, timer);
   
-  // Adjust for differences in performance
-  adjustFPS();
-  
-  // Quadrants upkeep
-  determineAllQuadrants();
-  
-  // Solids upkeep
-  maintainSolids();
-  
-  // Character upkeep
-  maintainCharacters();
-  
-  // Mario specific
-  maintainMario();
-  
-  // Texts upkeep, if there are any
-  if(texts.length) maintainTexts();
-  
-  // Events upkeep
-  TimeHandler.handleEvents();
-  // handleEvents();
-  
-  refillCanvas();
+  // See utility.js::fastforward
+  for(var i = window.speed; i > 0; --i) {
+    
+    // Adjust for differences in performance
+    adjustFPS();
+    
+    // Quadrants upkeep
+    determineAllQuadrants();
+    
+    // Solids upkeep
+    maintainSolids();
+    
+    // Character upkeep
+    maintainCharacters();
+    
+    // Mario specific
+    maintainMario();
+    
+    // Texts upkeep, if there are any
+    if(texts.length) maintainTexts();
+    
+    // Events upkeep
+    TimeHandler.handleEvents();
+    // handleEvents();
+    
+    refillCanvas();
+    
+  }
 }
 
 function adjustFPS() {

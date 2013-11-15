@@ -256,7 +256,7 @@ function lulz(options, timer) {
   mario.star = true;
   options = options || [Goomba];
   timer = timer || 7;
-  TimeHandler.addEvent(function() {
+  TimeHandler.addEventInterval(function() {
     if(characters.length > 210) return;
     var lul = new Thing(options[randInt(options.length)], randBoolJS(), randBoolJS());
     lul.yvel = random() * -unitsizet4;
@@ -274,7 +274,7 @@ function maxlulz() {
   // Sigh....
   // window.palette = arrayShuffle(window.palette, 1);
   // clearAllSprites(true);
-  TimeHandler.addEvent(function(arr) {
+  TimeHandler.addEventInterval(function(arr) {
       setAreaSetting(arr[randInt(arr.length)]);
     }, 7, Infinity, ["Overworld", "Underworld", "Underwater", "Sky", "Castle"]);
 }
@@ -287,7 +287,13 @@ function setMessageTriggers() {
   // Commands will be sent in by these codes
   var command_codes = {
     setMap: triggerSetMap,
-    startEditor: function() { loadEditor(); }
+    startEditor: function() { loadEditor(); },
+    toggleOption: function(data) { 
+      var name = "toggle" + data.option;
+      console.log(name, window[name]);
+      if(window[name]) window[name]();
+      else log("Could not toggle", name);
+    }
   };
   
   // When a message is received, send it to the appropriate command code

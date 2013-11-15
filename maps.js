@@ -63,7 +63,7 @@ function Area(setting, rawfunc) {
 function setAreaSetting(area, setting, sound) {
   map.shifting = true;
   if(arguments.length == 1) {
-    setting = arguments[0];
+    setting = arguments[0] || "Overworld";
     area = map.area;
   }
   area.setting = area.background = setting;

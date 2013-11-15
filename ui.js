@@ -24,6 +24,9 @@ function start() {
   // Level editor
   setLevelEditor();
   
+  // Options
+  setOptions();
+  
   // Make lots of friends
   setCheats();
 }
@@ -138,6 +141,31 @@ function startEditor() {
   game.focus();
 }
 
+// Fills the options menu with a bunch of divs, each of which have an onclick of toggleGame('XYZ')
+function setOptions() {
+  var out = document.getElementById("in_options"),
+      options = [
+        "Mute",
+        "Luigi",
+        "FastFWD"
+      ],
+      innerHTML = "",
+      option, i;
+  for(i in options) {
+    option = options[i];
+    innerHTML += "<div class='maprectout' onclick='toggleGame(\"" + option + "\")'><div class='maprect big larger'>Toggle " + option + "</div></div>";
+    innerHTML += "<br />";
+  }
+  out.innerHTML += innerHTML + "<br />More coming soon!";
+}
+
+// toggleGame('XYZ') sends a message to the game to toggle XYZ
+function toggleGame(me) {
+  game.postMessage({
+    type: "toggleOption",
+    option: me
+  }, "*");
+}
 
 function setCheats() {
   var i;
