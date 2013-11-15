@@ -491,7 +491,7 @@ function characterIsAlive(me) {
 /*
  * Scoring on enemies
  */
-function scoreMarioShell(mario, shell) {
+function scoreMarioShell(player, shell) {
   // Star Mario gets 200
   if(player.star) return score(shell, 200, true);
   // Shells in the air cause 8000 points, oh lawdy
@@ -639,7 +639,7 @@ function moveFalling(me) {
   
   // Since Mario is on me, fall
   shiftVert(me, me.yvel += unitsized8);
-  setBottom(mario, me.top);
+  setBottom(player, me.top);
   
   // After a velocity threshold, always fall
   if(me.yvel >= unitsize * 2.8) {

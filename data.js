@@ -75,7 +75,7 @@ function updateDataTime(me) {
   // If the time direction isn't up (random map), check for timing
   if(me.dir != 1) {
     if(me.amount == 100) playCurrentThemeHurry(); 
-    else if(me.amount <= 0) killMario(mario, true);
+    else if(me.amount <= 0) killPlayer(player, true);
   }
   // If time is still enabled, change it by 1
   if(!notime) {
@@ -96,8 +96,8 @@ function updateDataElement(me) {
 function score(me, amount, appears) {
   // Don't do negative values
   if(amount <= 0) return;
-  // If it's in the form 'score(X)', return 'score(mario, x)'
-  if(arguments.length == 1) return score(mario, me);
+  // If it's in the form 'score(X)', return 'score(player, x)'
+  if(arguments.length == 1) return score(player, me);
   // Keep the high score in localStorage, why not.
   localStorage.highscore = max(localStorage.highscore, data.score.amount += amount);
   // If it appears, add the element
@@ -136,9 +136,9 @@ function setLives(num) {
   updateDataElement(data.lives);
 }
 
-function storeMarioStats() {
+function storePlayerStats() {
   data.playerpower = player.power;
 }
-function clearMarioStats() {
+function clearPlayerStats() {
   data.playerpower = player.power = 1;
 }

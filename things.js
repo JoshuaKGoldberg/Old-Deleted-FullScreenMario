@@ -171,7 +171,7 @@ function pushPreThing(type, xloc, yloc, extras, more) {
 }
 
 /*
- * Characters (except Mario, who has his own .js)
+ * Characters (except player, who has his own .js)
  */
  
 
@@ -193,7 +193,7 @@ function Mushroom(me, type) {
   var name = "mushroom";
   switch(type) {
     case 1: me.action = gainLife; name += " gainlife"; break;
-    case -1: me.action = killMario; name += " death"; break;
+    case -1: me.action = killPlayer; name += " death"; break;
     default: me.action = marioShroom; name += " regular"; break;
   }
   setCharacter(me, name);
@@ -266,7 +266,7 @@ function Star(me) { // GOLDEEN GOLDEEN
   me.animate = emergeUp;
   me.movement = moveJumping;
   me.collide = collideFriendly;
-  me.action = marioStar;
+  me.action = playerStar;
   me.death = killNormal;
   me.nofire = true;
   setCharacter(me, "star item"); // Item class so mario's star isn't confused with this
@@ -307,41 +307,41 @@ function hitShell(one, two) {
       }
     break;
     
-    // Hitting Mario
+    // Hitting Player
     case "mario":
       var shelltoleft = objectToLeft(two, one),
           mariojump = one.yvel > 0 && one.bottom <= two.top + unitsizet2;
       
-      // Star Mario is pretty easy
+      // Star Player is pretty easy
       if(one.star) {
-        scoreMarioShell(one, two);
+        scorePlayerShell(one, two);
         return two.death(two, 2);
       }
       
-      // If the shell is already being landed on by Mario:
+      // If the shell is already being landed on by Player:
       if(two.landing) {
         // If the recorded landing direction hasn't changed:
         if(two.shelltoleft == shelltoleft) {
           // Increase the landing count, and don't do anything.
           ++two.landing;
           // If it's now a count of 1, score the shell
-          if(two.landing == 1) scoreMarioShell(one, two);
+          if(two.landing == 1) scorePlayerShell(one, two);
           // Reduce that count very soon
           TimeHandler.addEvent(function(two) { --two.landing; }, 2, two);
         }
-        // Otherwise, the shell has reversed direction during land. Mario should die.
+        // Otherwise, the shell has reversed direction during land. Player should die.
         else {
-          // This prevents accidentally scoring Mario's hit
+          // This prevents accidentally scoring Player's hit
           player.death(mario);
         }
         return;
       }
       
-      // Mario is kicking the shell (either hitting a still shell or jumping onto a shell)
+      // Player is kicking the shell (either hitting a still shell or jumping onto a shell)
       if(two.xvel == 0 || mariojump) {
-        // Mario has has hit the shell in a dominant matter. You go, Mario!
+        // Player has has hit the shell in a dominant matter. You go, Player!
         two.counting = 0;
-        scoreMarioShell(one, two);
+        scorePlayerShell(one, two);
         // The shell is peeking
         if(two.peeking) {
           two.peeking = false;
@@ -359,27 +359,27 @@ function hitShell(one, two) {
             two.moveleft = false;
             two.xvel = two.speed;
           }
-          // Make sure to know not to kill Mario too soon
+          // Make sure to know not to kill Player too soon
           ++two.hitcount;
           TimeHandler.addEvent(function(two) { --two.hitcount; }, 2, two);
         }
         // Otherwise set the xvel to 0
         else two.xvel = 0;
         
-        // Mario is landing on the shell (movements, xvels already set)
+        // Player is landing on the shell (movements, xvels already set)
         if(mariojump) {
           play("Kick");
           // The shell is moving
           if(!two.xvel) {
             jumpEnemy(one, two);
             one.yvel *= 2;
-            scoreMarioShell(one, two);
+            scorePlayerShell(one, two);
             setBottom(one, two.top - unitsize, true);
           }
           // The shell isn't moving
           else {
             // shelltoleft ? setRight(two, one.left) : setLeft(two, one.right);
-            scoreMarioShell(one, two);
+            scorePlayerShell(one, two);
           }
           ++two.landing;
           two.shelltoleft = shelltoleft;
@@ -387,7 +387,7 @@ function hitShell(one, two) {
         }
       }
       else {
-        // Since the shell is moving and Mario isn't, if the xvel is towards Mario, that's a death
+        // Since the shell is moving and Player isn't, if the xvel is towards player, that's a death
         if(!two.hitcount && ((shelltoleft && two.xvel < 0) || (!shelltoleft && two.xvel > 0)))
           one.death(one);
       }
@@ -464,7 +464,7 @@ function moveShell(me) {
   }
 }
 
-// Assuming one is Mario, two is item
+// Assuming one is player, two is item
 function collideFriendly(one, two) {
   if(one.type != "mario") return;
   if(two.action) two.action(one);
@@ -618,7 +618,7 @@ function movePirhanaNew(me, amount) {
 }
 function movePirhanaRestart(me) {
   var marmid = getMidX(mario);
-  // If Mario's too close and counter == 0, don't do anything
+  // If Player's too close and counter == 0, don't do anything
   if(me.counter >= me.countermax && marmid > me.left - unitsizet8 && marmid < me.right + unitsizet8) {
     setTimeout(movePirhanaRestart, 7, me);
     return;
@@ -633,12 +633,12 @@ function killPirhana(me) {
 }
 
 // Really just checks toly for pirhanas.
-function marioAboveEnemy(mario, enemy) {
+function marioAboveEnemy(player, enemy) {
   if(player.bottom < enemy.top + enemy.toly) return true;
   return false;
 }
 
-// Assuming one should generally be Mario/thing, two is enemy
+// Assuming one should generally be Player/thing, two is enemy
 function collideEnemy(one, two) {
   // Check for life
   if(!characterIsAlive(one) || !characterIsAlive(two)) return;
@@ -653,31 +653,31 @@ function collideEnemy(one, two) {
     return;
   }
   
-  // Mario on top of enemy
+  // Player on top of enemy
   if(!map.underwater && one.player && ((one.star && !two.nostar) || (!two.deadly && objectOnTop(one, two)))) {
     // Enforces toly
     if(marioAboveEnemy(one, two)) return;
-    // Mario is on top of them (or star):
+    // Player is on top of them (or star):
     if(one.player && !one.star) TimeHandler.addEvent(function(one, two) { jumpEnemy(one, two); }, 0, one, two);
     else two.nocollide = true;
     // Kill the enemy
     //// If killed returns a Thing, then it's a shell
-    //// Make sure Mario isn't immediately hitting the shell
+    //// Make sure Player isn't immediately hitting the shell
     var killed = two.death(two, one.star * 2);
     if(one.star) scoreEnemyStar(two);
     else {
       scoreEnemyStomp(two);
       /*TimeHandler.addEvent(function(one, two) { */setBottom(one, min(one.bottom, two.top + unitsize));/* }, 0, one, two);*/
     }
-    // Make Mario have the hopping thing
+    // Make Player have the hopping thing
     addClass(one, "hopping");
     removeClasses(one, "running skidding jumping one two three")
     // addClass(one, "running three");
     one.hopping = true;
-    if(player.power == 1)  setMarioSizeSmall(one);
+    if(player.power == 1)  setPlayerSizeSmall(one);
   }
   
-  // Mario getting hit by an enemy
+  // Player getting hit by an enemy
   else if(one.player) {
     if(!marioAboveEnemy(one, two)) one.death(one);
   }
@@ -758,7 +758,7 @@ function moveHammerBro(me) {
   me.xvel = Math.sin(Math.PI * (me.counter += .007)) / 2.1;
   
   // Make him turn to look at mario if needed
-  lookTowardMario(me);
+  lookTowardPlayer(me);
   
   // If falling, don't collide with solids
   me.nocollidesolid = me.yvel < 0 || me.falling;
@@ -823,9 +823,9 @@ function moveCannonInit(me) {
   TimeHandler.addEventInterval(
     function(me) {
       if(player.right > me.left - unitsizet8 && player.left < me.right + unitsizet8)
-        return; // don't fire if Mario is too close
+        return; // don't fire if Player is too close
       var spawn = new Thing(BulletBill);
-      if(objectToLeft(mario, me)) {
+      if(objectToLeft(player, me)) {
         addThing(spawn, me.left, me.top);
         spawn.direction = spawn.moveleft = true;
         spawn.xvel *= -1;
@@ -873,7 +873,7 @@ function moveBowserInit(me) {
 }
 function moveBowser(me) {
   if(!characterIsAlive(mario)) return;
-  lookTowardMario(me);
+  lookTowardPlayer(me);
   if(me.lookleft) me.xvel = Math.sin(Math.PI * (me.counter += .007)) / 1.4;
   else me.xvel = min(me.xvel + .07, .84);
 }
@@ -906,7 +906,7 @@ function bowserFires(me) {
     play("Bowser Fires");
   }, 14, me);
 }
-// This is for when Fiery Mario kills bowser - the normal one is listed under the castle things
+// This is for when Fiery Player kills bowser - the normal one is listed under the castle things
 function killBowser(me, big) {
   if(big) {
     me.nofall = false;
@@ -969,7 +969,7 @@ function Blooper(me) {
 
 // Normally goes up at increasing rate
 // Every X seconds, squeezes to go down
-//// Minimum Y seconds, continues if Mario is below until bottom is 8 above floor
+//// Minimum Y seconds, continues if Player is below until bottom is 8 above floor
 function moveBlooper(me) {
   switch(me.counter) {
     case 56: me.squeeze = true; ++me.counter; break;
@@ -1179,7 +1179,7 @@ function moveSpinyEgg(me) {
 function createSpiny(me) {
   var spawn = new Thing(Spiny);
   addThing(spawn, me.left, me.top);
-  spawn.moveleft = objectToLeft(mario, spawn);
+  spawn.moveleft = objectToLeft(player, spawn);
   killNormal(me);
 }
 
@@ -1301,10 +1301,10 @@ function coinEmergeMoveParent(me) {
 }
 
 /*
- * Mario
+ * Player
  */
- function Mario(me) {
-  setMarioSizeSmall(me);
+ function Player(me) {
+  setPlayerSizeSmall(me);
   me.walkspeed = unitsized2;
   me.canjump = me.nofiredeath = me.nofire = me.player = me.nokillend = 1;
   me.numballs = me.moveleft = me.skidding = me.star = me.dying = me.nofall = me.maxvel = me.paddling = me.jumpers = me.landing = 0;
@@ -1313,9 +1313,9 @@ function coinEmergeMoveParent(me) {
   me.maxspeed = me.maxspeedsave = unitsize * 1.35; // Really only used for timed animations
   me.scrollspeed = unitsize * 1.75;
   me.keys = new Keys();
-  me.fire = marioFires;
-  me.movement = moveMario;
-  me.death = killMario;
+  me.fire = playerFires;
+  me.movement = movePlayer;
+  me.death = killPlayer;
   setCharacter(me, "mario normal small still");
   me.tolx = unitsizet2;
   me.toly = 0;
@@ -1326,19 +1326,19 @@ function coinEmergeMoveParent(me) {
   }  
 }
 
-function placeMario(xloc, yloc) {
-  clearOldMario();
-  window.player = new Thing(Mario);
+function placePlayer(xloc, yloc) {
+  clearOldPlayer();
+  window.player = new Thing(Player);
   if (window.luigi) window.player.title = "Luigi";
 
   var adder = addThing(player, xloc || unitsizet16, yloc || (map.floor - player.height) * unitsize);
   if(data.playerpower >= 2) {
-    marioGetsBig(mario, true);
-    if(data.playerpower == 3) marioGetsFire(mario, true);
+    marioGetsBig(player, true);
+    if(data.playerpower == 3) marioGetsFire(player, true);
   }
   return adder;
 }
-function clearOldMario() {
+function clearOldPlayer() {
   if(!window.player) return;
   // if(player.element) removeElement(mario);
   player.alive = false;
@@ -1379,9 +1379,9 @@ function removeCrouch() {
   player.crouching = false;
   player.toly = player.tolyold || 0;
   if(player.power != 1) {
-    removeClass(mario, "crouching");
+    removeClass(player, "crouching");
     player.height = 16;
-    updateBottom(mario, 0);
+    updateBottom(player, 0);
     updateSize(mario);
   }
 }
@@ -1393,19 +1393,19 @@ function marioShroom(me) {
   if(me.power == 3) return;
   me.shrooming = true;
   (++me.power == 2 ? marioGetsBig : marioGetsFire)(me);
-  storeMarioStats();
+  storePlayerStats();
 }
 // These three modifiers don't change power levels.
 function marioGetsBig(me, noanim) {
   setMarioSizeLarge(me);
   me.keys.down = 0;
-  removeClasses(mario, "crouching small");
+  removeClasses(player, "crouching small");
   updateBottom(me, 0);
   updateSize(me);
   if(!noanim) {
     // pause();
     // Mario cycles through 'shrooming1', 'shrooming2', etc.
-    addClass(mario, "shrooming");
+    addClass(player, "shrooming");
     var stages = [1,2,1,2,3,2,3];
     for(var i = stages.length - 1; i >= 0; --i)
       stages[i] = "shrooming" + stages[i];
@@ -1434,20 +1434,20 @@ function marioGetsSmall(me) {
   addClass(me, "small");
   flicker(me);
   // Step one
-  removeClasses(mario, "running skidding jumping fiery");
-  addClass(mario, "paddling");
+  removeClasses(player, "running skidding jumping fiery");
+  addClass(player, "paddling");
   // Step two (t+21)
   TimeHandler.addEvent(function(mario) {
-    removeClass(mario, "large");
+    removeClass(player, "large");
     setMarioSizeSmall(mario);
-    setBottom(mario, bottom - unitsize);
+    setBottom(player, bottom - unitsize);
   }, 21, mario);
   // Step three (t+42)
   TimeHandler.addEvent(function(mario) {
-    thingRetrieveVelocity(mario, false);
+    thingRetrieveVelocity(player, false);
     player.nocollidechar = true;
-    removeClass(mario, "paddling");
-    if(player.running || player.xvel) addClass(mario, "running");
+    removeClass(player, "paddling");
+    if(player.running || player.xvel) addClass(player, "running");
     TimeHandler.addEvent(setThingSprite, 1, mario);
   }, 42, mario);
   // Step four (t+70);
@@ -1476,7 +1476,7 @@ function moveMario(me) {
   
   // Jumping
   else if(me.keys.jump > 0 && (me.yvel <= 0 || map.underwater) ) {
-    if(map.underwater) marioPaddles(me);
+    if(map.underwater) playerPaddles(me);
     if(me.resting) {
       if(me.resting.xvel) me.xvel += me.resting.xvel;
       me.resting = false;
@@ -1566,7 +1566,7 @@ function moveMario(me) {
   else if(!me.running) {
     me.running = true;
     switchClass(me, "still", "running");
-    marioStartRunningCycle(me);
+    playerStartRunningCycle(me);
     if(me.power == 1) setMarioSizeSmall(me);
   }
   if(me.xvel > 0) {
@@ -1611,17 +1611,17 @@ function moveMario(me) {
   if(isNaN(me.xvel)) debugger;
 }
 
-// Gives Mario visual running
-function marioStartRunningCycle(me) {
-  // setMarioRunningCycler sets the time between cycles
-  me.running = TimeHandler.addSpriteCycle(me, ["one", "two", "three", "two"], "running", setMarioRunningCycler);
+// Gives player visual running
+function playerStartRunningCycle(me) {
+  // setPlayerRunningCycler sets the time between cycles
+  me.running = TimeHandler.addSpriteCycle(me, ["one", "two", "three", "two"], "running", setPlayerRunningCycler);
 }
-// Used by Mario's running cycle to determine how fast he should switch between sprites
-function setMarioRunningCycler(event) {
+// Used by player's running cycle to determine how fast he should switch between sprites
+function setPlayerRunningCycler(event) {
   event.timeout = 5 + ceil(player.maxspeedsave - abs(player.xvel));
 }
 
-function marioPaddles(me) {
+function playerPaddles(me) {
   if(!me.paddling) {
     removeClasses(me, /*"running */"skidding paddle1 paddle2 paddle3 paddle4 paddle5");
     addClass(me, "paddling");
@@ -1632,19 +1632,19 @@ function marioPaddles(me) {
   me.yvel = unitsize * -.84;
 }
 
-function marioBubbles() {
+function playerBubbles() {
   var bubble = new Thing(Bubble);
   addThing(bubble, player.right, player.top);
   // TimeHandler.addEvent(killNormal, 140, bubble);
 }
 
-function moveMarioVine(me) {
+function movePlayerVine(me) {
   var attached = me.attached;
-  if(me.bottom < attached.top) return unattachMario(me);
+  if(me.bottom < attached.top) return unattachPlayer(me);
   if(me.keys.run == me.attachoff) {
     while(objectsTouch(me, attached))
       shiftHoriz(me, me.keys.run, true);
-    return unattachMario(me);
+    return unattachPlayer(me);
   }
   
   // If Mario is moving up, simply move up
@@ -1656,7 +1656,7 @@ function moveMarioVine(me) {
   else if(me.keys.crouch) {
     me.animatednow = true;
     shiftVert(me, unitsized2, true);
-    if(me.bottom > attached.bottom - unitsizet4) return unattachMario(me);
+    if(me.bottom > attached.bottom - unitsizet4) return unattachPlayer(me);
   }
   else me.animatednow = false;
   
@@ -1675,7 +1675,7 @@ function moveMarioVine(me) {
   }
 }
 
-function unattachMario(me) {
+function unattachPlayer(me) {
   me.movement = moveMario;//me.movementsave;
   removeClasses(me, "climbing", "animated");
   TimeHandler.clearClassCycle(me, "climbing");
@@ -1683,7 +1683,7 @@ function unattachMario(me) {
   me.xvel = me.keys.run;
 }
 
-function marioHopsOff(me, solid, addrun) {
+function playerHopsOff(me, solid, addrun) {
   removeClasses(me, "climbing running");
   addClass(me, "jumping");
   
@@ -1698,38 +1698,38 @@ function marioHopsOff(me, solid, addrun) {
     me.attached = false;
     if(addrun) {
       addClass(me, "running")
-      marioStartRunningCycle(me);
+      playerStartRunningCycle(me);
     }
   }, 21, me);
   
 }
 
-function marioFires() {
+function playerFires() {
   if(player.numballs >= 2) return;
   ++player.numballs;
-  addClass(mario, "firing");
+  addClass(player, "firing");
   var ball = new Thing(FireBall, player.moveleft, true);
   ball.yvel = unitsize
   addThing(ball, player.right + unitsized4, player.top + unitsizet8);
   if(player.moveleft) setRight(ball, player.left - unitsized4, true);
   ball.animate(ball);
   ball.ondelete = fireDeleted;
-  TimeHandler.addEvent(function(mario) { removeClass(mario, "firing"); }, 7, mario);
+  TimeHandler.addEvent(function(mario) { removeClass(player, "firing"); }, 7, mario);
 }
 function emergeFire(me) {
   play("Fireball");
 }
 
-function marioStar(me) {
+function playerStar(me) {
   if(me.star) return;
   ++me.star;
   play("Powerup");
   playTheme("Star", true);
-  TimeHandler.addEvent(marioRemoveStar, 560, me);
+  TimeHandler.addEvent(playerRemoveStar, 560, me);
   switchClass(me, "normal", "star");
   TimeHandler.addSpriteCycle(me, ["star1", "star2", "star3", "star4"], "star", 5);
 }
-function marioRemoveStar(me) {
+function playerRemoveStar(me) {
   if(!me.star) return;
   --me.star;
   removeClasses(me, "star star1 star2 star3 star4");
@@ -1739,7 +1739,7 @@ function marioRemoveStar(me) {
 }
 
 // Big means it must happen: 2 means no animation
-function killMario(me, big) {
+function killPlayer(me, big) {
   if(!me.alive || me.flickering || me.dying) return;
   // If this is an auto kill, it's for rizzles
   if(big == 2) {
@@ -1752,7 +1752,7 @@ function killMario(me, big) {
     if(!big && me.power > 1) {
       play("Power Down");
       me.power = 1;
-      storeMarioStats();
+      storePlayerStats();
       return marioGetsSmall(me);
     }
     // Otherwise, if this isn't a big one, animate a death
@@ -1803,14 +1803,14 @@ function killMario(me, big) {
       updateDataElement(data.lives);
       // placeMario(unitsizet16, unitsizet8 * -1 + (map.underwater * unitsize * 24));
       TimeHandler.addEvent(function() {
-        marioDropsIn();
+        playerDropsIn();
         playTheme();
       // }, 7 * (map.respawndist || 17));
       }, 117);
   }
 }
 // Used by random maps to respawn
-function marioDropsIn() {
+function playerDropsIn() {
   // Clear and place Mario
   clearOldMario();
   placeMario(unitsizet16, unitsizet8 * -1 + (map.underwater * unitsize * 24));
@@ -1845,7 +1845,7 @@ function gameOver() {
   body.innerHTML = innerHTML;
   
   window.gamecount = Infinity;
-  clearMarioStats();
+  clearPlayerStats();
   
   setTimeout(gameRestart, 7000);
 }
@@ -2085,7 +2085,7 @@ function touchVine(me, vine) {
   me.attachleft = !objectToLeft(me, vine);
   me.attachoff = me.attachleft * 2 - 1;
   me.movementsave = me.movement;
-  me.movement = moveMarioVine;
+  me.movement = movePlayerVine;
   me.keys = new Keys();
   
   // Reset classes to be in vine mode
@@ -2158,7 +2158,7 @@ function moveSpringUp(spring) {
   reduceSpringHeight(spring, -spring.tension);
   spring.tension *= 2;
   if(spring == player.spring) 
-    setBottom(mario, spring.top, true);
+    setBottom(player, spring.top, true);
   
   if(spring.height > spring.heightnorm) {
     if(spring == player.spring) {
@@ -2429,9 +2429,9 @@ function movePlatformNorm(me) {
   shiftHoriz(me, me.xvel);
   shiftVert(me, me.yvel);
   if(me == player.resting && me.alive) {
-    setBottom(mario, me.top);
-    shiftHoriz(mario, me.xvel);
-    if(player.right > innerWidth) setRight(mario, innerWidth);
+    setBottom(player, me.top);
+    shiftHoriz(player, me.xvel);
+    if(player.right > innerWidth) setRight(player, innerWidth);
   }
 }
 function detachMario(me) {
@@ -2491,7 +2491,7 @@ function FlagCollision(me, detector) {
   killOtherCharacters();
   nokeys = notime = player.nofall = 1;
   
-  // Mostly clear Mario, and set him to the pole's left
+  // Mostly clear player, and set him to the pole's left
   player.xvel = player.yvel = player.keys.up = player.keys.jump = map.canscroll = map.ending = player.movement = 0;
   player.nocollidechar = true;
   setRight(me, detector.pole.left, true);
@@ -2499,7 +2499,7 @@ function FlagCollision(me, detector) {
   addClass(me, "climbing animated");
   updateSize(me);
   TimeHandler.addSpriteCycle(me, ["one", "two"], "climbing");
-  marioRemoveStar(mario); // just in case
+  playerRemoveStar(mario); // just in case
   
   // Start the movement
   var mebot = false,
@@ -2512,8 +2512,8 @@ function FlagCollision(me, detector) {
             scoreMarioFlag(scoreheight, detector.stone);
             mebot = true;
             setBottom(me, detector.stone.top, true);
-            removeClass(mario, "animated");
-            TimeHandler.clearClassCycle(mario, "climbing");
+            removeClass(player, "animated");
+            TimeHandler.clearClassCycle(player, "climbing");
           } else shiftVert(me, unitsize, true);
         }
         // Same for the flag
@@ -2552,7 +2552,7 @@ function scoreMarioFlag(diff, stone) {
     // 62 to infinity and beyond
     else { amount = 5000; }
   }
-  score(mario, amount, true);
+  score(player, amount, true);
 }
 
 function FlagOff(me, pole) {
@@ -2563,7 +2563,7 @@ function FlagOff(me, pole) {
   setLeft(me, pole.right, true);
   setTimeout(function() {
     play("Stage Clear");
-    marioHopsOff(me, pole, true);
+    playerHopsOff(me, pole, true);
   }, timer * 14);
 }
 

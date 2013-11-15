@@ -134,12 +134,12 @@ function maintainMario(update) {
       // Paddling? (from falling off a solid)
       if(map.underwater) {
         if(!player.paddling) {
-          switchClass(mario, "paddling", "paddling");
+          switchClass(player, "paddling", "paddling");
           player.padding = true;
         }
       }
       else {
-        addClass(mario, "jumping");
+        addClass(player, "jumping");
         player.jumping = true;
       }
     }
@@ -150,15 +150,15 @@ function maintainMario(update) {
         // Random maps will pretend he died
         if(map.random) {
           goToTransport(["Random", "Overworld", "Down"]);
-          marioDropsIn();
+          playerDropsIn();
           return;
         }
         // Otherwise just shift to the location
         return shiftToLocation(map.exitloc);
       }
       // Otherwise, since Mario is below the gamescreen, kill him dead
-      clearMarioStats();
-      killMario(mario, 2);
+      clearPlayerStats();
+      killPlayer(player, 2);
     }
   }
   

@@ -312,7 +312,7 @@ function setMessageTriggers() {
 
 // The UI has requested a map change
 function triggerSetMap(data) {
-  clearMarioStats();
+  clearPlayerStats();
   setMap.apply(this, data.map || []);
   setLives(3);
 }
