@@ -781,7 +781,7 @@ function resetLibrary() {
         "Jump Super",
         "Kick",
         "Level Complete",
-        "Mario Dies",
+        "Player Dies",
         "Pause",
         "Pipe",
         "Power Down",

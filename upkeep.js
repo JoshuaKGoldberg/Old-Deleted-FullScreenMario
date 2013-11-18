@@ -21,8 +21,8 @@ function upkeep() {
     // Character upkeep
     maintainCharacters();
     
-    // Mario specific
-    maintainMario();
+    // Player specific
+    maintainPlayer();
     
     // Texts upkeep, if there are any
     if(texts.length) maintainTexts();
@@ -107,7 +107,7 @@ function maintainCharacters(update) {
     //// Good for performance if gamescreen.bottom - gamescreen.top is saved in screen and updated on shift
     // To do: is map.shifting needed?
     if(character.alive) {
-      if(character.type != "mario" && !map.shifting && 
+      if(character.type != "player" && !map.shifting && 
           (character.numquads == 0 || character.left > delx) && !character.outerok) {
           // (character.top > gamescreen.bottom - gamescreen.top || character.left < + quads.width * -1)) {
         deleteThing(character, characters, i);
@@ -123,10 +123,10 @@ function maintainCharacters(update) {
   }
 }
 
-function maintainMario(update) {
+function maintainPlayer(update) {
   if(!player.alive) return;
   
-  // Mario is falling
+  // Player is falling
   if(player.yvel > 0) {
     if(!map.underwater) player.keys.jump = 0;
     // Jumping?
@@ -143,7 +143,7 @@ function maintainMario(update) {
         player.jumping = true;
       }
     }
-    // Mario has fallen too far
+    // Player has fallen too far
     if(!player.piping && !player.dying && player.top > gamescreen.deathheight) {
       // If the map has an exit loc (cloud world), transport there
       if(map.exitloc) {
@@ -156,30 +156,30 @@ function maintainMario(update) {
         // Otherwise just shift to the location
         return shiftToLocation(map.exitloc);
       }
-      // Otherwise, since Mario is below the gamescreen, kill him dead
+      // Otherwise, since Player is below the gamescreen, kill him dead
       clearPlayerStats();
       killPlayer(player, 2);
     }
   }
   
-  // Mario is moving to the right
+  // Player is moving to the right
   if(player.xvel > 0) {
     if(player.right > gamescreen.middlex) {
-      // If Mario is to the right of the gamescreen's middle, move the gamescreen
+      // If Player is to the right of the gamescreen's middle, move the gamescreen
       if(player.right > gamescreen.right - gamescreen.left)
         player.xvel = min(0, player.xvel);
     }
   }
-  // Mario is moving to the left
+  // Player is moving to the left
   else if(player.left < 0) {
-    // Stop Mario from going to the left.
+    // Stop Player from going to the left.
     player.xvel = max(0, player.xvel);
   }
   
-  // Mario is hitting something (stop jumping)
+  // Player is hitting something (stop jumping)
   if(player.under) player.jumpcount = 0;
   
-  // Scrolloffset is how far over the middle mario's right is
+  // Scrolloffset is how far over the middle player's right is
   // It's multiplied by 0 or 1 for map.canscroll
   window.scrolloffset = (map.canscroll/* || (map.random && !map.noscroll)*/) * (player.right - gamescreen.middlex);
   if(scrolloffset > 0 && !map.shifting) {

@@ -95,7 +95,7 @@ function Controls(pipes, gamepadPipes) {
       if(player.canjump &&/* !player.crouching &&*/ (player.resting || map.underwater)) {
         keys.jump = 1;
         player.canjump = keys.jumplev = 0;
-        // To do: can mario make a jumping sound during the spring, and during the pipe cutscenes?
+        // To do: can player make a jumping sound during the spring, and during the pipe cutscenes?
         if(player.power > 1) play("Jump Super");
         else play("Jump Small");
         if(map.underwater) setTimeout(function() {
@@ -186,7 +186,7 @@ function Controls(pipes, gamepadPipes) {
 function ControlsPipe(name, strict) {
   var responses = controls[name];
   return function(event) {
-    if((strict && ((mario && player.dead) || window.paused)) || window.nokeys) return;
+    if((strict && ((player && player.dead) || window.paused)) || window.nokeys) return;
 
     // Allow this to be used as keyup(37) or keyup({which: 37})
     if(typeof(event) != "number" || event.which || event.control)
@@ -204,7 +204,7 @@ function ControlsPipe(name, strict) {
 }
 
 function keydown(event) {
-  if((mario && player.dead) || window.paused || window.nokeys) return;
+  if((player && player.dead) || window.paused || window.nokeys) return;
   var responses = controls["keydown"];
   // Allow this to be used as keyup(37) or keyup({which: 37})
   if(typeof(event) === "object" || event.which)

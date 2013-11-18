@@ -881,14 +881,14 @@ function sectionColliderInit(me) {
   me.movement = false;
 }
 function sectionPass(character, collider) {
-  if(character.type != "mario") return false;
+  if(character.type != "player") return false;
   collider.nocollide = true;
   var parent = collider.parent;
   if(--parent.numpass) return;
   activateSection(collider.parent, true);
 }
 function sectionFail(character, collider) {
-  if(character.type != "mario") return false;
+  if(character.type != "player") return false;
   collider.nocollide = true;
   
   activateSection(collider.parent, false);

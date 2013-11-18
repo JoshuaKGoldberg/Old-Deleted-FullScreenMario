@@ -395,7 +395,7 @@ function solidOnCharacter(solid, me) {
   (solid.bottom - solid.yvel <= me.top + me.toly - me.yvel);
 }
 // This would make the smart koopas stay on the edges more intelligently
-// Can't use objectOnTop for this, else Mario will walk on walls.
+// Can't use objectOnTop for this, else Player will walk on walls.
 function characterOnSolid(me, solid) {
   return (me.resting == solid || (objectOnSolid(me, solid) && me.yvel >= 0 &&
     me.left + me.xvel + unitsize != solid.right && me.right - me.xvel - unitsize != solid.left));
@@ -447,12 +447,12 @@ function characterTouchedSolid(me, solid) {
       shiftHoriz(me, min(solid.right - unitsize - me.left, unitsized2), true);
     }
     
-    // Non-Marios are instructed to flip
+    // Non-Players are instructed to flip
     if(!me.player) {
       me.moveleft = !me.moveleft;
       if(me.group == "item") me.collide(solid, me);
     }
-    // Mario uses solid.actionLeft (e.g. Pipe -> intoPipeHoriz)
+    // Player uses solid.actionLeft (e.g. Pipe -> intoPipeHoriz)
     else if(solid.actionLeft)
       solid.actionLeft(me, solid, solid.transport);
   }
@@ -491,8 +491,8 @@ function characterIsAlive(me) {
 /*
  * Scoring on enemies
  */
-function scoreMarioShell(player, shell) {
-  // Star Mario gets 200
+function scorePlayerShell(player, shell) {
+  // Star Player gets 200
   if(player.star) return score(shell, 200, true);
   // Shells in the air cause 8000 points, oh lawdy
   if(!shell.resting) return score(shell, 8000, true);
@@ -637,7 +637,7 @@ function collideTransport(me, solid) {
 function moveFalling(me) {
   if(me != player.resting) return me.yvel = 0;
   
-  // Since Mario is on me, fall
+  // Since Player is on me, fall
   shiftVert(me, me.yvel += unitsized8);
   setBottom(player, me.top);
   
@@ -648,7 +648,7 @@ function moveFalling(me) {
   }
 }
 function moveFallingScale(me) {
-  // If Mario is resting on me, fall
+  // If Player is resting on me, fall
   if(player.resting == me) {
     shiftScaleStringVert(me, me.string, me.yvel += unitsized16);
     shiftScaleStringVert(me.partner, me.partner.string, -me.yvel);
@@ -803,7 +803,7 @@ function flicker(me, cleartime, interval) {
   TimeHandler.addEvent(function(me) { me.flickering = me.hidden = false; }, cleartime * interval + 1, me);
 }
 
-// Kills all characters other than mario
+// Kills all characters other than the player
 // Used in endCastleOutside/Inside
 // Also kills all moving solids
 function killOtherCharacters() {
@@ -822,8 +822,8 @@ function killOtherCharacters() {
   }
 }
 
-function lookTowardMario(me, big) {
-  // Mario is to the left
+function lookTowardPlayer(me, big) {
+  // Player is to the left
   if(player.right <= me.left) {
     if(!me.lookleft || big) {
       me.lookleft = true;
@@ -831,7 +831,7 @@ function lookTowardMario(me, big) {
       unflipHoriz(me);
     }
   }
-  // Mario is to the right
+  // Player is to the right
   else if(player.left >= me.right) {
     if(me.lookleft || big) {
       me.lookleft = false;
