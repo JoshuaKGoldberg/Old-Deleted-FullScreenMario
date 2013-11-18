@@ -974,7 +974,7 @@ function editorControlUndo() {
   var placed = editor.placed,
       last = placed.pop();
   
-  if(last && !last.mario) {
+  if(last && !last.player) {
     killNormal(last);
   }  
 }
@@ -1149,7 +1149,7 @@ function eraserErases(me) {
   // If this touches anything in placed
   for(i = arr.length - 1; i >= 0; --i) {
     other = arr[i];
-    if(other.mario || other == editor.follower) continue;
+    if(other.player || other == editor.follower) continue;
     // These ones touch:
     if(objectsTouch(me, other)) {
       // Kill the other
@@ -1178,8 +1178,8 @@ function addThingsToPlaced() {
   // Grab all the Things, and sort them
   editor.placed = (editor.placed || []).concat(characters).concat(solids).concat(scenery);
   placed.sort(prethingsorter);
-  // (don't include Mario in this)
-  placed.splice(placed.indexOf(mario), 1);
+  // (don't include player in this)
+  placed.splice(placed.indexOf(player), 1);
   
   // Make the new placed all know their reference
   for(i = placed.length - 1; i >= 0; --i) {
@@ -1316,8 +1316,8 @@ function editorSubmitGameFunc() {
   setMap(["Custom", "Map"]);
   window.canedit = editor.playing = false;
   
-  // Load mario and all things 
-  entryBlank(mario);
+  // Load player and all things 
+  entryBlank(player);
   addThingsToPlaced();
   
   // Save and close
@@ -1342,13 +1342,13 @@ function editorSubmitLoad() {
   editorSubmitGameFunc();
 }
 
-// Allows Mario to roam the world
+// Allows player to roam the world
 function editorStartPlaying() {
   editorPreventClicks();
   editor.playing = true;
-  // Place a Mario normally
-  placeMario();
-  entryPlain(mario);
+  // Place a player normally
+  placeplayer();
+  entryPlain(player);
   nokeys = false;
   // Retrieve each thing
   var placed = editor.placed,

@@ -178,11 +178,11 @@ function setCheats() {
     Change_Map_Location: "game.shiftToLocation(#);",
     Fast_Forward: "game.fastforward(amount; 1 by default);",
     Life: "game.gainLife(# amount or Infinity)",
-    Low_Gravity: "game.mario.gravity = game.gravity /= 2;",
+    Low_Gravity: "game.player.gravity = game.gravity /= 2;",
     Lulz: "game.lulz();",
     Random_Map: "game.setMapRandom();",
-    Shroom: "game.marioShroom(game.mario)",
-    Star_Power: "game.marioStar(game.mario)",
+    Shroom: "game.playerShroom(game.player)",
+    Star_Power: "game.playerStar(game.player)",
     Unlimited_Time: "game.data.time.amount = Infinity;",
   }
   cheatsize = 0;

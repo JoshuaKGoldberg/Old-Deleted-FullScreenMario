@@ -150,7 +150,7 @@ function setMap(one, two) {
   window.area = newmap.area = newmap.areas[0];
   
   // Save the score if need be
-  if(window.mario && mario.power) storeMarioStats();
+  if(window.player && player.power) storePlayerStats();
   if(window.data) data.scoreold = data.score.amount;
   
   // Actual resetting is done in shiftToLocation
@@ -160,7 +160,7 @@ function setMap(one, two) {
 // For ease of transfer
 // Random map pipe transports are ["Random", "XXXworld", LocationType]
 // LocationType is either 1 (down) or -1 (up)
-// Down means Mario is moving down; Up means Mario is moving up.
+// Down means Player is moving down; Up means Player is moving up.
 function setMapRandom(transport) {
   if(!gameon) return;
   
@@ -207,15 +207,15 @@ function shiftToLocation(loc) {
   area.creation();
   setAreaPostCreation(area);
   
-  // Start off by spawning, then placing Mario
+  // Start off by spawning, then placing Player
   spawnMap();
-  mario = placeMario();
-  scrollMario(loc.xloc * unitsize);
-  locMovePreparations(mario);
+  player = placePlayer();
+  scrollPlayer(loc.xloc * unitsize);
+  locMovePreparations(player);
   // Note that some locs will pause manually after this
   unpause();
   // Typically this will do nothing or be from a pipe
-  loc.entry(mario, loc.entrything);
+  loc.entry(player, loc.entrything);
   // Don't forget the least annoying part of programming this!
   TimeHandler.addEvent(playTheme, 2);
   
@@ -266,9 +266,9 @@ function setAreaPostCreation() {
   map.has_lakitu = false;
   TimeHandler.addEvent(setMapGravity, 1);
   
-  // If it's underwater, give it the waves on top and mario's bubble event
+  // If it's underwater, give it the waves on top and player's bubble event
   if(area.underwater) {
-    // Random maps have a block to stop mario from swimming too high
+    // Random maps have a block to stop player from swimming too high
     area.presolids.push(new PreThing(0, 0, WaterBlock, area.width));
     // Non-random maps also have a water sprite (randoms set it themselves)
     if(!map.random) area.presolids.push(new PreThing(0, 16, Sprite, "Water", [area.width / 3, 1]));
@@ -370,11 +370,11 @@ function goToTransport(transport) {
   // Goes to a new map
   if(transport instanceof Array) { 
     map.ending = true;
-    storeMarioStats();
+    storePlayerStats();
     pause();
     if(map.random) {
       setMapRandom(transport);
-      // entryRandom(mario);
+      // entryRandom(player);
     }
     else setMap(transport);
   }
@@ -421,22 +421,22 @@ function entryRandom(me) {
   // To do: remember to set the text & width of the curmap datadisplay
   switch(map.entrancetype) {
     case "Down": 
-      entryNormal(mario);
+      entryNormal(player);
     break;
     case "Up":
       // Use a pipe
-      locMovePreparations(mario);
-      exitPipeVert(mario, addThing(new Thing(Pipe, 32), unitsizet8, (map.floor - 32) * unitsize));
+      locMovePreparations(player);
+      exitPipeVert(player, addThing(new Thing(Pipe, 32), unitsizet8, (map.floor - 32) * unitsize));
     break;
     case "Vine":
       // Do that vine stuff
-      locMovePreparations(mario);
-      TimeHandler.addEvent(function() { enterCloudWorld(mario, true); }, 1);
-      mario.nofall = true;
+      locMovePreparations(player);
+      TimeHandler.addEvent(function() { enterCloudWorld(player, true); }, 1);
+      player.nofall = true;
       spawnMap();
     break;
     case "Castle":
-      startCastle(mario);
+      startCastle(player);
     break;
     default:
       // Only reached by Overworld the first time
@@ -447,7 +447,7 @@ function entryRandom(me) {
 function enterCloudWorld(me) {
   // There are four cloud blocks to the left
   // The vine goes up until it has four blocks above the clouds, then waits 2 seconds
-  // Mario climbs up the left until two blocks from the top, then switches & jumps
+  // Player climbs up the left until two blocks from the top, then switches & jumps
   // if(paused) unpause();
   
   if(map.random) map.exitloc = getAfterSkyTransport();
@@ -472,23 +472,23 @@ function enterCloudWorld(me) {
       me.attached.movement = false;
       var stopheight = me.attached.top + unitsizet16;
       movement = setInterval(function() {
-        // Mario moving up
+        // Player moving up
         shiftVert(me, unitsized4 * -1, true);
         if(me.top <= stopheight) {
-          // Mario stops moving up
+          // Player stops moving up
           removeClass(me, "animated");
           clearInterval(movement);
           setTop(me, stopheight, true);
           clearInterval(movement);
           setTimeout(function() {
-            // Mario switches sides
+            // Player switches sides
             setLeft(me, unitsize * 36, true);
             addClass(me, "flipped");
             setTimeout(function() {
-              // Mario hops off
-              marioHopsOff(me, me.attached, true);
+              // Player hops off
+              playerHopsOff(me, me.attached, true);
               TimeHandler.clearClassCycle(me, "climbing");
-              me.running = TimeHandler.addSpriteCycle(me, ["one", "two", "three", "two"], "running", setMarioRunningCycler);
+              me.running = TimeHandler.addSpriteCycle(me, ["one", "two", "three", "two"], "running", setPlayerRunningCycler);
             }, timer * 28);
           }, timer * 14);
         }
@@ -497,24 +497,24 @@ function enterCloudWorld(me) {
   }, timer);
 }
 function walkToPipe() {
-  mario = placeMario();
-  startWalking(mario);
+  player = placePlayer();
+  startWalking(player);
   map.canscroll = false;
 
   var hasPipingStarted = false;
   var move = setInterval(function() {
-    if(mario.piping) {
+    if(player.piping) {
       // We have started piping
       if(sounds[0]) sounds[0].pause();
-      nokeys = mario.keys.run = notime = false;
+      nokeys = player.keys.run = notime = false;
       clearInterval(move);
-      mario.maxspeed = mario.maxspeedsave;
+      player.maxspeed = player.maxspeedsave;
     }
   }, timer);
   unpause();
 }
 function startWalking(me) {
-  me.movement = moveMario;
+  me.movement = movePlayer;
   me.maxspeed = me.walkspeed;
   nokeys = notime = me.keys.run = true;
   me.nofall = me.nocollide = false;
@@ -535,7 +535,7 @@ function intoPipeVert(me, pipe, transport) {
   }, timer);
 }
 function intoPipeHoriz(me, pipe, transport) {
-  // If Mario isn't resting or swimming, he shouldn't be allowed to pipe
+  // If Player isn't resting or swimming, he shouldn't be allowed to pipe
   // (resting may have been cleared at this point, so yvel is how it checks)
   // if(abs(me.yvel) > unitsized8 || !map.underwater) return;
   
@@ -569,7 +569,7 @@ function locMovePreparations(me) {
   removeClass(me, "flipped");
 }
 function startCastle(me) {
-  me = me || window.mario;
+  me = me || window.player;
   if(!me) return;
   setBottom(me, unitsize * 56);
   setLeft(me, unitsizet2);
@@ -598,7 +598,7 @@ function endLevel() {
   if(map.ending) return;
   map.ending = true;
   map.random ? setMapRandom(["Random", "Castle"]) : setNextLevelArr(currentmap);
-  storeMarioStats();
+  storePlayerStats();
   pause();
   setMap();
 }
@@ -744,20 +744,20 @@ function pushPreWarpWorld(xloc, yloc, worlds, offset, block) {
 function goUnderWater() {
   if(window.map) {
     if(map.area) {
-      if(window.mario && !map.shifting)
+      if(window.player && !map.shifting)
         setAreaSetting(String(map.area.setting || "") + " Underwater");
       map.area.underwater = true;
     }
     setMapGravity();
     TimeHandler.clearEvent(map.bubbling);
-    map.bubbling = TimeHandler.addEventInterval(marioBubbles, 96, Infinity);
+    map.bubbling = TimeHandler.addEventInterval(playerBubbles, 96, Infinity);
     map.underwater = true;
   }
 }
 function goOntoLand() {
   if(map) {
     if(map.area) {
-      if(window.mario && !map.shifting)
+      if(window.player && !map.shifting)
         setAreaSetting(map.area.setting.replace("Underwater", "") || "Overworld");
       map.area.underwater = false;
     }
@@ -767,9 +767,9 @@ function goOntoLand() {
   }
 }
 function setMapGravity() {
-  if(window.mario) {
-    if(map.underwater) mario.gravity = gravity / 2.8;
-    else mario.gravity = gravity;
+  if(window.player) {
+    if(map.underwater) player.gravity = gravity / 2.8;
+    else player.gravity = gravity;
   }
 }
 
@@ -881,14 +881,14 @@ function sectionColliderInit(me) {
   me.movement = false;
 }
 function sectionPass(character, collider) {
-  if(character.type != "mario") return false;
+  if(character.type != "player") return false;
   collider.nocollide = true;
   var parent = collider.parent;
   if(--parent.numpass) return;
   activateSection(collider.parent, true);
 }
 function sectionFail(character, collider) {
-  if(character.type != "mario") return false;
+  if(character.type != "player") return false;
   collider.nocollide = true;
   
   activateSection(collider.parent, false);
@@ -1055,11 +1055,11 @@ function zoneDisableLakitu() {
 function zoneStartCheeps(xloc) { pushPreFuncCollider(xloc, zoneEnableCheeps); }
 function zoneStopCheeps(xloc) { pushPreFuncCollider(xloc, zoneDisableCheeps); }
 function zoneEnableCheeps(me) {
-  if(map.zone_cheeps || !me.mario) return;
+  if(map.zone_cheeps || !me.player) return;
   startCheepSpawn();
 }
 function zoneDisableCheeps(me) {
-  if(!me.mario) return;
+  if(!me.player) return;
   map.zone_cheeps = false;
 }
 
@@ -1363,7 +1363,7 @@ function WorldRandomCastle(map) {
   randMapType(map);
 }
 
-console.log("This is an offline copy of Full Screen Mario, intended for private testing.",
+console.log("This is an offline copy of Full Screen player, intended for private testing.",
             "Normally, maps are loaded over-eagerly via AJAX requests; for the sake of offline use,",
             "they have all been copied to the bottom of maps.js instead.",
             "If you wish to make changes to a map, change both maps.js::WorldXY(map) and Maps/WorldXY.js",

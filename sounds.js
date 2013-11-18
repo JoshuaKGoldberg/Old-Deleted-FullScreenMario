@@ -42,17 +42,17 @@ function play(name_raw) {
   return sound;
 }
 
-// The same as regular play, but with lower volume when further from Mario
+// The same as regular play, but with lower volume when further from the player
 function playLocal(name, xloc, main) {
   var sound = play(name, main),
       volume_real;
-  // Don't do anything without having played a sound, or if there's no actual Mario
-  if(!sound || !window.mario) return;
+  // Don't do anything without having played a sound, or if there's no actual the player
+  if(!sound || !window.player) return;
   
   // If it's out of bounds (or muted), the volume is 0
   if(muted || xloc < 0 || xloc > gamescreen.unitwidth) volume_real = 0;
-  // Otherwise it's a function of how far the thing is from Mario
-  else volume_real = max(.14, min(.84, 1.4 * (gamescreen.unitwidth - abs(xloc - mario.left)) / gamescreen.unitwidth));
+  // Otherwise it's a function of how far the thing is from the player
+  else volume_real = max(.14, min(.84, 1.4 * (gamescreen.unitwidth - abs(xloc - player.left)) / gamescreen.unitwidth));
   
   sound.volume = volume_real;
   sound.volume_real = volume_real;

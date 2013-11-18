@@ -131,7 +131,7 @@ function setThingSprite(thing) {
       title = thing.title,
       className = thing.className,
       classes = className.split(/\s+/g).slice(1).sort(), // first one will be thing type (character, solid...)
-      key = title + " " + classes, // ex: "Mario mario,running,small,two"
+      key = title + " " + classes, // ex: "Player player,running,small,two"
       cached = cache[key],
       sprite;
       
@@ -166,7 +166,7 @@ function getSpriteFromLibrary(thing) {
   // So it knows to do these conditionally, add them to the front
   for(i in setting) classes.unshift(setting[i]);
   
-  key = title + " " + classes; // ex: "Mario mario,running,small,two"
+  key = title + " " + classes; // ex: "Player player,running,small,two"
   cached = cache[key],
   sprite;
   

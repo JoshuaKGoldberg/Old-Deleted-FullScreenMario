@@ -87,19 +87,19 @@ function Controls(pipes, gamepadPipes) {
     // Right
     right: function(keys) {
       keys.run = 1;
-      keys.right_down = true; // independent of changes to mario.keys.run
+      keys.right_down = true; // independent of changes to player.keys.run
     },
     // Up / Jump
     up: function(keys) {
       keys.up = true;
-      if(mario.canjump &&/* !mario.crouching &&*/ (mario.resting || map.underwater)) {
+      if(player.canjump &&/* !player.crouching &&*/ (player.resting || map.underwater)) {
         keys.jump = 1;
-        mario.canjump = keys.jumplev = 0;
-        // To do: can mario make a jumping sound during the spring, and during the pipe cutscenes?
-        if(mario.power > 1) play("Jump Super");
+        player.canjump = keys.jumplev = 0;
+        // To do: can player make a jumping sound during the spring, and during the pipe cutscenes?
+        if(player.power > 1) play("Jump Super");
         else play("Jump Small");
         if(map.underwater) setTimeout(function() {
-          mario.jumping = keys.jump = false;
+          player.jumping = keys.jump = false;
         }, timer * 14);
       }
     },
@@ -109,8 +109,8 @@ function Controls(pipes, gamepadPipes) {
     },
     // Sprint / Fire
     sprint: function(keys) {
-      if(mario.power == 3 && keys.sprint == 0 && !keys.crouch)
-        mario.fire();
+      if(player.power == 3 && keys.sprint == 0 && !keys.crouch)
+        player.fire();
       keys.sprint = 1;
     },
     // Pause
@@ -149,7 +149,7 @@ function Controls(pipes, gamepadPipes) {
     // Up
     up: function(keys) {
       if(!map.underwater) keys.jump = keys.up = 0;
-      mario.canjump = true;
+      player.canjump = true;
     },
     // Down
     down: function(keys) {
@@ -186,7 +186,7 @@ function Controls(pipes, gamepadPipes) {
 function ControlsPipe(name, strict) {
   var responses = controls[name];
   return function(event) {
-    if((strict && ((mario && mario.dead) || window.paused)) || window.nokeys) return;
+    if((strict && ((player && player.dead) || window.paused)) || window.nokeys) return;
 
     // Allow this to be used as keyup(37) or keyup({which: 37})
     if(typeof(event) != "number" || event.which || event.control)
@@ -194,7 +194,7 @@ function ControlsPipe(name, strict) {
 
     // If there is a known response to this character code, do it
     if(responses[event])
-      responses[event](mario.keys);
+      responses[event](player.keys);
     // Otherwise only complain if verbosity[name] is true
     else mlog(name, "Could not", name,  event);
 
@@ -204,13 +204,13 @@ function ControlsPipe(name, strict) {
 }
 
 function keydown(event) {
-  if((mario && mario.dead) || window.paused || window.nokeys) return;
+  if((player && player.dead) || window.paused || window.nokeys) return;
   var responses = controls["keydown"];
   // Allow this to be used as keyup(37) or keyup({which: 37})
   if(typeof(event) === "object" || event.which)
     event = event.which;
   if(responses[event])
-      responses[event](mario.keys);
+      responses[event](player.keys);
 
   window.gamehistory[gamecount] = [keydown, event];
 }
@@ -222,7 +222,7 @@ function keyup(event) {
   if(typeof(event) === "object" || event.which)
     event = event.which;
   if(responses[event])
-      responses[event](mario.keys);
+      responses[event](player.keys);
 
   window.gamehistory[gamecount] = [keyup, event];
 }
@@ -253,7 +253,7 @@ function scriptKeys(oldhistory) {
 
 
 function lulz(options, timer) {
-  mario.star = true;
+  player.star = true;
   options = options || [Goomba];
   timer = timer || 7;
   TimeHandler.addEventInterval(function() {
@@ -312,7 +312,7 @@ function setMessageTriggers() {
 
 // The UI has requested a map change
 function triggerSetMap(data) {
-  clearMarioStats();
+  clearPlayerStats();
   setMap.apply(this, data.map || []);
   setLives(3);
 }
