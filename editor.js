@@ -1347,7 +1347,7 @@ function editorStartPlaying() {
   editorPreventClicks();
   editor.playing = true;
   // Place a player normally
-  placeplayer();
+  placePlayer();
   entryPlain(player);
   nokeys = false;
   // Retrieve each thing
