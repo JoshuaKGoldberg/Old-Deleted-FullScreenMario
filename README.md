@@ -54,23 +54,23 @@ Here's a quick set of cheat codes you can use during the game. If you're using t
   </tr>
 
   <tr>
-    <td><code>marioShroom(mario)</code></td>
-    <td>The equivalent of Mario touching a Mushroom or FireFlower item.</td>
+    <td><code>playerShroom(player)</code></td>
+    <td>The equivalent of the player touching a Mushroom or FireFlower item.</td>
   </tr>
 
   <tr>
-    <td><code>marioStar(mario)</code></td>
-    <td>The equivalent of Mario touching a Star item. Note that if you want Mario to be invincible for the rest of the current map, use <code>++mario.star</code>.</td>
+    <td><code>playerStar(player)</code></td>
+    <td>The equivalent of the player touching a Star item. Note that if you want the player to be invincible for the rest of the current map, use <code>++player.star</code>.</td>
   </tr>
 
   <tr>
-    <td><code>scrollMario(X)</code></td>
-    <td>Scrolls the window horizontally by X, keeping Mario in the same spot relative to the screen.</td>
+    <td><code>scrollPlayer(X)</code></td>
+    <td>Scrolls the window horizontally by X, keeping the player in the same spot relative to the screen.</td>
   </tr>
 
   <tr>
     <td><code>scrollTime(T)</code></td>
-    <td>Floats Mario through the rest of the level (beware, this is best used on the Random worlds!).</td>
+    <td>Floats the player through the rest of the level (beware, this is best used on the Random worlds!).</td>
   </tr>
 
   <tr>
