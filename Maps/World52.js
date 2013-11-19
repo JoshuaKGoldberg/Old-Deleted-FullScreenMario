@@ -152,8 +152,8 @@ map.areas = [
   new Area("Sky", function() {
     setLocationGeneration(4);
 
-    pushPreThing(Clouds, 0, 0, 4);
-    pushPreThing(Clouds, 40, 0, 72);
+    pushPreThing(Stone, 0, 0, 4);
+    pushPreThing(Stone, 40, 0, 72);
     pushPreThing(Platform, 120, 32, 8, collideTransport);
     fillPreThing(Coin, 120, 64, 16, 1, 8);
     fillPreThing(Coin, 256, 80, 3, 1, 8);
