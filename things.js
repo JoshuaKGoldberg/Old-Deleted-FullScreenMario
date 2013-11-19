@@ -158,18 +158,6 @@ function checkTexts() {
   }
 }
 
-
-// To do: make this use a variable number of arguments!
-function pushPreThing(type, xloc, yloc, extras, more) {
-  var prething = new PreThing(map.refx + xloc, map.refy - yloc, type, extras, more);
-  if(prething.object.solid) {
-    map.area.width = max(map.area.width, prething.xloc + prething.object.width);
-    map.area.presolids.push(prething);
-  }
-  else map.area.precharacters.push(prething);
-  return prething;
-}
-
 /*
  * Characters (except player, who has his own .js)
  */

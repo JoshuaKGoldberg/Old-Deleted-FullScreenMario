@@ -611,12 +611,14 @@ function setExitLoc(num) {
 /* Shortcut Functions */
 // Most of which call pushPre---
 function pushPreThing(type, xloc, yloc, extras, more) {
-  var prething = new PreThing(map.refx + xloc, map.refy - yloc, type, extras, more);
-  if(prething.object.solid && !prething.object.nostretch) {
-    map.area.width = max(map.area.width, prething.xloc + prething.object.width);
-    map.area.presolids.push(prething);
-  }
-  else map.area.prechars.push(prething);
+  var prething = new PreThing(map.refx + xloc, map.refy - yloc, type, extras, more),
+      object = prething.object;
+  // Stretch the area's width if it's a solid or character
+  if((object.solid || object.character) && !object.nostretch)
+    map.area.width = max(map.area.width, prething.xloc + object.width);
+  // Otherwise put it in solids or chars (scenery has its own pushPre*)
+  if(object.solid) map.area.presolids.push(prething);
+  else map.area.precharacters.push(prething);
   return prething;
 }
 function pushPreScenery(name, xloc, yloc, repx, repy) {
@@ -3445,7 +3447,7 @@ function World62(map) {
       pushPreThing(PipeSide, 496, 48, 2);
       pushPreThing(Stone, 504, 88, 2, 11);
     }),
-    new Area("Sky", function() { // cloud world
+    new Area("Sky Night", function() { // cloud world
       setLocationGeneration(7);
       
       pushPreThing(Stone, 0, 0, 4);

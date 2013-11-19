@@ -158,7 +158,7 @@ map.areas = [
     pushPreThing(PipeSide, 496, 48, 2);
     pushPreThing(Stone, 504, 88, 2, 11);
   }),
-  new Area("Sky", function() { // cloud world
+  new Area("Sky Night", function() { // cloud world
     setLocationGeneration(7);
     
     pushPreThing(Stone, 0, 0, 4);
