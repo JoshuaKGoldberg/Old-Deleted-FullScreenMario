@@ -472,7 +472,7 @@ function endCastleInsideRandomFinal(xloc) {
 function placeRandomCastleNPC(xloc) {
   var npc = pushPreThing(Toad, xloc + 194, 12).object;
   npc.text = [
-      pushPreText({innerHTML: "THANK YOU MARIO!"}, xloc + 160, 66).object,
+      pushPreText({innerHTML: "THANK YOU" + window.player.title.toUpperCase() + "!"}, xloc + 160, 66).object,
       pushPreText({innerHTML: "LOL YOU THOUGHT THERE WOULD BE SOMETHING HERE DIDN'T YOU!"}, xloc + 148, 50).object
     ];
 }
