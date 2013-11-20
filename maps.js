@@ -840,7 +840,7 @@ function endCastleInsideFinal(xloc, last) {
   if(last) {
     pushPreThing(Peach, xloc + 194, 13).object;
     text = stopper.text = [
-      pushPreText({innerHTML: "THANK YOU MARIO!", style: style}, xloc + 160, 66).object,
+      pushPreText({innerHTML: "THANK YOU" + window.player.title.toUpperCase() + "!", style: style}, xloc + 160, 66).object,
       pushPreText({innerHTML: "YOUR QUEST IS OVER.<BR>WE PRESENT YOU A NEW QUEST.", style: style}, xloc + 148, 50).object,
       pushPreText({innerHTML: "PRESS BUTTON B<BR>TO SELECT A WORLD.", style: style}, xloc + 148, 26).object
     ];
@@ -849,7 +849,7 @@ function endCastleInsideFinal(xloc, last) {
   else {
     pushPreThing(Toad, xloc + 194, 12).object;
     text = stopper.text = [
-      pushPreText({innerHTML: "THANK YOU MARIO!", style: style}, xloc + 160, 66).object,
+      pushPreText({innerHTML: "THANK YOU" + window.player.title.toUpperCase() + "!", style: style}, xloc + 160, 66).object,
       pushPreText({innerHTML: "BUT OUR PRINCESS IS IN<BR>ANOTHER CASTLE!", style: style}, xloc + 148, 50).object
     ];
   }
