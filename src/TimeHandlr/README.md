@@ -1,8 +1,8 @@
-EventHandlr.js
+TimeHandlr.js
 ==============
 
-A timed events library derived from Full Screen Mario
-This has two functions:
+A timed events library derived from Full Screen Mario. It keeps a listing of functions to execute at certain timeouts and intervals, separate from Javascript's native methods.
+This has two primary applications:
 <ol>
 <li>Provide a flexible alternative to setTimeout and setInterval that respects pauses and resumes in time (such as from game pauses)</li>
 <li>Provide functions to automatically 'cycle' between certain classes on an object</li>
@@ -26,7 +26,7 @@ Essential Functions
         window.MyEventHandler = new EventHandlr();</code><br /><code>
         MyEventHandler.addEvent(function() { console.log("It's starting!"); });</code><br /><code>
         MyEventHandler.addEvent(function() { console.log("It has ended.."); }, 49);</code><br /><code>
-        MyEventHandler.addEvent(function() { console.log("Can you see why this won't be reached?"); }, 96);</code><br /><code>
+        MyEventHandler.addEvent(function() { console.log("This won't be reached!"); }, 96);</code><br /><code>
         MyEventHandler.addEventInterval(function() { console.log("Running..."); }, 7, 6);</code><br /><code>
         for(var i = 0; i < 70; ++i)</code><br /><code>
           MyEventHandler.handleEvents();
@@ -52,13 +52,11 @@ Essential Functions
 
   <tr>
     <th>Command</th>
-    <th>Usage</th>
     <th>Result</th>
   </tr>
   
   <tr>
-    <td><h3>new EventHandlr</h3></td>
-    <td>
+    <td><h3>new EventHandlr</h3>
       <code><strong>new EventHandlr</strong>();</code>
       <p>(or)</p>
       <code>
@@ -100,8 +98,7 @@ Essential Functions
   </tr>
   
   <tr>
-    <td><h3>handleEvents</h3></td>
-    <td>
+    <td><h3>handleEvents</h3>
       <code><strong>handleEvents</strong>)</code>
     </td>
     <td>
@@ -115,9 +112,10 @@ Essential Functions
   </tr>
   
   <tr>
-    <td><h3>addEvent</h3></td>
-    <td>
-      <code><strong>addEvent</strong>(function, time_delay=1[, arguments...]);</code>
+    <td><h3>addEvent</h3>
+      <code><strong>addEvent</strong>(function,</code><br /><code>
+                                      time_delay=1</code><br /><code>
+                                      [, arguments...]);</code>
     </td>
     <td>
       <p>Will run the <code>function</code> in <code>time_delay</code> ticks, passing any given arguments. This is equivalent to <code>setTimeout(function)</code>.</p>
@@ -132,9 +130,11 @@ Essential Functions
   </tr>
   
   <tr>
-    <td><h3>addEventInterval</h3></td>
-    <td>
-      <code><strong>addEventInterval</strong>(function, time_delay=1, num_repeats[, arguments...]);</code>
+    <td><h3>addEventInterval</h3>
+      <code><strong>addEventInterval</strong>(function,</code><br /><code>
+                                              time_delay=1,</code><br /><code>
+                                              num_repeats</code><br /><code>
+                                              [, arguments...]);</code>
     </td>
     <td>
       <p>Will run the <code>function</code> in <code>time_delay</code> ticks a <code>num_repeats</code> number of times, passing any given arguments. <code>num_repeats</code> may be a function to evaluate or a typical number. This is equivalent to <code>setInterval(function)</code>.</p>
@@ -145,8 +145,7 @@ Essential Functions
   </tr>
   
   <tr>
-    <td><h3>clearEvent</h3></td>
-    <td>
+    <td><h3>clearEvent</h3>
       <code><strong>clearEvent</strong>(event);</code>
     </td>
     <td>
@@ -159,8 +158,7 @@ Essential Functions
   </tr>
   
   <tr>
-    <td><h3>clearAllEvents</h3></td>
-    <td>
+    <td><h3>clearAllEvents</h3>
       <code><strong>clearAllEvents</strong>();</code>
     </td>
     <td>
@@ -190,9 +188,10 @@ Class Cycling
       <code>
       window.MyEventHandler = new EventHandlr();</code><br /><code>
       var me = { className: "myclass", doSpriteCycleStart: true};</code><br /><code>
+      var log = function log = console.log.bind(console);</code><br /><code>
       MyEventHandler.addSpriteCycle(me, ["one", "two", "three"]);</code><br /><code>
-      MyEventHandler.addEventInterval(function(my_obj) { console.log(my_obj.className); }, 7, Infinity, me);</code><br /><code>
-      console.log(me.className, "(starting)");</code><br /><code>
+      MyEventHandler.addEventInterval(log, 7, Infinity, me);</code><br /><code>
+      log(me.className, "(starting)");</code><br /><code>
       for(var i = 0; i < 49; ++i)</code><br /><code>
         MyEventHandler.handleEvents();
       </code>
@@ -217,13 +216,11 @@ Class Cycling
   
   <tr>
     <th>Command</th>
-    <th>Usage</th>
     <th>Output</th>
   </tr>
   
   <tr>
-    <td><h3>addSpriteCycle</h3></td>
-    <td>
+    <td><h3>addSpriteCycle</h3>
       <code><strong>addSpriteCycle</strong>(me, classnames[, cyclename[, cycletime]])</code>
     <td>
       <p>Initializes a cycle of <code>.className</code>s for an object. The object will continuously cycle through them until <code>clearAllCycles</code> or <code>clearClassCycle</code> are called.</p>
@@ -235,8 +232,7 @@ Class Cycling
   </tr>
   
   <tr>
-    <td><h3>addSpriteCycleSynched</h3></td>
-    <td>
+    <td><h3>addSpriteCycleSynched</h3>
       <code><strong>addSpriteCycleSynched</strong>(me, classnames[, cyclename[, cycletime]])</code>
     </td>
     <td>
