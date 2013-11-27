@@ -127,7 +127,7 @@ function findScore(lev) {
 
 function gainLife(num, nosound) {
   data.lives.amount += typeof(num) == "number" ? num : 1;
-  if(!nosound) play("Gain Life");
+  if(!nosound) AudioPlayer.play("Gain Life");
   updateDataElement(data.lives);
 }
 

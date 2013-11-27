@@ -52,9 +52,6 @@ function FullScreenMario() {
   window.gameon = true;
   setMap(1,1);
   
-  // Load sounds after setting the map, since it uses clearAllTimeouts
-  startLoadingSounds();
-  
   log("It took " + (Date.now() - time_start) + " milliseconds to start.");
 }
 
@@ -153,6 +150,65 @@ function resetEvents() {
   });
 }
 
+// Sounds are done with AudioPlayr.js
+function resetSounds() {
+  window.sounds = {};
+  window.theme = false;
+  window.muted = (localStorage && localStorage.muted == "true");
+  
+  window.AudioPlayer = new AudioPlayr({
+    directory: "Sounds",
+    getVolumeLocal: function() { return .49; },
+    getThemeDefault: function() { return area.theme; }, 
+    library: {
+      Sounds: [
+        "Bowser Falls",
+        "Bowser Fires",
+        "Break Block",
+        "Bump",
+        "Coin",
+        "Ending",
+        "Fireball",
+        "Firework",
+        "Flagpole",
+        "Gain Life",
+        "Game Over 2",
+        "Game Over",
+        "Hurry",
+        "Into the Tunnel",
+        "Jump Small",
+        "Jump Super",
+        "Kick",
+        "Level Complete",
+        "Player Dies",
+        "Pause",
+        "Pipe",
+        "Power Down",
+        "Powerup Appears",
+        "Powerup",
+        "Stage Clear",
+        "Vine Emerging",
+        "World Clear",
+        "You Dead"
+      ],
+      Themes: [
+        "Castle",
+        "Overworld",
+        "Underwater",
+        "Underworld",
+        "Star",
+        "Sky",
+        "Hurry Castle",
+        "Hurry Overworld",
+        "Hurry Underwater",
+        "Hurry Underworld",
+        "Hurry Star",
+        "Hurry Sky"
+      ]
+    }
+  });
+}
+
 // Variables regarding the state of the game
 // This is called in setMap to reset everything
 function resetGameState(nocount) {
@@ -170,8 +226,7 @@ function resetGameState(nocount) {
   // Keep a history of pressed keys
   window.gamehistory = [];
   // Clear audio
-  pauseAllSounds();
-  sounds = {};
+  AudioPlayer.pause();
 }
 
 function scrollWindow(x, y) {

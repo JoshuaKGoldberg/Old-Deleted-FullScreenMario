@@ -531,7 +531,7 @@ function scoreEnemyStar(enemy) {
     default: amount = 200; break;
   }
   scoreEnemyFin(enemy, amount);
-  play("Kick");
+  AudioPlayer.play("Kick");
 }
 function scoreEnemyBelow(enemy) {
   var amount = 100;
@@ -764,7 +764,7 @@ function blockBumpMovement(me) {
 }
 
 function emergeUp(me, solid) {
-  play("Powerup Appears");
+  AudioPlayer.play("Powerup Appears");
   flipHoriz(me);
   me.nomove = me.nocollide = me.alive = me.nofall = me.emerging = true;
   determineThingQuadrants(me);

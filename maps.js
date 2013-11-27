@@ -73,7 +73,7 @@ function setAreaSetting(area, setting, sound) {
   if(area.fillStyle.indexOf("Underwater") != -1) goUnderWater();
   else goOntoLand();
   
-  if(sound) playTheme();
+  if(sound) AudioPlayer.playTheme();
   if(gameon) clearAllSprites();
   map.shifting = false;
 }
@@ -217,7 +217,7 @@ function shiftToLocation(loc) {
   // Typically this will do nothing or be from a pipe
   loc.entry(player, loc.entrything);
   // Don't forget the least annoying part of programming this!
-  TimeHandler.addEvent(playTheme, 2);
+  TimeHandler.addEvent(AudioPlayer.playTheme, 2);
   
   // Texts are bound-check checked periodically for peformance reasons
   TimeHandler.addEventInterval(checkTexts, 117, Infinity);
@@ -505,7 +505,7 @@ function walkToPipe() {
   var move = setInterval(function() {
     if(player.piping) {
       // We have started piping
-      if(sounds[0]) sounds[0].pause();
+      AudioPlayer.pauseTheme();
       nokeys = player.keys.run = notime = false;
       clearInterval(move);
       player.maxspeed = player.maxspeedsave;
@@ -551,8 +551,8 @@ function intoPipeHoriz(me, pipe, transport) {
   }, timer);
 }
 function pipePreparations(me) {
-  pauseTheme();
-  play("Pipe");
+  AudioPlayer.pauseTheme();
+  AudioPlayer.play("Pipe");
   locMovePreparations(me);
   me.nofall = me.nocollide = nokeys = notime = true;
   me.movement = me.xvel = me.yvel = 0;
@@ -580,7 +580,7 @@ function startCastle(me) {
 function exitPipeVert(me, pipe) {
   switchContainers(me, characters, scenery);
   me.nofall = nokeys = notime = true;
-  play("Pipe");
+  AudioPlayer.play("Pipe");
   setTop(me, pipe.top);
   setMidXObj(me, pipe, true);
   var dy = unitsize / -4, move = setInterval(function() {
@@ -840,7 +840,7 @@ function endCastleInsideFinal(xloc, last) {
   if(last) {
     pushPreThing(Peach, xloc + 194, 13).object;
     text = stopper.text = [
-      pushPreText({innerHTML: "THANK YOU" + window.player.title.toUpperCase() + "!", style: style}, xloc + 160, 66).object,
+      pushPreText({innerHTML: "THANK YOU " + window.player.title.toUpperCase() + "!", style: style}, xloc + 160, 66).object,
       pushPreText({innerHTML: "YOUR QUEST IS OVER.<BR>WE PRESENT YOU A NEW QUEST.", style: style}, xloc + 148, 50).object,
       pushPreText({innerHTML: "PRESS BUTTON B<BR>TO SELECT A WORLD.", style: style}, xloc + 148, 26).object
     ];
@@ -849,7 +849,7 @@ function endCastleInsideFinal(xloc, last) {
   else {
     pushPreThing(Toad, xloc + 194, 12).object;
     text = stopper.text = [
-      pushPreText({innerHTML: "THANK YOU" + window.player.title.toUpperCase() + "!", style: style}, xloc + 160, 66).object,
+      pushPreText({innerHTML: "THANK YOU " + window.player.title.toUpperCase() + "!", style: style}, xloc + 160, 66).object,
       pushPreText({innerHTML: "BUT OUR PRINCESS IS IN<BR>ANOTHER CASTLE!", style: style}, xloc + 148, 50).object
     ];
   }

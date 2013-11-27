@@ -96,8 +96,7 @@ function Controls(pipes, gamepadPipes) {
         keys.jump = 1;
         player.canjump = keys.jumplev = 0;
         // To do: can player make a jumping sound during the spring, and during the pipe cutscenes?
-        if(player.power > 1) play("Jump Super");
-        else play("Jump Small");
+        AudioPlayer.play(player.power > 1 ? "Jump Super" : "Jump Small");
         if(map.underwater) setTimeout(function() {
           player.jumping = keys.jump = false;
         }, timer * 14);
@@ -120,7 +119,7 @@ function Controls(pipes, gamepadPipes) {
     },
     // Mute / Unmute
     mute: function(keys) {
-      toggleMute();
+      AudioPlayer.toggleMute();
     },
     // qqqqqqq
     q: function(keys) {

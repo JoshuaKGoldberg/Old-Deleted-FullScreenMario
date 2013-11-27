@@ -760,53 +760,7 @@ function resetLibrary() {
       },
     },
     cache: {},
-    posts: [],
-    sounds: {
-      names: [
-        "Bowser Falls",
-        "Bowser Fires",
-        "Break Block",
-        "Bump",
-        "Coin",
-        "Ending",
-        "Fireball",
-        "Firework",
-        "Flagpole",
-        "Gain Life",
-        "Game Over 2",
-        "Game Over",
-        "Hurry",
-        "Into the Tunnel",
-        "Jump Small",
-        "Jump Super",
-        "Kick",
-        "Level Complete",
-        "Player Dies",
-        "Pause",
-        "Pipe",
-        "Power Down",
-        "Powerup Appears",
-        "Powerup",
-        "Stage Clear",
-        "Vine Emerging",
-        "World Clear",
-        "You Dead"
-      ],
-      themes: [
-        "Castle",
-        "Overworld",
-        "Underwater",
-        "Underworld",
-        "Star",
-        "Sky",
-        "Hurry Castle",
-        "Hurry Overworld",
-        "Hurry Underwater",
-        "Hurry Underworld",
-        "Hurry Star",
-        "Hurry Sky"
-      ]
-    }
+    posts: []
   };
   library.filters = filters;
   delete window.filters;

@@ -83,7 +83,7 @@ function setSolid(me, name) {
   me.solid = me.alive = true;
   me.speed = me.speed || 0; // vertical speed
   me.collide = me.collide || characterTouchedSolid;
-  me.bottomBump = me.bottomBump ||  function() { /*play("Bump");*/ };
+  me.bottomBump = me.bottomBump ||  function() { /*AudioPlayer.play("Bump");*/ };
   me.action = me.action || function() {};
   me.jump = me.jump || function() {};
   me.spritewidth = me.spritewidth || 8;
@@ -225,10 +225,10 @@ function fireEnemy(enemy, me) {
   if(!me.alive || me.emerging || enemy.nofire || enemy.height <= unitsize) return;
 
   if(enemy.solid) {
-    playLocal("Bump", me.right);
+    AudioPlayer.playLocal("Bump", me.right);
   }
   else {
-    playLocal("Kick", me.right);
+    AudioPlayer.playLocal("Kick", me.right);
     enemy.death(enemy, 2);
     scoreEnemyFire(enemy);
   }
@@ -283,12 +283,12 @@ function hitShell(one, two) {
     // Hitting a wall
     case "solid": 
       if(two.right < one.right) {
-        playLocal("Bump", one.left);
+        AudioPlayer.playLocal("Bump", one.left);
         setRight(two, one.left);
         two.xvel = -two.speed;
         two.moveleft = true;
       } else {
-        playLocal("Bump", one.right);
+        AudioPlayer.playLocal("Bump", one.right);
         setLeft(two, one.right);
         two.xvel = two.speed;
         two.moveleft = false;
@@ -356,7 +356,7 @@ function hitShell(one, two) {
         
         // Player is landing on the shell (movements, xvels already set)
         if(playerjump) {
-          play("Kick");
+          AudioPlayer.play("Kick");
           // The shell is moving
           if(!two.xvel) {
             jumpEnemy(one, two);
@@ -419,7 +419,7 @@ function hitShell(one, two) {
             } // Otherwise just kill it normally
             else killFlip(one);
             
-            play("Kick");
+            AudioPlayer.play("Kick");
             score(one, findScore(two.enemyhitcount), true);
             ++two.enemyhitcount;
           } // Otherwise the enemy just turns around
@@ -466,7 +466,7 @@ function jumpEnemy(me, enemy) {
   if(me.keys.up) me.yvel = unitsize * -1.4;
   else me.yvel = unitsize * -.7;
   me.xvel *= .91;
-  play("Kick");
+  AudioPlayer.play("Kick");
   if(enemy.group != "item" || enemy.type == "shell")
     score(enemy, findScore(me.jumpcount++ + me.jumpers), true);
   ++me.jumpers;
@@ -820,7 +820,7 @@ function moveCannonInit(me) {
         flipHoriz(spawn);
       }
       else addThing(spawn, me.left + me.width, me.top);
-      playLocal("Bump", me.right);
+      AudioPlayer.playLocal("Bump", me.right);
     }, 270, Infinity, me);
   me.movement = false;
 }
@@ -884,14 +884,14 @@ function bowserFires(me) {
   if(!me.lookleft) return;
   // Close the mouth
   addClass(me, "firing");
-  playLocal("Bowser Fires", me.left);
+  AudioPlayer.playLocal("Bowser Fires", me.left);
   // After a little bit, open and fire
   TimeHandler.addEvent(function(me) {
     var top = me.top + unitsizet4,
         fire = new Thing(BowserFire, roundDigit(player.bottom, unitsizet8));
     removeClass(me, "firing");
     addThing(fire, me.left - unitsizet8, top);
-    play("Bowser Fires");
+    AudioPlayer.play("Bowser Fires");
   }, 14, me);
 }
 // This is for when Fiery Player kills bowser - the normal one is listed under the castle things
@@ -1237,7 +1237,7 @@ function coinBecomesSolid(me) {
 }
 function hitCoin(me, coin) {
   if(!me.player) return;
-  play("Coin");
+  AudioPlayer.play("Coin");
   score(me, 200, false);
   gainCoin();
   killNormal(coin);
@@ -1250,7 +1250,7 @@ function gainCoin() {
   updateDataElement(data.coins);
 }
 function coinEmerge(me, solid) {
-  play("Coin");
+  AudioPlayer.play("Coin");
   removeClass(me, "still");
   switchContainers(me, characters, scenery);
   score(me, 200, false);
@@ -1378,7 +1378,7 @@ function removeCrouch() {
 
 function playerShroom(me) {
   if(me.shrooming) return;
-  play("Powerup");
+  AudioPlayer.play("Powerup");
   score(me, 1000, true);
   if(me.power == 3) return;
   me.shrooming = true;
@@ -1707,14 +1707,14 @@ function playerFires() {
   TimeHandler.addEvent(function(player) { removeClass(player, "firing"); }, 7, player);
 }
 function emergeFire(me) {
-  play("Fireball");
+  AudioPlayer.play("Fireball");
 }
 
 function playerStar(me) {
   if(me.star) return;
   ++me.star;
-  play("Powerup");
-  playTheme("Star", true);
+  AudioPlayer.play("Powerup");
+  AudioPlayer.playTheme("Star", true);
   TimeHandler.addEvent(playerRemoveStar, 560, me);
   switchClass(me, "normal", "star");
   TimeHandler.addSpriteCycle(me, ["star1", "star2", "star3", "star4"], "star", 5);
@@ -1725,7 +1725,7 @@ function playerRemoveStar(me) {
   removeClasses(me, "star star1 star2 star3 star4");
   TimeHandler.clearClassCycle(me, "star");
   addClass(me, "normal");
-  playTheme();
+  AudioPlayer.playTheme();
 }
 
 // Big means it must happen: 2 means no animation
@@ -1740,7 +1740,7 @@ function killPlayer(me, big) {
   else {
     // If Player can survive this, just power down
     if(!big && me.power > 1) {
-      play("Power Down");
+      AudioPlayer.play("Power Down");
       me.power = 1;
       storePlayerStats();
       return playerGetsSmall(me);
@@ -1769,8 +1769,8 @@ function killPlayer(me, big) {
   }
 
   // Clear and reset
-  pauseAllSounds();
-  if(!window.editing) play("Player Dies");
+  AudioPlayer.pause();
+  if(!window.editing) AudioPlayer.play("Player Dies");
   me.nocollide = me.nomove = nokeys = 1;
   --data.lives.amount;
   if(!map.random) data.score.amount = data.scoreold;
@@ -1794,7 +1794,7 @@ function killPlayer(me, big) {
       // placePlayer(unitsizet16, unitsizet8 * -1 + (map.underwater * unitsize * 24));
       TimeHandler.addEvent(function() {
         playerDropsIn();
-        playTheme();
+        AudioPlayer.playTheme();
       // }, 7 * (map.respawndist || 17));
       }, 117);
   }
@@ -1823,8 +1823,8 @@ function gameOver() {
   // Having a gamecount of -1 truly means it's all over
   gameon = false;
   pause();
-  pauseTheme();
-  play("Game Over");
+  AudioPlayer.pauseTheme();
+  AudioPlayer.play("Game Over");
   
   var innerHTML = "<div style='font-size:49px;padding-top: " + (innerHeight / 2 - 28/*49*/) + "px'>GAME OVER</div>";
   // innerHTML += "<p style='font-size:14px;opacity:.49;width:490px;margin:auto;margin-top:49px;'>";
@@ -1892,7 +1892,7 @@ function Brick(me, content) {
 }
 function brickBump(me, character) {
   if(me.up || character.type != "player") return;
-  play("Bump");
+  AudioPlayer.play("Bump");
   if(me.used) return;
   me.up = character;
   if(character.power > 1 && !me.contents)
@@ -1929,7 +1929,7 @@ function makeUsedBlock(me) {
   switchClass(me, "unused", "used");
 }
 function brickBreak(me, character) {
-  play("Break Block");
+  AudioPlayer.play("Break Block");
   score(me, 50);
   me.up = character;
   TimeHandler.addEvent(placeShards, 1, me);
@@ -1987,7 +1987,7 @@ function Block(me, content, hidden) {
 function blockBump(me, character) {
   if(character.type != "player") return;
   if(me.used) {
-    play("Bump");
+    AudioPlayer.play("Bump");
     return;
   }
   me.used = 1;
@@ -2046,7 +2046,7 @@ function Vine(me, locnum) {
 }
 
 function vineEmerge(me, solid) {
-  play("Vine Emerging");
+  AudioPlayer.play("Vine Emerging");
   setHeight(me, 0);
   me.movement = vineMovement;
   TimeHandler.addEvent(vineEnable, 14, me);
@@ -2291,8 +2291,8 @@ function CastleAxeFalls(me, collider) {
   killOtherCharacters();
   TimeHandler.addEvent(killNormal, 7, axe.chain);
   TimeHandler.addEvent(CastleAxeKillsBridge, 14, axe.bridge, axe);
-  pauseTheme();
-  playTheme("World Clear", false, false);
+  AudioPlayer.pauseTheme();
+  AudioPlayer.playTheme("World Clear", false, false);
 }
 // Step 2 of getting to that jerkface Toad
 function CastleAxeKillsBridge(bridge, axe) {
@@ -2474,8 +2474,8 @@ function CastleDoorDetector(me) {
 function FlagCollision(me, detector) {
   if(!me || !me.player) return killNormal(me);
   window.detector = detector;
-  pauseAllSounds();
-  play("Flagpole");
+  AudioPlayer.pause();
+  AudioPlayer.play("Flagpole");
   
   // Reset and clear most stuff, including killing all other characters
   killOtherCharacters();
@@ -2552,7 +2552,7 @@ function FlagOff(me, pole) {
   TimeHandler.clearClassCycle(me, "climbing");
   setLeft(me, pole.right, true);
   setTimeout(function() {
-    play("Stage Clear");
+    AudioPlayer.play("Stage Clear");
     playerHopsOff(me, pole, true);
   }, timer * 14);
 }
@@ -2577,14 +2577,14 @@ function endLevelPoints(me, detector) {
     updateDataElement(data.score);
     updateDataElement(data.time);
     // Each point(x50) plays the coin noise
-    play("Coin");
+    AudioPlayer.play("Coin");
     // Once it's done, move on to the fireworks.
     if(data.time.amount <= 0)  {
       // pause();
       clearInterval(points);
       setTimeout(function() { endLevelFireworks(me, numfire, detector); }, timer * 49);
     }
-  }, timerd2);
+  }, timer);
 }
 function endLevelFireworks(me, numfire, detector) {
   var nextnum, nextfunc,
@@ -2593,7 +2593,7 @@ function endLevelFireworks(me, numfire, detector) {
     // var castlemid = detector.castle.left + detector.castle.width * unitsized2;
     var castlemid = detector.left + 32 * unitsized2;
     while(i < numfire)
-      explodeFirework(++i, castlemid); //pre-increment since explodeFirework expects numbers starting at 1
+      explodeFirework(++i, castlemid); // Pre-increment since explodeFirework expects numbers starting at 1
     nextnum = timer * (i + 2) * 42;
   }
   else nextnum = 0;
@@ -2602,10 +2602,7 @@ function endLevelFireworks(me, numfire, detector) {
   nextfunc = function() { setTimeout(function() { endLevel(); }, nextnum); };
   
   // If the Stage Clear sound is still playing, wait for it to finish
-  if(sounds["Stage Clear"] && !sounds["Stage Clear"].paused)
-    sounds["Stage Clear"].addEventListener("ended", function() { TimeHandler.addEvent(nextfunc, 35); });
-  // Otherwise just start it immediately
-  else nextfunc();
+  AudioPlayer.addEventImmediate("Stage Clear", "ended", function() { TimeHandler.addEvent(nextfunc, 35); });
 }
 function explodeFirework(num, castlemid) {
   setTimeout(function() {
@@ -2631,7 +2628,7 @@ function Firework(me, num) {
   // Otherwise, it's just a normal explosion
   me.animate = function() {
     var name = me.className + " n";
-    if(me.locs) play("Firework");
+    if(me.locs) AudioPlayer.play("Firework");
     TimeHandler.addEvent(function(me) { setClass(me, name + 1); }, 0, me);
     TimeHandler.addEvent(function(me) { setClass(me, name + 2); }, 7, me);
     TimeHandler.addEvent(function(me) { setClass(me, name + 3); }, 14, me);

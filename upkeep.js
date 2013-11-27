@@ -50,16 +50,16 @@ function adjustFPS() {
 function pause(big) {
   if(paused && !window.nextupk) return;
   cancelAnimationFrame(nextupk);
-  pauseAllSounds();
+  AudioPlayer.pause();
   paused = true;
-  if(big) play("Pause");
+  if(big) AudioPlayer.play("Pause");
 }
 
 function unpause() {
   if(!paused) return;
   window.nextupk = requestAnimationFrame(upkeep);
   paused = false;
-  resumeAllSounds();
+  AudioPlayer.resume();
 }
 
 
