@@ -150,7 +150,7 @@ function AudioPlayr(settings) {
     
     // If it's used (no repeat), add the event listener to resume theme
     if(sound.used == 1)
-      sound.addEventListener("ended", playTheme);
+      sound.addEventListener("ended", this.playTheme);
     
     return sound;
   }
