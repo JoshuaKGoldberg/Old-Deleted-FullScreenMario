@@ -49,7 +49,7 @@ function addQuadCol(left) {
 function shiftQuadCol() {
   var old = [];
   if(!map.nodeletequads) {
-    for(var i=quads.rows-1; i>0; --i) {
+    for(var i=quads.rows-1; i>=0; --i) {
       old.push(deleteQuad(quads.shift()));
     }
   }

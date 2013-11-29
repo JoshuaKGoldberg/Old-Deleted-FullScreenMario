@@ -244,8 +244,6 @@ function AudioPlayr(settings) {
         library[name] = createAudio(name, s_name);
       }
     }
-    
-    console.log("Library is now", library);
   }
   
   // Creates an audio element, gives it the sources, and starts preloading
