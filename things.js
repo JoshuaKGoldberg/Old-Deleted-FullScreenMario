@@ -2221,6 +2221,7 @@ function CastleBlock(me, arg1, arg2) {
     me.movement = castleBlockSpawn;
     me.timer = me.counter = 0;
     me.angle = .25;
+    me.spawn_as_char = true;
   }
 }
 function castleBlockSpawn(me) {

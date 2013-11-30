@@ -617,7 +617,7 @@ function pushPreThing(type, xloc, yloc, extras, more) {
   if((object.solid || object.character) && !object.nostretch)
     map.area.width = max(map.area.width, prething.xloc + object.width);
   // Otherwise put it in solids or chars (scenery has its own pushPre*)
-  if(object.solid && object.name != "castleblock") map.area.presolids.push(prething);
+  if(object.solid && !object.spawn_as_char) map.area.presolids.push(prething);
   else map.area.precharacters.push(prething);
   return prething;
 }
