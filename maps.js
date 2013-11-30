@@ -1463,6 +1463,7 @@ function World12(map) {
       fillPreThing(Goomba, 768, 8, 3, 1, 12, 8);
       pushPrePipe(800, 0, 24, true, 2);
       pushPrePipe(848, 0, 32, true);
+      pushPreThing(Goomba, 872, 8);
       pushPrePipe(896, 0, 16, true, false, 3);
       
       pushPreFloor(952, 0, 2);
@@ -1472,7 +1473,9 @@ function World12(map) {
       pushPreThing(Stone, 1040, 8);
       pushPreThing(Stone, 1048, 16, 1, 2);
       pushPreThing(Stone, 1056, 24, 1, 3);
+      pushPreThing(Goomba, 1056, 32);
       pushPreThing(Stone, 1064, 32, 1, 4);
+      pushPreThing(Goomba, 1064, 48);
       pushPreThing(Stone, 1072, 32, 1, 4);
       pushPrePlatformGenerator(1096, 6, 1);
       // pushPreThing(PlatformGenerator, 1096, ceilmax, 6, 1);
