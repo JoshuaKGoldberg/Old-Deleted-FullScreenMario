@@ -5,6 +5,7 @@
 // There is a lot of information stored in each of these.
 // Variable amounts of arguments are passed to the constructor:
 // * var mything = new Thing(ConstructionFunc[, arg1[, arg2[, ...]]]);
+// Examples:
 // * var mygoomb = new Thing(Goomba);
 // * var mykoopa = new Thing(Koopa, true);
 function Thing(type) {
@@ -24,16 +25,18 @@ function Thing(type) {
   if(self.tolx == null) self.tolx = 0;
   if(self.toly == null) self.toly = unitsized8;
   
-  self.movement = self.movement; // why..?
   self.collide = self.collide || function() {}; // To do: why does taking this out mess things up?
   self.death = self.death || killNormal;
   self.animate = self.animate || emergeUp;
   
-  if(self.width * unitsize < quads.width && self.height * unitsize < quads.height)
-    self.maxquads = 4; // self could be done with modular stuff... beh
-  else self.maxquads = quads.length;
+  var maxquads = 4, num;
+  if((num = floor(self.width * unitsize / QuadsKeeper.getQuadWidth())) > 0)
+    maxquads += ((num + 1) * maxquads / 2);
+  if((num = floor(self.height * unitsize / QuadsKeeper.getQuadHeight())) > 0)
+    maxquads += ((num + 1) * maxquads / 2);
+  self.maxquads = maxquads;
   
-  self.quads = new Array(self.maxquads)
+  self.quadrants = new Array(self.maxquads)
   self.overlaps = [];
   
   self.title = self.title || type.name;
@@ -106,7 +109,6 @@ function addThing(me, left, top) {
   placeThing(me, left, top);
   window[me.libtype].push(me);
   me.placed = true;
-  determineThingQuadrants(me);
   if(me.onadding) me.onadding(); // generally just for sprite cycles
   setThingSprite(me);
   window["last_" + (me.title || me.group || "unknown")] = me;
@@ -144,7 +146,7 @@ function spawnText(me, settings) {
 
 // Set at the end of shiftToLocation
 function checkTexts() {
-  var delx = quads.delx,
+  var delx = QuadsKeeper.getDelX(),
       element, me, i;
   for(i = texts.length - 1; i >= 0; --i) {
     me = texts[i]
@@ -1256,7 +1258,6 @@ function coinEmerge(me, solid) {
   score(me, 200, false);
   gainCoin();
   me.nocollide = me.alive = me.nofall = me.emerging = true;
-  determineThingQuadrants(me);
   
   if(me.blockparent) me.movement = coinEmergeMoveParent;
   else me.movement = coinEmergeMove;

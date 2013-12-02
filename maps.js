@@ -321,9 +321,9 @@ function setLocationGeneration(num) {
 // Solids are spawned a little bit before characters
 function spawnMap() {
   var area = map.area,
-      rightdiff = quads.rightdiff,
+      rightdiff = QuadsKeeper.getOutDifference(),
       screenright = gamescreen.right + rightdiff,
-      quadswidtht2 = quads.width * 2 + rightdiff,
+      quadswidtht2 = QuadsKeeper.getQuadWidth() * 2 + rightdiff,
       screenrightpq = screenright + quadswidtht2,
       arr, arrlen, prething, thing, current;
   
@@ -506,6 +506,7 @@ function walkToPipe() {
     if(player.piping) {
       // We have started piping
       AudioPlayer.pauseTheme();
+      // nokeys = player.keys.run = notime = false;
       clearInterval(move);
       player.maxspeed = player.maxspeedsave;
     }

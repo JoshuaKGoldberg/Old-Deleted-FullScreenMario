@@ -209,6 +209,20 @@ function resetSounds() {
   });
 }
 
+// Quadrants are done with QuadsKeepr.js
+// This starts off with 7 cols and 6 rows (each has 1 on each side for padding)
+function resetQuadrants() {
+  window.QuadsKeeper = new QuadsKeepr({
+    num_rows: 5,
+    num_cols: 6,
+    screen_width: window.innerWidth,
+    screen_height: window.innerHeight,
+    tolerance: unitsized2,
+    onUpdate: spawnMap,
+    onCollide: false
+  });
+}
+
 // Variables regarding the state of the game
 // This is called in setMap to reset everything
 function resetGameState(nocount) {
@@ -239,9 +253,9 @@ function scrollWindow(x, y) {
   shiftAll(characters, xinv, yinv);
   shiftAll(solids, xinv, yinv);
   shiftAll(scenery, xinv, yinv);
-  shiftAll(quads, xinv, yinv);
+  shiftAll(QuadsKeeper.getQuadrants(), xinv, yinv);
   shiftElements(texts, xinv, yinv);
-  updateQuads(xinv);
+  QuadsKeeper.updateQuadrants(xinv);
   
   if(window.playediting) scrollEditor(x, y);
 }
@@ -265,7 +279,7 @@ function scrollPlayer(x, y, see) {
   scrollWindow(x,y);
   setLeft(player, saveleft, see);
   setTop(player, savetop + y * unitsize, see);
-  updateQuads();
+  QuadsKeeper.updateQuadrants();
 }
 
 // Calls log if window.verbosity has the type enabled

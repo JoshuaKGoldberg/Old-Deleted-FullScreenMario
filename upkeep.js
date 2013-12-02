@@ -13,7 +13,7 @@ function upkeep() {
     adjustFPS();
     
     // Quadrants upkeep
-    determineAllQuadrants();
+    QuadsKeeper.determineAllQuadrants(solids);
     
     // Solids upkeep
     maintainSolids();
@@ -70,13 +70,13 @@ function maintainSolids(update) {
     if(solid.alive) {
       if(solid.movement) solid.movement(solid);
     }
-    if(!solid.alive || solid.right < quads.delx)
+    if(!solid.alive || solid.right < QuadsKeeper.getDelX())
       deleteThing(solid, solids, i);
   }
 }
 
 function maintainCharacters(update) {
-  var delx = gamescreen.right + quads.rightdiff,
+  var delx = gamescreen.right + QuadsKeeper.getOutDifference(),
       character, i;
   for(i = 0; i < characters.length; ++i) {
     character = characters[i];
@@ -88,7 +88,7 @@ function maintainCharacters(update) {
     
     // Position updating and collision detection
     updatePosition(character);
-    determineThingQuadrants(character);
+    QuadsKeeper.determineThingQuadrants(character);
     character.under = character.undermid = false;
     determineThingCollisions(character);
     

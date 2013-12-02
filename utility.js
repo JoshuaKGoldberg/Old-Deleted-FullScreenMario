@@ -255,7 +255,7 @@ function determineThingCollisions(me) {
   
   // For each quadrant the thing is in:
   for(i = 0, leni = me.numquads; i < leni; ++i) {
-    cur = me.quads[i];
+    cur = me.quadrants[i];
     others = cur.things;
     // For each other thing in that quadrant:
     for(j = 0, lenj = cur.numthings; j < lenj; ++j) {
@@ -767,7 +767,6 @@ function emergeUp(me, solid) {
   AudioPlayer.play("Powerup Appears");
   flipHoriz(me);
   me.nomove = me.nocollide = me.alive = me.nofall = me.emerging = true;
-  determineThingQuadrants(me);
   switchContainers(me, characters, scenery);
   // Start moving up
   var move = setInterval(function() {
