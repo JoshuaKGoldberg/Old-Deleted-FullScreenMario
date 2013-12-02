@@ -506,7 +506,6 @@ function walkToPipe() {
     if(player.piping) {
       // We have started piping
       AudioPlayer.pauseTheme();
-      nokeys = player.keys.run = notime = false;
       clearInterval(move);
       player.maxspeed = player.maxspeedsave;
     }
