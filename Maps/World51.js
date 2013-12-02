@@ -13,6 +13,7 @@ map.areas = [
     pushPreFloor(0, 0, 49);
     pushPreThing(Koopa, 128, 12);
     fillPreThing(Goomba, 152, 8, 3, 1, 12);
+    fillPreThing(Goomba, 240, 8, 3, 1, 12);
     fillPreThing(Koopa, 328, 12, 2, 1, 12);
     pushPrePipe(352, 0, 24, true);
     
