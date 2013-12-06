@@ -2637,6 +2637,7 @@ function Firework(me, num) {
     TimeHandler.addEvent(function(me) { killNormal(me); }, 21, me);
   }
   setCharacter(me, "firework");
+  score(me, 500);
 }
 
 function Coral(me, height) {
