@@ -966,6 +966,11 @@ function moveBlooper(me) {
     case 63: squeezeBlooper(me); break;
     default: ++me.counter; break;
   }
+
+  if(me.top < unitsizet16 + 10) {
+    squeezeBlooper(me);
+  }
+
   if(me.squeeze) me.yvel = max(me.yvel + .021, .7); // going down
   else me.yvel = min(me.yvel - .035, -.7); // going up
   shiftVert(me, me.yvel, true);
