@@ -1517,7 +1517,7 @@ function World12(map) {
       
       pushPrePattern("backreg", 104, 0, 1);
       pushPreFloor(0, 0, 58);
-      pushPrePipe(0, 0, 16, false, false, 4);
+      pushPrePipe(0, 0, 16, true, false, 4);
       pushPreThing(Stone, 16, 8);
       pushPreThing(Stone, 24, 16, 1, 2);
       pushPreThing(Stone, 32, 24, 1, 3);
@@ -1881,7 +1881,7 @@ function World22(map) {
     
       pushPrePattern("backreg", 104, 0, 1);
       pushPreFloor(0, 0, 42);
-      pushPrePipe(0, 0, 16, false, false, 2);
+      pushPrePipe(0, 0, 16, true, false, 2);
       pushPreThing(Stone, 16, 8, 1, 1);
       pushPreThing(Stone, 24, 16, 1, 2);
       pushPreThing(Stone, 32, 24, 1, 3);
