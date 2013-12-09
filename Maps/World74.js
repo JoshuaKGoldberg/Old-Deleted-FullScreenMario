@@ -102,7 +102,7 @@ map.areas = [
         pushPreFloor(xloc + 176, 24, 2);
         pushPreFloor(xloc + 192, 0, 2);
         pushPreFloor(xloc + 208, 24, 6);
-        endCastleInside(xloc + 256);
+        endCastleInside(xloc + 256, 0, 1);
       }
     }
   })

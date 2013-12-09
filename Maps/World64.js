@@ -51,6 +51,6 @@ map.areas = [
     pushPreThing(Stone, 984, 24, 5, 3);
     pushPreThing(Stone, 984, 80, 5, 2);
     
-    endCastleInside(1024);
+    endCastleInside(1024, 0, 1);
   })
 ];

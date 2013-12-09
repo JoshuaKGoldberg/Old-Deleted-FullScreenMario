@@ -811,12 +811,12 @@ function startCastleInside() {
   pushPreThing(Stone, 32, 32, 1, DtB(32, 8));
 }
 
-function endCastleInside(xloc, last) {
+function endCastleInside(xloc, last, hard) {
   var collider = pushPreThing(FuncCollider, xloc + 104, 48, CastleAxeFalls, [16, 24]).object,
       axe = collider.axe = pushPreThing(CastleAxe, xloc + 104, 40).object;
   axe.bridge = pushPreThing(CastleBridge, xloc, 24, 13).object;
   axe.chain = pushPreThing(CastleChain, xloc + 96.5, 32).object;
-  axe.bowser = pushPreThing(Bowser, xloc + 69, 42).object;
+  axe.bowser = pushPreThing(Bowser, xloc + 69, 42, hard).object;
   pushPreThing(ScrollBlocker, xloc + 112, ceilmax); // 104 + 16
   
   pushPreThing(Stone, xloc, 88, 32);
@@ -1236,7 +1236,7 @@ function World11(map) {
       pushPreThing(Stone, 1488, 48, 1, 6);
       pushPreThing(Stone, 1496, 56, 1, 7);
       pushPreThing(Stone, 1504, 64, 2, 8);
-      endCastleOutside(1580);
+      endCastleOutside(1580, 0, 1);
       
     }),
     new Area("Underworld", function() {
@@ -3610,7 +3610,7 @@ function World64(map) {
       pushPreThing(Stone, 984, 24, 5, 3);
       pushPreThing(Stone, 984, 80, 5, 2);
       
-      endCastleInside(1024);
+      endCastleInside(1024, 0, 1);
     })
   ];
 }
@@ -4035,7 +4035,7 @@ function World74(map) {
           pushPreFloor(xloc + 176, 24, 2);
           pushPreFloor(xloc + 192, 0, 2);
           pushPreFloor(xloc + 208, 24, 6);
-          endCastleInside(xloc + 256);
+          endCastleInside(xloc + 256, 0, 1);
         }
       }
     })
@@ -4519,7 +4519,7 @@ function World84(map) {
       pushPreThing(Podoboo, 160, -32);
       pushPreFloor(184, 24, 6);
       pushPreThing(Stone, 184, 80, 6, 2);
-      endCastleInside(232, 0)
+      endCastleInside(232, 1, 1);
     }),
   ];
 }

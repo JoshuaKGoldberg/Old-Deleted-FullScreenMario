@@ -2318,6 +2318,8 @@ function CastleAxeKillsBridge(bridge, axe) {
 // Step 3 of getting to that jerkface Toad
 function CastleAxeKillsBowser(bowser) {
   bowser.nofall = false;
+  // this is a total hack to avoid being hit by hammers after Bowser dies in 6-4, 7-4, 8-4
+  ++player.star;
   TimeHandler.addEvent(CastleAxeContinues, 35, player);
 }
 // Step 4 of getting to that jerkface Toad

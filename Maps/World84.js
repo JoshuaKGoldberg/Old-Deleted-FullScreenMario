@@ -142,6 +142,6 @@ map.areas = [
     pushPreThing(Podoboo, 160, -32);
     pushPreFloor(184, 24, 6);
     pushPreThing(Stone, 184, 80, 6, 2);
-    endCastleInside(232, 0)
+    endCastleInside(232, 1, 1);
   }),
 ];
