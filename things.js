@@ -754,7 +754,7 @@ function moveHammerBro(me) {
   me.nocollidesolid = me.yvel < 0 || me.falling;
 }
 function throwHammer(me, count) {
-  if(!characterIsAlive(me) || me.nothrow || me.right < -unitsizet32) return;
+  if(!characterIsAlive(me) || me.right < -unitsizet32) return;
   if(count != 3) {
     switchClass(me, "thrown", "throwing");
   }
@@ -896,7 +896,7 @@ function bowserFires(me) {
     AudioPlayer.play("Bowser Fires");
   }, 14, me);
 }
-// This is for when Fiery Player kills bowser - the normal one is CastleAxeKillsBowser
+// This is for when Fiery Player kills bowser - the normal one is listed under the castle things
 function killBowser(me, big) {
   if(big) {
     me.nofall = false;
@@ -2318,7 +2318,6 @@ function CastleAxeKillsBridge(bridge, axe) {
 // Step 3 of getting to that jerkface Toad
 function CastleAxeKillsBowser(bowser) {
   bowser.nofall = false;
-  bowser.nothrow = true;
   TimeHandler.addEvent(CastleAxeContinues, 35, player);
 }
 // Step 4 of getting to that jerkface Toad
