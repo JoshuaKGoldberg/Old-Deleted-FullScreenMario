@@ -12,29 +12,34 @@ function TonedJS(give_window) {
       recipient = recipient || {};
       for(var i in donor)
         recipient[i] = donor[i];
-      return recipient
+      return recipient;
     },
     // Like giveSup/erior, but it doesn't override pre-existing members
     giveSub: function(donor, recipient) {
       recipient = recipient || {};
       for(var i in donor)
-        if(!recipient[i])
+        if(!recipient.hasOwnProperty(i))
           recipient[i] = donor[i];
-      return recipient
+      return recipient;
     },
     
-    // Proliferates all members of settings to the element recursively
-    proliferate: function(elem, settings, no_override) {
+    // Proliferates all members of the donor to the recipient recursively
+    // This is more intelligent than giveSup & giveSub
+    proliferate: function(recipient, donor, no_override) {
       var setting, i;
-      for(i in settings) {
-        if(no_override && elem[i]) continue;
-        if(typeof(setting = settings[i]) == "object") {
-          if(!elem[i]) elem[i] = {};
-          proliferate(elem[i], setting, no_override);
+      // For each attribute of the donor
+      for(i in donor) {
+        // If no_override is specified, don't override if it already exists
+        if(no_override && recipient.hasOwnProperty(i)) continue;
+        // If it's an object, recurse on a new version of it
+        if(typeof(setting = donor[i]) == "object") {
+          if(!recipient.hasOwnProperty(i)) recipient[i] = new setting.constructor();
+          proliferate(recipient[i], setting, no_override);
         }
-        else elem[i] = setting;
+        // Regular primitives are easy to copy otherwise
+        else recipient[i] = setting;
       }
-      return elem;
+      return recipient;
     },
     
     // Blindly grabs the first key or value of the object, depending on grabkey
