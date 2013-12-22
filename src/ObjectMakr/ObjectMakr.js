@@ -61,7 +61,7 @@ function ObjectMakr(settings) {
   /* Proliferate helper
    * Proliferates all members of the donar to the recipient recursively
   */
-  function(recipient, donor, no_override) {
+  function proliferate(recipient, donor, no_override) {
     var setting, i;
     // For each attribute of the donor
     for(i in donor) {
