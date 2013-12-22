@@ -72,7 +72,7 @@ function AudioPlayr(settings) {
     // Reset the sound to the start, at the correct volume
     sound.name_raw = name_raw; // just to be sure
     soundStop(sound);
-    sound.volume /*= !muted; /**/ = 0; /**/
+    sound.volume = !muted;
     
     // This plays the sound.
     sound.play();
