@@ -224,7 +224,11 @@ function FireBall(me, moveleft) {
   TimeHandler.addSpriteCycle(me, ["one", "two", "three", "four"], 4);
 }
 function fireEnemy(enemy, me) {
-  if(!me.alive || me.emerging || enemy.nofire || enemy.height <= unitsize) return;
+  if(!me.alive || me.emerging || enemy.height <= unitsize) return;
+  if(enemy.nofire) {
+    if(enemy.nofire > 1) return me.death(me);
+    return;
+  }
 
   if(enemy.solid) {
     AudioPlayer.playLocal("Bump", me.right);
@@ -1182,7 +1186,8 @@ function Beetle(me) {
   me.width = me.height = 8;
   me.group = "enemy";
   me.speed = me.xvel = unitsize * .21;
-  me.moveleft = me.nofire = true;
+  me.nofire = 2;
+  me.moveleft = true;
   me.smart = false;
   me.collide = collideEnemy;
   me.movement = moveSmart;
