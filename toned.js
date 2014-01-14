@@ -32,7 +32,7 @@ function TonedJS(give_window) {
         // If no_override is specified, don't override if it already exists
         if(no_override && recipient.hasOwnProperty(i)) continue;
         // If it's an object, recurse on a new version of it
-        if(typeof(setting = donor[i]) == "object") {
+        if(typeof(setting = donor[i]) == "object" && setting != null) {
           if(!recipient.hasOwnProperty(i)) recipient[i] = setting instanceof Array ? [] : {};
           proliferate(recipient[i], setting, no_override);
         }
