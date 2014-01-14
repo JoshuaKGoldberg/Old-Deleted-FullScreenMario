@@ -33,7 +33,7 @@ function TonedJS(give_window) {
         if(no_override && recipient.hasOwnProperty(i)) continue;
         // If it's an object, recurse on a new version of it
         if(typeof(setting = donor[i]) == "object") {
-          if(!recipient.hasOwnProperty(i)) recipient[i] = new setting.constructor();
+          if(!recipient.hasOwnProperty(i)) recipient[i] = setting instanceof Array ? [] : {};
           proliferate(recipient[i], setting, no_override);
         }
         // Regular primitives are easy to copy otherwise
