@@ -49,6 +49,10 @@ iframe {
 
 #out_options { margin: 7px auto; }
 
+#out_keymapping { margin: 7px auto; }
+
+#in_keymapping:hover { height: 400px;}
+
 .expander {
   margin-top: -24px;
   padding: 7px;
