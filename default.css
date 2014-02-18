@@ -53,7 +53,15 @@ iframe {
 
 #in_keymapping:hover { height: 400px;}
 
-#in_keymapping input { width: 80px; margin-right: 20px; float: right; }
+#in_keymapping input {
+  width: 80px; 
+  margin-right: 20px;
+  float: right; 
+  font-family: "Press Start";
+  text-transform: uppercase;
+}
+
+#in_keymapping input:focus { background-color:#0099ff; }
 
 .expander {
   margin-top: -24px;
