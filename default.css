@@ -53,6 +53,8 @@ iframe {
 
 #in_keymapping:hover { height: 400px;}
 
+#in_keymapping input { width: 80px; margin-right: 20px; float: right; }
+
 .expander {
   margin-top: -24px;
   padding: 7px;
