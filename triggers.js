@@ -278,7 +278,28 @@ function maxlulz() {
     }, 7, Infinity, ["Overworld", "Underworld", "Underwater", "Sky", "Castle"]);
 }
 
-
+//Function to map a new key to a new action
+function mapKeyToControl(action, keyCode) {
+  
+  //check if this mapping already exists
+  if(window.controls.pipes[action].indexOf(keyCode) != -1) {
+    return;
+  }
+  
+  //add the new key to the current mapping
+  window.controls.pipes[action].push(keyCode);
+  var newPipes = window.controls.pipes;
+  
+  //Update the controls of the game
+  window.controls = new Controls(newPipes);
+  //Update the links between events and the game
+  proliferate(body, {
+      onkeydown: ControlsPipe("keydown", true),
+      onkeyup: ControlsPipe("keyup", false),
+      oncontextmenu: contextmenu,
+      onmousedown: mousedown
+    });
+}
 
 /* Triggers (from a UI)
 */
@@ -292,7 +313,10 @@ function setMessageTriggers() {
       console.log(name, window[name]);
       if(window[name]) window[name]();
       else log("Could not toggle", name);
-    }
+    },
+	setKey: function(data) {
+	  mapKeyToControl(data.action, data.keyCode);
+	}
   };
   
   // When a message is received, send it to the appropriate command code

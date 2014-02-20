@@ -49,6 +49,22 @@ iframe {
 
 #out_options { margin: 7px auto; }
 
+#out_keymapping { margin: 7px auto; }
+
+#in_options { position:absolute; z-index:-1;}
+
+#in_keymapping:hover { height: 400px;}
+
+#in_keymapping input {
+  width: 80px; 
+  margin-right: 20px;
+  float: right; 
+  font-family: "Press Start";
+  text-transform: uppercase;
+}
+
+#in_keymapping input:focus { background-color:#0099ff; }
+
 .expander {
   margin-top: -24px;
   padding: 7px;

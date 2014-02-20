@@ -27,6 +27,9 @@ function start() {
   // Options
   setOptions();
   
+  // Key Mapping Menu
+  setKeyMappingMenu();
+  
   // Make lots of friends
   setCheats();
 }
@@ -157,6 +160,41 @@ function setOptions() {
     innerHTML += "<br />";
   }
   out.innerHTML += innerHTML + "<br />More coming soon!";
+}
+
+// Fills the keys mapping menu with div and input to change the keys
+function setKeyMappingMenu() {
+  var out = document.getElementById("in_keymapping"),
+      keys = [
+        "Up",
+        "Down",
+        "Left",
+        "Right",
+        "Sprint",
+		"Pause",
+		"Mute"
+      ],
+      innerHTML = "", key, low, i;
+	for(i in keys){
+	  key = keys[i];
+	  low = key.toLowerCase();
+      innerHTML += "<div class='maprectout'><div class='maprect big larger'>" + key + "<input onkeydown='setKey(event)' type='texte' id='" + low + "' readonly></input></div></div>";
+      innerHTML += "<br />";
+	}
+	innerHTML += "<br />";
+	out.innerHTML += innerHTML;
+      
+}
+
+function setKey(event) {
+  game.postMessage({
+    type: "setKey",
+    action: event.target.id,
+	keyCode: event.keyCode
+  }, "*");
+  
+  //show the keyCode used in the UI
+  event.target.value = event.keyCode;
 }
 
 // toggleGame('XYZ') sends a message to the game to toggle XYZ
