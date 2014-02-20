@@ -1,5 +1,32 @@
 /* library.js */
 // Loads the library of raw data, then parses it
+/*
+  Sprites in FullScreenMario are stored in this library as compressed
+  arrays of integers. Each integer represents a color in the palette,
+  defined in resetLibrary as window.palette. 0 maps [0,0,0,0] (clear), !!!!!!!
+  1 maps [255,255,255,255] (white), and so on.
+  As a shortcut, the start of each string defines a subset of colors,
+  such as p[0,1,7,14], used by the sprite. This lets the string refer
+  to those colors as [0,1,2,3] (respectively), so each one only needs
+  a single digit each (instead of two).
+  Furthermore, when a color is repeated multiple times, the sprite     !!!!!!!
+  uses the x symbol to signify a repeat: x07, repeats 0 seven times.
+  
+  This custom sprite syntax is used for the purpose of native filters
+  on colors. Many Mario sprites have multiple versions (eg. Overworld
+  vs Underworld for Goombas, Bricks, etc.). Directly manipulating the
+  color codes allows for the color mapping located in window.filters.
+  
+  In order to support advanced commands like filtering and copying, a
+  post-processor was implemented: see evaluatePost() for a listing of
+  the available commands. 
+  'same' directly copies another sprite's data.
+  'filter' directly copies another sprite's data, but filters it with
+           one of the window.filter filters.
+  'multiple' creates a SpriteMultiple, which contains multiple single
+             sprites. These are either 'vertical' or 'horizontal', so
+             their 'middle' sprite is repeated in that direction.
+*/
 
 function resetLibrary() {
   window.palette = [
