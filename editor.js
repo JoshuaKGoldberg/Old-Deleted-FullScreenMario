@@ -131,8 +131,10 @@ function setEditorLibrary() {
         },
         prefunc_custom: function(prestatement, placer, reference, args) {
           var output = "Brick, ";
-          output += prestatement.xloc + ", " + (prestatement.yloc) + ", ";
-          output += placer.contents[0].name;
+          output += prestatement.xloc + ", " + (prestatement.yloc);
+          if(placer.contents) {
+            output += ", " + placer.contents[0].name;
+          }
           return output;
         }
       },
