@@ -15,7 +15,7 @@ function resetTriggers() {
     q:      [81],                                                        // q
     l:      [76],                                                        // l
   });
-  
+
   // Gamepad.js support for joysticks and controllers
   window.gamepad = new Gamepad();
   gamepad.bind(Gamepad.Event.BUTTON_DOWN, ControlsPipe("keydown", true));
@@ -23,10 +23,10 @@ function resetTriggers() {
   gamepad.bind(Gamepad.Event.AXIS_CHANGED, function(event) {
     var value = event.value,
         value_abs = abs(value);
-    
+
     // Don't allow tremors
     if(value_abs < 0.1) return;
-    
+
     // Depending on the axis used...
     switch(event.axis) {
       // Left stick, vertical
@@ -67,7 +67,7 @@ function resetTriggers() {
       oncontextmenu: contextmenu,
       onmousedown: mousedown
     });
-  
+
   // Set UI triggers
   setMessageTriggers();
 }
@@ -280,16 +280,16 @@ function maxlulz() {
 
 //Function to map a new key to a new action
 function mapKeyToControl(action, keyCode) {
-  
+
   //check if this mapping already exists
   if(window.controls.pipes[action].indexOf(keyCode) != -1) {
     return;
   }
-  
+
   //add the new key to the current mapping
   window.controls.pipes[action].push(keyCode);
   var newPipes = window.controls.pipes;
-  
+
   //Update the controls of the game
   window.controls = new Controls(newPipes);
   //Update the links between events and the game
@@ -308,7 +308,7 @@ function setMessageTriggers() {
   var command_codes = {
     setMap: triggerSetMap,
     startEditor: function() { loadEditor(); },
-    toggleOption: function(data) { 
+    toggleOption: function(data) {
       var name = "toggle" + data.option;
       console.log(name, window[name]);
       if(window[name]) window[name]();
@@ -318,7 +318,7 @@ function setMessageTriggers() {
 	  mapKeyToControl(data.action, data.keyCode);
 	}
   };
-  
+
   // When a message is received, send it to the appropriate command code
   window.addEventListener("message", function(event) {
     var data = event.data,
